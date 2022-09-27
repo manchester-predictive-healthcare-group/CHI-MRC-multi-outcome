@@ -1,0 +1,28 @@
+---
+title: "p0_sim_calc_min_sample_size"
+author: "Alex Pate"
+date: "09/06/2022"
+output: word_document
+---
+
+```{r, echo=FALSE}
+### This code is for the large sample validation, so the models are developed and calibrated on the same dataset
+
+### Set working directory
+rm(list=ls())
+setwd("/mnt/bmh01-rds/mrc-multi-outcome/Project_1.4/")
+
+load("data/sim_calc_min_sample_size.RData")
+
+print("SAMP SIZE SCENARIO A")
+samp.size.s1
+print("SAMP SIZE SCENARIO B")
+samp.size.s2
+print("SAMP SIZE SCENARIO C")
+samp.size.s3
+print("SAMP SIZE SCENARIO D")
+samp.size.s4
+
+```
+
+

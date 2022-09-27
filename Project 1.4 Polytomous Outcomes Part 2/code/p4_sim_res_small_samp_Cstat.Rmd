@@ -1,0 +1,157 @@
+---
+title: "sim_res_large_samp_Cstat"
+author: "Alex Pate"
+date: "24/05/2022"
+output: word_document
+---
+
+```{r, echo=FALSE}
+### Set working directory
+rm(list=ls())
+setwd("/mnt/bmh01-rds/mrc-multi-outcome/Project_1.4/")
+
+### Load packages
+source("code/sim_load_packages.R")
+
+### Load functions
+source("code/sim_functions.R")
+source("code/sim_functions_results.R")
+
+### Load generic input parameters
+source("code/sim_load_generic_input_parameters.R")
+
+
+## N values for table
+N.vec <- c(100, 250, 500)
+## K values for table
+K.vec <- c(3, 5)
+## Scenarios to produce table for 
+scenario.vec <- c(1, 2, 3, 4)
+## DGM's for plot
+DGM.vec <- c("mult", "seqlog")
+## Analysis methods
+anal.vec <- c("binary", "multinomial")
+## Set seed for coefficients (keep at 1 for now)
+seed.coef.vec <- c(1, 2, 3)
+
+
+### Going to create seperate objects for each analysis method, then will combine into table at the end
+### Create output object that will store all the means of discrimination
+
+## For binary logistic regression analysis method
+Cstat.binary <- vector("list", length(seed.coef.vec))
+names(Cstat.binary) <- paste("seed = ", seed.coef.vec, sep = "")
+
+for (h in 1:length(Cstat.binary)){
+  Cstat.binary[[h]] <- vector("list", length(DGM.vec))
+  names(Cstat.binary[[h]]) <- DGM.vec
+  for (i in 1:length(Cstat.binary[[h]])){
+    Cstat.binary[[h]][[i]] <- vector("list", length(K.vec))
+    names(Cstat.binary[[h]][[i]]) <- paste("K = ", K.vec, sep = "")
+    for (j in 1:length(Cstat.binary[[h]][[i]])){
+      Cstat.binary[[h]][[i]][[j]] <- vector("list", length(N.vec))
+      names(Cstat.binary[[h]][[i]][[j]]) <- paste("N = ", N.vec, sep = "")
+      for (k in 1:length(Cstat.binary[[h]][[i]][[j]])){
+        Cstat.binary[[h]][[i]][[j]][[k]] <- rep(NA, length(scenario.vec))
+        names(Cstat.binary[[h]][[i]][[j]][[k]]) <- scenario.vec
+      }
+    }
+  }
+}
+
+## For multinomial logistic regression analysis method
+Cstat.multinomial <- vector("list", length(seed.coef.vec))
+names(Cstat.multinomial) <- paste("seed = ", seed.coef.vec, sep = "")
+
+for (h in 1:length(Cstat.multinomial)){
+  Cstat.multinomial[[h]] <- vector("list", length(DGM.vec))
+  names(Cstat.multinomial[[h]]) <- DGM.vec
+  for (i in 1:length(Cstat.multinomial[[h]])){
+    Cstat.multinomial[[h]][[i]] <- vector("list", length(K.vec))
+    names(Cstat.multinomial[[h]][[i]]) <- paste("K = ", K.vec, sep = "")
+    for (j in 1:length(Cstat.multinomial[[h]][[i]])){
+      Cstat.multinomial[[h]][[i]][[j]] <- vector("list", length(N.vec))
+      names(Cstat.multinomial[[h]][[i]][[j]]) <- paste("N = ", N.vec, sep = "")
+      for (k in 1:length(Cstat.multinomial[[h]][[i]][[j]])){
+        Cstat.multinomial[[h]][[i]][[j]][[k]] <- rep(NA, length(scenario.vec))
+        names(Cstat.multinomial[[h]][[i]][[j]][[k]]) <- scenario.vec
+      }
+    }
+  }
+}
+
+
+
+### Run through vectors, load simulation output, take mean of discrimination and sd of discrimination
+for (z in 1:length(seed.coef.vec)){
+  for (zz in 1:length(DGM.vec)){
+    for (zzz in 1:length(K.vec)){
+      for (zzzz in 1:length(N.vec)){
+        for (zzzzz in 1:length(scenario.vec)){
+          
+          ## Assign parameters
+          seed.coef.sim <- seed.coef.vec[z]
+          DGM.sim <- DGM.vec[zz]
+          K.sim <- K.vec[zzz]
+          N.devel.sim <- N.vec[zzzz]
+          scenario.sim <- scenario.vec[zzzzz]
+          
+          ### Load .RData file for DGM mult
+          load(paste("data/results_small_samp_DGM", DGM.sim, "_scen" , scenario.sim, ".", seed.coef.sim, "_K", 
+                     K.sim, "_P", P.sim, "_N", N.devel.sim, ".RData", sep =""))
+          
+          ## Calculate mean and sd for each method
+          Cstat.binary[[z]][[zz]][[zzz]][[zzzz]][zzzzz] <- mean(comb.sim.out.Cstat.binary)
+          Cstat.multinomial[[z]][[zz]][[zzz]][[zzzz]][zzzzz] <- mean(comb.sim.out.Cstat.multinomial)
+        }
+      }
+    }
+  }
+}
+
+
+### Write function to create output table from the Cstatistics objcet
+create.Cstat.table <- function(Cstat.in.binary, Cstat.in.multinomial, seed.coef, dp){
+  return(rbind(c(paste(round(Cstat.in.multinomial[[seed.coef]][["mult"]][["K = 3"]][["N = 100"]], dp), "/", 
+                       round(Cstat.in.binary[[seed.coef]][["mult"]][["K = 3"]][["N = 100"]], dp), sep = ""),
+                 paste(round(Cstat.in.multinomial[[seed.coef]][["seqlog"]][["K = 3"]][["N = 100"]], dp), "/", 
+                       round(Cstat.in.binary[[seed.coef]][["seqlog"]][["K = 3"]][["N = 100"]], dp), sep = "")),
+               c(paste(round(Cstat.in.multinomial[[seed.coef]][["mult"]][["K = 3"]][["N = 250"]], dp), "/", 
+                       round(Cstat.in.binary[[seed.coef]][["mult"]][["K = 3"]][["N = 250"]], dp), sep = ""),
+                 paste(round(Cstat.in.multinomial[[seed.coef]][["seqlog"]][["K = 3"]][["N = 250"]], dp), "/", 
+                       round(Cstat.in.binary[[seed.coef]][["seqlog"]][["K = 3"]][["N = 250"]], dp), sep = "")),
+               c(paste(round(Cstat.in.multinomial[[seed.coef]][["mult"]][["K = 3"]][["N = 500"]], dp), "/", 
+                       round(Cstat.in.binary[[seed.coef]][["mult"]][["K = 3"]][["N = 500"]], dp), sep = ""),
+                 paste(round(Cstat.in.multinomial[[seed.coef]][["seqlog"]][["K = 3"]][["N = 500"]], dp), "/", 
+                       round(Cstat.in.binary[[seed.coef]][["seqlog"]][["K = 3"]][["N = 500"]], dp), sep = "")),
+               c(paste(round(Cstat.in.multinomial[[seed.coef]][["mult"]][["K = 5"]][["N = 100"]], dp), "/", 
+                       round(Cstat.in.binary[[seed.coef]][["mult"]][["K = 5"]][["N = 100"]], dp), sep = ""),
+                 paste(round(Cstat.in.multinomial[[seed.coef]][["seqlog"]][["K = 5"]][["N = 100"]], dp), "/", 
+                       round(Cstat.in.binary[[seed.coef]][["seqlog"]][["K = 5"]][["N = 100"]], dp), sep = "")),
+               c(paste(round(Cstat.in.multinomial[[seed.coef]][["mult"]][["K = 5"]][["N = 250"]], dp), "/", 
+                       round(Cstat.in.binary[[seed.coef]][["mult"]][["K = 5"]][["N = 250"]], dp), sep = ""),
+                 paste(round(Cstat.in.multinomial[[seed.coef]][["seqlog"]][["K = 5"]][["N = 250"]], dp), "/", 
+                       round(Cstat.in.binary[[seed.coef]][["seqlog"]][["K = 5"]][["N = 250"]], dp), sep = "")),
+               c(paste(round(Cstat.in.multinomial[[seed.coef]][["mult"]][["K = 5"]][["N = 500"]], dp), "/", 
+                       round(Cstat.in.binary[[seed.coef]][["mult"]][["K = 5"]][["N = 500"]], dp), sep = ""),
+                 paste(round(Cstat.in.multinomial[[seed.coef]][["seqlog"]][["K = 5"]][["N = 500"]], dp), "/", 
+                       round(Cstat.in.binary[[seed.coef]][["seqlog"]][["K = 5"]][["N = 500"]], dp), sep = ""))
+               
+               
+  ))
+}
+
+Cstat.table.seed1 <- create.Cstat.table(Cstat.binary, Cstat.multinomial, seed.coef = 1, dp = 2)
+Cstat.table.seed2 <- create.Cstat.table(Cstat.binary, Cstat.multinomial, seed.coef = 2, dp = 2)
+Cstat.table.seed3 <- create.Cstat.table(Cstat.binary, Cstat.multinomial, seed.coef = 3, dp = 2)
+
+print("TABLE SEED 1")
+kable(Cstat.table.seed1)
+print("TABLE SEED 2")
+kable(Cstat.table.seed2)
+print("TABLE SEED 3")
+kable(Cstat.table.seed3)
+      
+
+
+```

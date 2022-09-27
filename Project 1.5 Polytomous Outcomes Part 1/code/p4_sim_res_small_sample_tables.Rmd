@@ -1,0 +1,124 @@
+---
+title: "TEMP_run_sim_large_sample_s1"
+author: "Alex Pate"
+date: "16/05/2022"
+output: word_document
+classoptions: orientation=landscape
+---
+
+```{r, echo=FALSE}
+### This code is for the large sample validation, so the models are developed and calibrated on the same dataset
+
+### Set working directory
+rm(list=ls())
+setwd("/mnt/bmh01-rds/mrc-multi-outcome/Project_1.5/")
+
+### Load packages
+source("code/sim_load_packages.R")
+
+### Load functions
+source("code/sim_functions.R")
+source("code/sim_functions_results.R")
+
+### Load generic input parameters
+source("code/sim_load_generic_input_parameters.R")
+
+### Define K.sim
+K.sim <- 3
+
+### Create list to store output in
+seed.coef.vec <- c(1, 2, 3)
+scenario.vec <- c(1, 2, 3, 4)
+N.vec <- c(250, 500, 1000)
+tab.list <- vector("list", length(seed.coef.vec))
+for (i in 1:length(seed.coef.vec)){
+  tab.list[[i]] <-vector("list", length(N.vec))
+}
+
+### Define base scenario number
+for (a in 1:length(seed.coef.vec)){
+  for (aa in 1:length(N.vec)){
+
+    ## Assign seed.coef.sim and scenario.sim
+    seed.coef.sim <- seed.coef.vec[a]
+    N.devel.sim <- N.vec[aa]
+    print(paste("seed = ", seed.coef.sim, ", N.devel.sim = ", N.devel.sim, sep = ""))
+    
+    ## Create temporary list to store tables for each sample size
+    tab <- vector("list", length(scenario.vec))
+    for (aaa in 1:length(scenario.vec)){
+      
+      ## Define N
+      scenario.sim <- scenario.vec[aaa]
+      
+      ## Load data
+      load(paste("data/sim_res_small_sample_s", scenario.sim, ".", seed.coef.sim, "_K", K.sim, "_N", N.devel.sim, ".RData", sep = ""))
+      
+      ## Create table and assign to list
+      tab[[aaa]] <- create.table.small.sample.wrapper(sim.out.list.comb, 2)
+      tab[[aaa]] <- data.frame(
+        cbind(c("NA", rep(c("A", "B", "C", "D")[as.numeric(scenario.sim)], nrow(tab[[aaa]]$DGM.multinomial)), 
+                "NA", rep(c("A", "B", "C", "D")[as.numeric(scenario.sim)], nrow(tab[[aaa]]$DGM.multinomial))), 
+              c("NA", rownames(tab[[aaa]]$DGM.multinomial), "NA", rownames(tab[[aaa]]$DGM.seqlog)), 
+              rbind(rep("DGM multinomial", ncol(tab[[aaa]]$DGM.multinomial)), tab[[aaa]]$DGM.multinomial,
+                  rep("DGM c-ratio", ncol(tab[[aaa]]$DGM.seqlog)), tab[[aaa]]$DGM.seqlog)
+            )
+        )
+      
+      rownames(tab[[aaa]]) <- NULL
+      
+    }
+    
+    ## Rbind into a single table
+    tab.list[[a]][[aa]] <- do.call("rbind", tab)
+    
+  }
+}
+
+
+print("SEED.COEF = 1, N.devel.sim = 250")
+kable(tab.list[[1]][[1]])
+print("SEED.COEF = 1, N.devel.sim = 500")
+kable(tab.list[[1]][[2]])
+
+
+print("SEED.COEF = 2, N.devel.sim = 250")
+kable(tab.list[[2]][[1]])
+print("SEED.COEF = 2, N.devel.sim = 500")
+kable(tab.list[[2]][[2]])
+
+
+print("SEED.COEF = 3, N.devel.sim = 250")
+kable(tab.list[[3]][[1]])
+print("SEED.COEF = 3, N.devel.sim = 500")
+kable(tab.list[[3]][[2]])
+
+
+
+
+
+
+
+
+
+### Now print tables for other randomly simulated coefficients
+
+# print("OTHER SEED.COEF.SIM")
+# for (seed.coef.sim in c(2,3,4,5)){
+#   for (K.sim in c(3,5)){
+#     for (scenario.sim in c(1,2,3,4)){
+#     ## Load data
+#     load(paste("data/sim_res_small_sample_s", scenario.sim, ".", seed.coef.sim, "_K", K.sim, ".RData", sep = ""))
+#     
+#     ## Create table
+#     tab <- create.table.small.sample.wrapper(sim.out.list.comb, 2)
+#     
+#     ## Print table
+#     print(paste("K.sim = ", K.sim, " scenario = ", scenario.sim, " seed.coef.sim = ", seed.coef.sim, sep = ""))
+#         kable(rbind(rep("DGM MULT", ncol(tab[[1]])), tab[[1]],
+#             rep("DGM SEQLOG", ncol(tab[[2]])), tab[[2]])))
+#     }
+#   }
+# }
+
+```

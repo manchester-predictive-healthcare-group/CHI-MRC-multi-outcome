@@ -1,0 +1,121 @@
+---
+title: "sim_res_large_samp_Cstat"
+author: "Alex Pate"
+date: "24/05/2022"
+output: word_document
+---
+
+```{r, echo=FALSE}
+### Set working directory
+rm(list=ls())
+setwd("/mnt/bmh01-rds/mrc-multi-outcome/Project_1.4/")
+
+### Load packages
+source("code/sim_load_packages.R")
+
+### Load functions
+source("code/sim_functions.R")
+source("code/sim_functions_results.R")
+
+### Load generic input parameters
+source("code/sim_load_generic_input_parameters.R")
+
+### Size of development datasets
+N.devel.sim <- 500000
+
+
+## N values for table
+K.vec <- c(3, 5)
+## Scenarios to produce table for 
+scenario.vec <- c(1, 2, 3, 4)
+## DGM's for plot
+DGM.vec <- c("mult", "seqlog")
+## Analysis methods
+anal.vec <- c("binary", "multinomial", "rcs4", "rcs5")
+
+## Set seed for coefficients (keep at 1 for now)
+seed.coef.vec <- c(1, 2, 3)
+
+### Create output object that will store all the means and sd's of discrimination
+## Mean
+Cstat <- vector("list", length(seed.coef.vec))
+names(Cstat) <- paste("seed = ", seed.coef.vec, sep = "")
+
+for (h in 1:length(Cstat)){
+  Cstat[[h]] <- vector("list", length(DGM.vec))
+  names(Cstat[[h]]) <- DGM.vec
+  for (i in 1:length(Cstat[[h]])){
+    Cstat[[h]][[i]] <- vector("list", length(K.vec))
+    names(Cstat[[h]][[i]]) <- paste("K = ", K.vec, sep = "")
+    for (j in 1:length(Cstat[[h]][[i]])){
+      Cstat[[h]][[i]][[j]] <- vector("list", length(scenario.vec))
+      names(Cstat[[h]][[i]][[j]]) <- scenario.vec
+      for (k in 1:length(Cstat[[h]][[i]][[j]])){
+        Cstat[[h]][[i]][[j]][[k]] <- rep(NA, length(anal.vec))
+        names(Cstat[[h]][[i]][[j]][[k]]) <- anal.vec
+      }
+    }
+  }
+}
+
+
+### Run through vectors, load simulation output, take mean of discrimination and sd of discrimination
+for (z in 1:length(seed.coef.vec)){
+  for (zz in 1:length(DGM.vec)){
+    for (zzz in 1:length(K.vec)){
+      for (zzzz in 1:length(scenario.vec)){
+        
+        ## Assign parameters
+        seed.coef.sim <- seed.coef.vec[z]
+        DGM.sim <- DGM.vec[zz]
+        K.sim <- K.vec[zzz]
+        scenario.sim <- scenario.vec[zzzz]
+        
+        ### Load .RData file for DGM mult
+        load(paste("data/s", scenario.sim, "/sim_run_large_sample_DGM", DGM.sim, "_scen" , scenario.sim, ".", seed.coef.sim, "_K", 
+                   K.sim, "_P", P.sim, "_N", N.devel.sim, ".RData", sep =""))
+        
+        ## Calculate mean and sd for each method
+        Cstat[[z]][[zz]][[zzz]][[zzzz]][1] <- sim.out.binary[[3]]
+        Cstat[[z]][[zz]][[zzz]][[zzzz]][2] <- sim.out.multinomial[[3]]
+        if (DGM.sim == "mult"){
+          Cstat[[z]][[zz]][[zzz]][[zzzz]][3] <- sim.out.binary.rcs3[[3]]
+          Cstat[[z]][[zz]][[zzz]][[zzzz]][4] <- sim.out.binary.rcs5[[3]]
+        } else if (DGM.sim == "seqlog"){
+          Cstat[[z]][[zz]][[zzz]][[zzzz]][3] <- sim.out.multinomial.rcs3[[3]]
+          Cstat[[z]][[zz]][[zzz]][[zzzz]][4] <- sim.out.multinomial.rcs5[[3]]
+        }
+      }
+    }
+  }
+}
+
+### Write function to create output table from the Cstatistics objcet
+create.discrim.table <- function(Cstat.in, seed.coef, dp){
+  return(rbind(c(round(Cstat.in[[seed.coef]][["mult"]][["K = 3"]][[1]], dp), round(Cstat.in[[seed.coef]][["seqlog"]][["K = 3"]][[1]], dp)),
+               c(round(Cstat.in[[seed.coef]][["mult"]][["K = 3"]][[2]], dp), round(Cstat.in[[seed.coef]][["seqlog"]][["K = 3"]][[2]], dp)),
+               c(round(Cstat.in[[seed.coef]][["mult"]][["K = 3"]][[3]], dp), round(Cstat.in[[seed.coef]][["seqlog"]][["K = 3"]][[3]], dp)),
+               c(round(Cstat.in[[seed.coef]][["mult"]][["K = 3"]][[4]], dp), round(Cstat.in[[seed.coef]][["seqlog"]][["K = 3"]][[4]], dp)),
+               c(round(Cstat.in[[seed.coef]][["mult"]][["K = 5"]][[1]], dp), round(Cstat.in[[seed.coef]][["seqlog"]][["K = 5"]][[1]], dp)),
+               c(round(Cstat.in[[seed.coef]][["mult"]][["K = 5"]][[2]], dp), round(Cstat.in[[seed.coef]][["seqlog"]][["K = 5"]][[2]], dp)),
+               c(round(Cstat.in[[seed.coef]][["mult"]][["K = 5"]][[3]], dp), round(Cstat.in[[seed.coef]][["seqlog"]][["K = 5"]][[3]], dp)),
+               c(round(Cstat.in[[seed.coef]][["mult"]][["K = 5"]][[4]], dp), round(Cstat.in[[seed.coef]][["seqlog"]][["K = 5"]][[4]], dp))
+  ))
+}
+
+### Create tables and print them
+table.seed1 <- create.discrim.table(Cstat, seed.coef = 1, dp = 2)
+table.seed2 <- create.discrim.table(Cstat, seed.coef = 2, dp = 2)
+table.seed3 <- create.discrim.table(Cstat, seed.coef = 3, dp = 2)
+
+print("TABLE SEED 1")
+kable(table.seed1)
+
+print("TABLE SEED 2")
+kable(table.seed2)
+
+print("TABLE SEED 3")
+kable(table.seed3)
+      
+
+```

@@ -1,0 +1,74 @@
+Loading required package: survival
+Loading required package: stats4
+Loading required package: splines
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Loading required package: lattice
+Loading required package: Formula
+Loading required package: ggplot2
+
+Attaching package: ‘Hmisc’
+
+The following objects are masked from ‘package:dplyr’:
+
+    src, summarize
+
+The following objects are masked from ‘package:base’:
+
+    format.pval, units
+
+Loading required package: SparseM
+
+Attaching package: ‘SparseM’
+
+The following object is masked from ‘package:base’:
+
+    backsolve
+
+
+Attaching package: ‘rms’
+
+The following objects are masked from ‘package:VGAM’:
+
+    calibrate, lrtest
+
+
+Attaching package: ‘DescTools’
+
+The following objects are masked from ‘package:Hmisc’:
+
+    Label, Mean, %nin%, Quantile
+
+The following object is masked from ‘package:VGAM’:
+
+    Rank
+
+
+Attaching package: ‘kernlab’
+
+The following object is masked from ‘package:ggplot2’:
+
+    alpha
+
+The following object is masked from ‘package:VGAM’:
+
+    nvar
+
+[1] "K.sim = 5 scenario = 1 seed.coef.sim = 1"
+[1] "plot mlr  1"
+[1] "plot mlr  2"
+[1] "plot po  1"
+[1] "plot po  2"
+Saving 7 x 7 in image
+Saving 7 x 7 in image
+Saving 7 x 7 in image
+Saving 7 x 7 in image
