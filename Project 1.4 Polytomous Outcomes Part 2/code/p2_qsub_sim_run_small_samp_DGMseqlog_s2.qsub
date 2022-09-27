@@ -1,0 +1,42 @@
+#!/bin/bash --login
+#$ -S bin/bash
+#$ -cwd
+#$ -V
+
+module load compilers/intel/18.0.3
+module load libs/intel-18.0/gsl/2.5
+module load apps/gcc/R/4.0.2
+
+#$ -t 1-20
+
+Rscript sim_run_small_samp_DGMseqlog_s2_K5_csf.R $SGE_TASK_ID 1 1000 > sim_run_small_samp_DGMseqlog_K5_s2.1_1000.$SGE_TASK_ID.out
+Rscript sim_run_small_samp_DGMseqlog_s2_K5_csf.R $SGE_TASK_ID 2 1000 > sim_run_small_samp_DGMseqlog_K5_s2.2_1000.$SGE_TASK_ID.out
+Rscript sim_run_small_samp_DGMseqlog_s2_K5_csf.R $SGE_TASK_ID 3 1000 > sim_run_small_samp_DGMseqlog_K5_s2.3_1000.$SGE_TASK_ID.out
+
+Rscript sim_run_small_samp_DGMseqlog_s2_K3_csf.R $SGE_TASK_ID 1 1000 > sim_run_small_samp_DGMseqlog_K3_s2.1_1000.$SGE_TASK_ID.out
+Rscript sim_run_small_samp_DGMseqlog_s2_K3_csf.R $SGE_TASK_ID 2 1000 > sim_run_small_samp_DGMseqlog_K3_s2.2_1000.$SGE_TASK_ID.out
+Rscript sim_run_small_samp_DGMseqlog_s2_K3_csf.R $SGE_TASK_ID 3 1000 > sim_run_small_samp_DGMseqlog_K3_s2.3_1000.$SGE_TASK_ID.out
+
+Rscript sim_run_small_samp_DGMseqlog_s2_K5_csf.R $SGE_TASK_ID 1 500 > sim_run_small_samp_DGMseqlog_K5_s2.1_500.$SGE_TASK_ID.out
+Rscript sim_run_small_samp_DGMseqlog_s2_K5_csf.R $SGE_TASK_ID 2 500 > sim_run_small_samp_DGMseqlog_K5_s2.2_500.$SGE_TASK_ID.out
+Rscript sim_run_small_samp_DGMseqlog_s2_K5_csf.R $SGE_TASK_ID 3 500 > sim_run_small_samp_DGMseqlog_K5_s2.3_500.$SGE_TASK_ID.out
+
+Rscript sim_run_small_samp_DGMseqlog_s2_K3_csf.R $SGE_TASK_ID 1 500 > sim_run_small_samp_DGMseqlog_K3_s2.1_500.$SGE_TASK_ID.out
+Rscript sim_run_small_samp_DGMseqlog_s2_K3_csf.R $SGE_TASK_ID 2 500 > sim_run_small_samp_DGMseqlog_K3_s2.2_500.$SGE_TASK_ID.out
+Rscript sim_run_small_samp_DGMseqlog_s2_K3_csf.R $SGE_TASK_ID 3 500 > sim_run_small_samp_DGMseqlog_K3_s2.3_500.$SGE_TASK_ID.out
+
+Rscript sim_run_small_samp_DGMseqlog_s2_K5_csf.R $SGE_TASK_ID 1 250 > sim_run_small_samp_DGMseqlog_K5_s2.1_250.$SGE_TASK_ID.out
+Rscript sim_run_small_samp_DGMseqlog_s2_K5_csf.R $SGE_TASK_ID 2 250 > sim_run_small_samp_DGMseqlog_K5_s2.2_250.$SGE_TASK_ID.out
+Rscript sim_run_small_samp_DGMseqlog_s2_K5_csf.R $SGE_TASK_ID 3 250 > sim_run_small_samp_DGMseqlog_K5_s2.3_250.$SGE_TASK_ID.out
+
+Rscript sim_run_small_samp_DGMseqlog_s2_K3_csf.R $SGE_TASK_ID 1 250 > sim_run_small_samp_DGMseqlog_K3_s2.1_250.$SGE_TASK_ID.out
+Rscript sim_run_small_samp_DGMseqlog_s2_K3_csf.R $SGE_TASK_ID 2 250 > sim_run_small_samp_DGMseqlog_K3_s2.2_250.$SGE_TASK_ID.out
+Rscript sim_run_small_samp_DGMseqlog_s2_K3_csf.R $SGE_TASK_ID 3 250 > sim_run_small_samp_DGMseqlog_K3_s2.3_250.$SGE_TASK_ID.out
+
+Rscript sim_run_small_samp_DGMseqlog_s2_K5_csf.R $SGE_TASK_ID 1 100 > sim_run_small_samp_DGMseqlog_K5_s2.1_100.$SGE_TASK_ID.out
+Rscript sim_run_small_samp_DGMseqlog_s2_K5_csf.R $SGE_TASK_ID 2 100 > sim_run_small_samp_DGMseqlog_K5_s2.2_100.$SGE_TASK_ID.out
+Rscript sim_run_small_samp_DGMseqlog_s2_K5_csf.R $SGE_TASK_ID 3 100 > sim_run_small_samp_DGMseqlog_K5_s2.3_100.$SGE_TASK_ID.out
+
+Rscript sim_run_small_samp_DGMseqlog_s2_K3_csf.R $SGE_TASK_ID 1 100 > sim_run_small_samp_DGMseqlog_K3_s2.1_100.$SGE_TASK_ID.out
+Rscript sim_run_small_samp_DGMseqlog_s2_K3_csf.R $SGE_TASK_ID 2 100 > sim_run_small_samp_DGMseqlog_K3_s2.2_100.$SGE_TASK_ID.out
+Rscript sim_run_small_samp_DGMseqlog_s2_K3_csf.R $SGE_TASK_ID 3 100 > sim_run_small_samp_DGMseqlog_K3_s2.3_100.$SGE_TASK_ID.out

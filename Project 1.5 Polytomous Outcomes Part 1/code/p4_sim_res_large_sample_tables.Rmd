@@ -1,0 +1,200 @@
+---
+title: "TEMP_run_sim_large_sample_s1"
+author: "Alex Pate"
+date: "16/05/2022"
+output: word_document
+classoptions: orientation=landscape
+---
+
+```{r, echo=FALSE}
+### This code is for the large sample validation, so the models are developed and calibrated on the same dataset
+
+### Set working directory
+rm(list=ls())
+setwd("/mnt/bmh01-rds/mrc-multi-outcome/Project_1.5/")
+
+### Load packages
+source("code/sim_load_packages.R")
+
+### Load functions
+source("code/sim_functions.R")
+source("code/sim_functions_results.R")
+
+### Load generic input parameters
+source("code/sim_load_generic_input_parameters.R")
+
+### Set K.sim
+K.sim <- 3
+
+### Set seed.coef.sim (we will have tables for seed.coef.sim first for each scenario)
+seed.coef.sim <- 1
+
+### Create list to store output tables in
+output.tables.list <- vector("list", 4)  
+  
+  for (scenario.sim in c(1,2,3,4)){
+    
+    ## Load data
+    load(paste("data/sim_run_large_sample_s", scenario.sim, ".", seed.coef.sim, "_K", K.sim, ".RData", sep = ""))
+
+    ## Set i
+    i <- as.numeric(scenario.sim)
+    
+    ## Print table
+    output.tables.list[[i]] <- data.frame("ANAL METHOD" = rep(c("NA", "Mult", "c-ratio", "OvA-N", "OvO-PC"), 2), 
+      rbind(rep("DGM MULT", ncol(sim.res.tables[[1]])), sim.res.tables[[1]],
+            rep("DGM SEQLOG", ncol(sim.res.tables[[2]])), sim.res.tables[[2]]))
+  }
+
+print(paste("K.sim = ", K.sim, ", seed.coef.sim = ", seed.coef.sim, sep = ""))
+
+kable(output.tables.list[[1]])
+kable(output.tables.list[[2]])
+kable(output.tables.list[[3]])
+kable(output.tables.list[[4]])
+
+
+### Set seed.coef.sim (we will have tables for seed.coef.sim first for each scenario)
+seed.coef.sim <- 2
+
+### Create list to store output tables in
+output.tables.list <- vector("list", 4)  
+  
+  for (scenario.sim in c(1,2,3,4)){
+    
+    ## Load data
+    load(paste("data/sim_run_large_sample_s", scenario.sim, ".", seed.coef.sim, "_K", K.sim, ".RData", sep = ""))
+
+    ## Set i
+    i <- as.numeric(scenario.sim)
+    
+    ## Print table
+    output.tables.list[[i]] <- data.frame("ANAL METHOD" = rep(c("NA", "Mult", "c-ratio", "OvA-N", "OvO-PC"), 2), 
+      rbind(rep("DGM MULT", ncol(sim.res.tables[[1]])), sim.res.tables[[1]],
+            rep("DGM SEQLOG", ncol(sim.res.tables[[2]])), sim.res.tables[[2]]))
+  }
+
+print(paste("K.sim = ", K.sim, ", seed.coef.sim = ", seed.coef.sim, sep = ""))
+
+kable(output.tables.list[[1]])
+kable(output.tables.list[[2]])
+kable(output.tables.list[[3]])
+kable(output.tables.list[[4]])
+
+
+### Set seed.coef.sim (we will have tables for seed.coef.sim first for each scenario)
+seed.coef.sim <- 3
+
+### Create list to store output tables in
+output.tables.list <- vector("list", 4)  
+  
+  for (scenario.sim in c(1,2,3,4)){
+    
+    ## Load data
+    load(paste("data/sim_run_large_sample_s", scenario.sim, ".", seed.coef.sim, "_K", K.sim, ".RData", sep = ""))
+
+    ## Set i
+    i <- as.numeric(scenario.sim)
+    
+    ## Print table
+    output.tables.list[[i]] <- data.frame("ANAL METHOD" = rep(c("NA", "Mult", "c-ratio", "OvA-N", "OvO-PC"), 2), 
+      rbind(rep("DGM MULT", ncol(sim.res.tables[[1]])), sim.res.tables[[1]],
+            rep("DGM SEQLOG", ncol(sim.res.tables[[2]])), sim.res.tables[[2]]))
+  }
+
+print(paste("K.sim = ", K.sim, ", seed.coef.sim = ", seed.coef.sim, sep = ""))
+
+kable(output.tables.list[[1]])
+kable(output.tables.list[[2]])
+kable(output.tables.list[[3]])
+kable(output.tables.list[[4]])
+
+
+
+### Set K.sim
+K.sim <- 5
+
+### Set seed.coef.sim (we will have tables for seed.coef.sim first for each scenario)
+seed.coef.sim <- 1
+
+### Create list to store output tables in
+output.tables.list <- vector("list", 4)  
+  
+  for (scenario.sim in c(1,2,3,4)){
+    
+    ## Load data
+    load(paste("data/sim_run_large_sample_s", scenario.sim, ".", seed.coef.sim, "_K", K.sim, ".RData", sep = ""))
+
+    ## Set i
+    i <- as.numeric(scenario.sim)
+    
+    ## Print table
+    output.tables.list[[i]] <- data.frame("ANAL METHOD" = rep(c("NA", "Mult", "c-ratio", "OvA-N", "OvO-PC"), 2), 
+      rbind(rep("DGM MULT", ncol(sim.res.tables[[1]])), sim.res.tables[[1]],
+            rep("DGM SEQLOG", ncol(sim.res.tables[[2]])), sim.res.tables[[2]]))
+  }
+
+print(paste("K.sim = ", K.sim, ", seed.coef.sim = ", seed.coef.sim, sep = ""))
+
+kable(output.tables.list[[1]])
+kable(output.tables.list[[2]])
+kable(output.tables.list[[3]])
+kable(output.tables.list[[4]])
+
+
+### Set seed.coef.sim (we will have tables for seed.coef.sim first for each scenario)
+seed.coef.sim <- 2
+
+### Create list to store output tables in
+output.tables.list <- vector("list", 4)  
+  
+  for (scenario.sim in c(1,2,3,4)){
+    
+    ## Load data
+    load(paste("data/sim_run_large_sample_s", scenario.sim, ".", seed.coef.sim, "_K", K.sim, ".RData", sep = ""))
+
+    ## Set i
+    i <- as.numeric(scenario.sim)
+    
+    ## Print table
+    output.tables.list[[i]] <- data.frame("ANAL METHOD" = rep(c("NA", "Mult", "c-ratio", "OvA-N", "OvO-PC"), 2), 
+      rbind(rep("DGM MULT", ncol(sim.res.tables[[1]])), sim.res.tables[[1]],
+            rep("DGM SEQLOG", ncol(sim.res.tables[[2]])), sim.res.tables[[2]]))
+  }
+
+print(paste("K.sim = ", K.sim, ", seed.coef.sim = ", seed.coef.sim, sep = ""))
+
+kable(output.tables.list[[1]])
+kable(output.tables.list[[2]])
+kable(output.tables.list[[3]])
+kable(output.tables.list[[4]])
+
+
+### Set seed.coef.sim (we will have tables for seed.coef.sim first for each scenario)
+seed.coef.sim <- 3
+
+### Create list to store output tables in
+output.tables.list <- vector("list", 4)  
+  
+  for (scenario.sim in c(1,2,3,4)){
+    
+    ## Load data
+    load(paste("data/sim_run_large_sample_s", scenario.sim, ".", seed.coef.sim, "_K", K.sim, ".RData", sep = ""))
+
+    ## Set i
+    i <- as.numeric(scenario.sim)
+    
+    ## Print table
+    output.tables.list[[i]] <- data.frame("ANAL METHOD" = rep(c("NA", "Mult", "c-ratio", "OvA-N", "OvO-PC"), 2), 
+      rbind(rep("DGM MULT", ncol(sim.res.tables[[1]])), sim.res.tables[[1]],
+            rep("DGM SEQLOG", ncol(sim.res.tables[[2]])), sim.res.tables[[2]]))
+  }
+
+print(paste("K.sim = ", K.sim, ", seed.coef.sim = ", seed.coef.sim, sep = ""))
+
+kable(output.tables.list[[1]])
+kable(output.tables.list[[2]])
+kable(output.tables.list[[3]])
+kable(output.tables.list[[4]])
+
+```

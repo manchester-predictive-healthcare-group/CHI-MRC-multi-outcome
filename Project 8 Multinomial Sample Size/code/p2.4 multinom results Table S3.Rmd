@@ -1,0 +1,24 @@
+---
+title: "scen9to12 with likelihood split"
+author: "Alex Pate"
+date: "24/11/2020"
+output: word_document
+---
+
+```{r, echo=FALSE}
+load("R_out/multinom results Table S3.RData")
+
+library(knitr)
+print("t7")
+kable(output.scen7.med)
+print("t8")
+kable(output.scen8.med)
+print("t9")
+kable(output.scen9.med)
+print("t10")
+kable(output.scen10.med)
+print("t11")
+kable(output.scen11.med)
+print("t12")
+kable(output.scen12.med)
+```
