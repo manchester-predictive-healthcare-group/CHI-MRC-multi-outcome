@@ -26,3 +26,5 @@ p4: Program to load data for clinical example (is called upon in p5 programs)
 p5: Fit the models for the clinical example. The predicted risks for the multistate model are generated using the .qsub file.
 p6: Produce calibration plots, traceplots and tables for the clinical example.
 p9: Report event rates as requested in peer review.
+
+The expSurvModel_ files (.rds and .stan) are the specification of models to be used when fitting frailty models. Contains vectorized and non-vectorized specifications, and weibull/exponential hazards.
