@@ -1,0 +1,485 @@
+---
+title: "Appendix S2 - supplementary figures and tables"
+author: "Alex Pate"
+date: "17/01/2023"
+output: html_document
+---
+
+Associated manuscript: INSERT
+
+# Section 1. Simulation: Calibration curves of product method
+
+These are the same plot type as Figure 2 in the manuscript, plotted for every sample size
+
+```{r, echo=FALSE, results = 'asis'}
+library(knitr)
+library(ggpubr)
+
+### Create a section and counter for Figure numbers
+section <- 1
+counter <- 1
+
+cat("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+        cat("\n\n\n")
+        cat("**Figure S", section, ".", counter, ": Calibration curves of the product method across the 1000 simulation iterations, panelled by simulation scenario (n = 1000)**", sep = "")
+        cat("![](","gg_1.summary.product.1000.png",")")
+counter <- counter + 1
+
+cat("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+        cat("\n\n\n")
+        cat("**Figure S", section, ".", counter, ": Calibration curves of the product method across the 1000 simulation iterations, panelled by simulation scenario (n = 2500)**", sep = "")
+        cat("![](","gg_1.summary.product.2500.png",")")
+counter <- counter + 1
+
+cat("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+        cat("\n\n\n")
+        cat("**Figure S", section, ".", counter, ": Calibration curves of the product method across the 1000 simulation iterations, panelled by simulation scenario (n = 5000)**", sep = "")
+        cat("![](","gg_1.summary.product.5000.png",")")
+counter <- counter + 1
+```
+
+# Section 2. Simulation: Median calibration curve across the 1000 simulation iterations (average calibration) for each data generating mechanism, scenario and sample size
+
+```{r, echo=FALSE, results = 'asis'}
+### Assign section 
+section <- 2
+### Assign counter
+counter <- 1
+
+### Loop through scenarios L and H
+scen.vec1 <- c("L", "H")
+scen.vec2 <- c("L", "H")
+
+for (scen.loop1 in c(1,2)){
+    for (scen.loop2 in c(1,2)){
+      for (n.loop in c(1000, 2500, 5000)){
+        
+cat("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+        cat("\n\n\n")
+        cat("**Figure S", section, ".", counter, ": Median calibration curve across the 1000 simulation iterations (average calibration) for scenario ", 
+            scen.vec1[scen.loop1], scen.vec2[scen.loop2], ", (n = ", n.loop, ")**", sep = "")
+        cat("![](",
+            paste("gg_2.summary.horiz.s",scen.loop1, ".", scen.loop2, "_n", n.loop, "v1000.median.png", sep = ""),
+            ")")
+        counter <- counter + 1
+    }
+  }
+}
+```
+
+# Section 3. Simulation: 5 - 95 percentile range in calibration curves across the 1000 simulation iterations (calibration variation) for each data generating mechanism, scenario and sample size
+
+```{r, echo=FALSE, results = 'asis'}
+### Assign section 
+section <- 3
+### Assign counter
+counter <- 1
+
+### Loop through scenarios L and H
+scen.vec1 <- c("L", "H")
+scen.vec2 <- c("L", "H")
+
+for (scen.loop1 in c(1,2)){
+    for (scen.loop2 in c(1,2)){
+      for (n.loop in c(1000, 2500, 5000)){
+        
+cat("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+        cat("\n\n\n")
+        cat("**Figure S", section, ".", counter, ": 5 - 95 percentile range in calibration curves across the 1000 simulation iterations (calibration variation) for scenario ", 
+            scen.vec1[scen.loop1], scen.vec2[scen.loop2], ", (n = ", n.loop, ")**", sep = "")
+        cat("![](",
+            paste("gg_2.summary.horiz.s",scen.loop1, ".", scen.loop2, "_n", n.loop, "v1000.p.range.png", sep = ""),
+            ")")
+        counter <- counter + 1
+    }
+  }
+}
+```
+
+# Section 4. Simulation: Discrimination tables
+
+```{r, echo=FALSE, results = 'asis'}
+
+### Assign section 
+section <- 4
+### Assign counter
+counter <- 1
+
+### Set working directory
+setwd("..")
+
+### Write function to print using kable
+print_kable <- function(kable.table.in){
+  print(kable.print.output <<- kable.table.in)
+  cat('\n\n\n')
+  }
+  
+
+###############################################
+### Do the scenarios with correatlion first ###
+###############################################
+
+### Loop through scenarios L and H
+scen.vec1 <- c("L", "H")
+scen.vec2 <- c("L", "H")
+
+### Run a loop to calculate table for each
+for (scen.loop1 in c(1,2)){
+  for (scen.loop2 in c(1,2)){
+    for (n.loop in c(1000, 2500, 5000)){
+      ### Load dataframe
+      load(paste("data/sim_results_s", scen.loop1, ".", scen.loop2, "_n", n.loop, "v1000.RData", sep = ""))
+
+    C.Har.tab <- rbind(res.DGM.msm["C.Har.tab"]$C.Har.tab, res.DGM.clay["C.Har.tab"]$C.Har.tab, res.DGM.gumb["C.Har.tab"]$C.Har.tab, 
+                           res.DGM.frank["C.Har.tab"]$C.Har.tab, res.DGM.normal["C.Har.tab"]$C.Har.tab, res.DGM.gamma["C.Har.tab"]$C.Har.tab)
+    colnames(C.Har.tab) <- c("product", "joint-o", "msm", "c-clay", "c-gumb", "c-frank", "f-norm", "f-gam")
+    rownames(C.Har.tab) <- c("DGM1 (msm)", "DGM2 (c-clay)", "DGM3 (c-gumb)", "DGM4 (c-frank)", "DGM5 (f-norm)", "DGM6 (f-gam)")
+    
+    cat("**Table S", section, ".", counter, ": Harrel's C-statistic (mean (sd)) for scenario ", 
+            scen.vec1[scen.loop1], scen.vec2[scen.loop2], ", (n = ", n.loop, ")**", sep = "")
+    
+    print_kable(kable(C.Har.tab))
+    
+    counter <- counter + 1
+    }
+  }
+}
+
+#####################################################
+### Need to do no correlation scenario separately ###
+#####################################################
+### Run a loop to calculate table for each
+for (scen.loop1 in c(1,2)){
+  ### Create list to store tables (one column each, so we can combine)
+  C.Har.tab.list <- vector("list", 3)
+  ### Cretae a counter for assinging
+  n<-1
+  ### run the loop
+    for (n.loop in c(1000, 2500, 5000)){
+      ### Load dataframe
+      load(paste("data/sim_results_s", scen.loop1, "_n", n.loop, "v1000.RData", sep = ""))
+      ### Assign output
+      C.Har.tab.list[[n]] <- res.DGM.nocorr["C.Har.tab"]$C.Har.tab
+      ### Assign rownames
+      names(C.Har.tab.list[[n]]) <- c("DGM1 (msm)", "DGM2 (c-clay)", "DGM3 (c-gumb)", "DGM4 (c-frank)", "DGM5 (f-norm)", "DGM6 (f-gam)")
+      ### Add one to counter
+      n <- n+1
+    }
+  
+  ### Combine into one table
+  C.Har.tab <- do.call("cbind", C.Har.tab.list)
+  colnames(C.Har.tab) <- paste("n = ", c(1000, 2500, 5000), sep = "")
+  
+  ### Print table
+  cat("**Table S", section, ".", counter, ": Harrel's C-statistic (mean (sd)) for scenario ", 
+            scen.vec1[scen.loop1], "**", sep = "")
+    
+  print_kable(kable(C.Har.tab))
+  
+  counter <- counter + 1
+}
+
+```
+
+
+# Section 5. Simulation: event rates
+
+```{r, echo=FALSE, results = 'asis'}
+### Set working directory
+setwd("..")
+
+### Assign section 
+section <- 5
+### Assign counter
+counter <- 1
+
+### Scenario LN
+load(paste("data/event_rates_s1_nocorr.RData", sep = ""))
+LN.A <- paste(round(mean(output.object$n.events.A)), " (", round(sd(output.object$n.events.A)), ")", sep = "")
+LN.B <- paste(round(mean(output.object$n.events.B)), " (", round(sd(output.object$n.events.B)), ")", sep = "")
+LN.AB <- paste(round(mean(output.object$n.events.AB)), " (", round(sd(output.object$n.events.AB)), ")", sep = "")
+
+### Scenario LL
+load(paste("data/event_rates_s1.1.RData", sep = ""))
+
+LL.A <- c(paste(round(mean(output.object[["msm"]]$n.events.A)), " (", round(sd(output.object[["msm"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["c.clay"]]$n.events.A)), " (", round(sd(output.object[["c.clay"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["c.gumb"]]$n.events.A)), " (", round(sd(output.object[["c.gumb"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["c.frank"]]$n.events.A)), " (", round(sd(output.object[["c.frank"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["f.normal"]]$n.events.A)), " (", round(sd(output.object[["f.normal"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["f.gamma"]]$n.events.A)), " (", round(sd(output.object[["f.gamma"]]$n.events.A)), ")", sep = ""))
+
+LL.B <- c(paste(round(mean(output.object[["msm"]]$n.events.B)), " (", round(sd(output.object[["msm"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["c.clay"]]$n.events.B)), " (", round(sd(output.object[["c.clay"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["c.gumb"]]$n.events.B)), " (", round(sd(output.object[["c.gumb"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["c.frank"]]$n.events.B)), " (", round(sd(output.object[["c.frank"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["f.normal"]]$n.events.B)), " (", round(sd(output.object[["f.normal"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["f.gamma"]]$n.events.B)), " (", round(sd(output.object[["f.gamma"]]$n.events.B)), ")", sep = ""))
+
+LL.AB <- c(paste(round(mean(output.object[["msm"]]$n.events.AB)), " (", round(sd(output.object[["msm"]]$n.events.AB)), ")", sep = ""),
+           paste(round(mean(output.object[["c.clay"]]$n.events.AB)), " (", round(sd(output.object[["c.clay"]]$n.events.AB)), ")", sep = ""),
+           paste(round(mean(output.object[["c.gumb"]]$n.events.AB)), " (", round(sd(output.object[["c.gumb"]]$n.events.AB)), ")", sep = ""),
+           paste(round(mean(output.object[["c.frank"]]$n.events.AB)), " (", round(sd(output.object[["c.frank"]]$n.events.AB)), ")", sep = ""),
+           paste(round(mean(output.object[["f.normal"]]$n.events.AB)), " (", round(sd(output.object[["f.normal"]]$n.events.AB)), ")", sep = ""),
+           paste(round(mean(output.object[["f.gamma"]]$n.events.AB)), " (", round(sd(output.object[["f.gamma"]]$n.events.AB)), ")", sep = ""))
+
+
+### Scenario LH
+load(paste("data/event_rates_s1.2.RData", sep = ""))
+
+LH.A <- c(paste(round(mean(output.object[["msm"]]$n.events.A)), " (", round(sd(output.object[["msm"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["c.clay"]]$n.events.A)), " (", round(sd(output.object[["c.clay"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["c.gumb"]]$n.events.A)), " (", round(sd(output.object[["c.gumb"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["c.frank"]]$n.events.A)), " (", round(sd(output.object[["c.frank"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["f.normal"]]$n.events.A)), " (", round(sd(output.object[["f.normal"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["f.gamma"]]$n.events.A)), " (", round(sd(output.object[["f.gamma"]]$n.events.A)), ")", sep = ""))
+
+LH.B <- c(paste(round(mean(output.object[["msm"]]$n.events.B)), " (", round(sd(output.object[["msm"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["c.clay"]]$n.events.B)), " (", round(sd(output.object[["c.clay"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["c.gumb"]]$n.events.B)), " (", round(sd(output.object[["c.gumb"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["c.frank"]]$n.events.B)), " (", round(sd(output.object[["c.frank"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["f.normal"]]$n.events.B)), " (", round(sd(output.object[["f.normal"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["f.gamma"]]$n.events.B)), " (", round(sd(output.object[["f.gamma"]]$n.events.B)), ")", sep = ""))
+
+LH.AB <- c(paste(round(mean(output.object[["msm"]]$n.events.AB)), " (", round(sd(output.object[["msm"]]$n.events.AB)), ")", sep = ""),
+           paste(round(mean(output.object[["c.clay"]]$n.events.AB)), " (", round(sd(output.object[["c.clay"]]$n.events.AB)), ")", sep = ""),
+           paste(round(mean(output.object[["c.gumb"]]$n.events.AB)), " (", round(sd(output.object[["c.gumb"]]$n.events.AB)), ")", sep = ""),
+           paste(round(mean(output.object[["c.frank"]]$n.events.AB)), " (", round(sd(output.object[["c.frank"]]$n.events.AB)), ")", sep = ""),
+           paste(round(mean(output.object[["f.normal"]]$n.events.AB)), " (", round(sd(output.object[["f.normal"]]$n.events.AB)), ")", sep = ""),
+           paste(round(mean(output.object[["f.gamma"]]$n.events.AB)), " (", round(sd(output.object[["f.gamma"]]$n.events.AB)), ")", sep = ""))
+
+
+### Scenario HN
+load(paste("data/event_rates_s2_nocorr.RData", sep = ""))
+HN.A <- paste(round(mean(output.object$n.events.A)), " (", round(sd(output.object$n.events.A)), ")", sep = "")
+HN.B <- paste(round(mean(output.object$n.events.B)), " (", round(sd(output.object$n.events.B)), ")", sep = "")
+HN.AB <- paste(round(mean(output.object$n.events.AB)), " (", round(sd(output.object$n.events.AB)), ")", sep = "")
+
+### Scenario HL
+load(paste("data/event_rates_s2.1.RData", sep = ""))
+
+HL.A <- c(paste(round(mean(output.object[["msm"]]$n.events.A)), " (", round(sd(output.object[["msm"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["c.clay"]]$n.events.A)), " (", round(sd(output.object[["c.clay"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["c.gumb"]]$n.events.A)), " (", round(sd(output.object[["c.gumb"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["c.frank"]]$n.events.A)), " (", round(sd(output.object[["c.frank"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["f.normal"]]$n.events.A)), " (", round(sd(output.object[["f.normal"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["f.gamma"]]$n.events.A)), " (", round(sd(output.object[["f.gamma"]]$n.events.A)), ")", sep = ""))
+
+HL.B <- c(paste(round(mean(output.object[["msm"]]$n.events.B)), " (", round(sd(output.object[["msm"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["c.clay"]]$n.events.B)), " (", round(sd(output.object[["c.clay"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["c.gumb"]]$n.events.B)), " (", round(sd(output.object[["c.gumb"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["c.frank"]]$n.events.B)), " (", round(sd(output.object[["c.frank"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["f.normal"]]$n.events.B)), " (", round(sd(output.object[["f.normal"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["f.gamma"]]$n.events.B)), " (", round(sd(output.object[["f.gamma"]]$n.events.B)), ")", sep = ""))
+
+HL.AB <- c(paste(round(mean(output.object[["msm"]]$n.events.AB)), " (", round(sd(output.object[["msm"]]$n.events.AB)), ")", sep = ""),
+           paste(round(mean(output.object[["c.clay"]]$n.events.AB)), " (", round(sd(output.object[["c.clay"]]$n.events.AB)), ")", sep = ""),
+           paste(round(mean(output.object[["c.gumb"]]$n.events.AB)), " (", round(sd(output.object[["c.gumb"]]$n.events.AB)), ")", sep = ""),
+           paste(round(mean(output.object[["c.frank"]]$n.events.AB)), " (", round(sd(output.object[["c.frank"]]$n.events.AB)), ")", sep = ""),
+           paste(round(mean(output.object[["f.normal"]]$n.events.AB)), " (", round(sd(output.object[["f.normal"]]$n.events.AB)), ")", sep = ""),
+           paste(round(mean(output.object[["f.gamma"]]$n.events.AB)), " (", round(sd(output.object[["f.gamma"]]$n.events.AB)), ")", sep = ""))
+
+
+### Scenario HH
+load(paste("data/event_rates_s2.2.RData", sep = ""))
+
+HH.A <- c(paste(round(mean(output.object[["msm"]]$n.events.A)), " (", round(sd(output.object[["msm"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["c.clay"]]$n.events.A)), " (", round(sd(output.object[["c.clay"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["c.gumb"]]$n.events.A)), " (", round(sd(output.object[["c.gumb"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["c.frank"]]$n.events.A)), " (", round(sd(output.object[["c.frank"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["f.normal"]]$n.events.A)), " (", round(sd(output.object[["f.normal"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["f.gamma"]]$n.events.A)), " (", round(sd(output.object[["f.gamma"]]$n.events.A)), ")", sep = ""))
+
+HH.B <- c(paste(round(mean(output.object[["msm"]]$n.events.B)), " (", round(sd(output.object[["msm"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["c.clay"]]$n.events.B)), " (", round(sd(output.object[["c.clay"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["c.gumb"]]$n.events.B)), " (", round(sd(output.object[["c.gumb"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["c.frank"]]$n.events.B)), " (", round(sd(output.object[["c.frank"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["f.normal"]]$n.events.B)), " (", round(sd(output.object[["f.normal"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["f.gamma"]]$n.events.B)), " (", round(sd(output.object[["f.gamma"]]$n.events.B)), ")", sep = ""))
+
+HH.AB <- c(paste(round(mean(output.object[["msm"]]$n.events.AB)), " (", round(sd(output.object[["msm"]]$n.events.AB)), ")", sep = ""),
+           paste(round(mean(output.object[["c.clay"]]$n.events.AB)), " (", round(sd(output.object[["c.clay"]]$n.events.AB)), ")", sep = ""),
+           paste(round(mean(output.object[["c.gumb"]]$n.events.AB)), " (", round(sd(output.object[["c.gumb"]]$n.events.AB)), ")", sep = ""),
+           paste(round(mean(output.object[["c.frank"]]$n.events.AB)), " (", round(sd(output.object[["c.frank"]]$n.events.AB)), ")", sep = ""),
+           paste(round(mean(output.object[["f.normal"]]$n.events.AB)), " (", round(sd(output.object[["f.normal"]]$n.events.AB)), ")", sep = ""),
+           paste(round(mean(output.object[["f.gamma"]]$n.events.AB)), " (", round(sd(output.object[["f.gamma"]]$n.events.AB)), ")", sep = ""))
+
+### Create tables of event rates for A, B an dAB
+table.A <- rbind(LN.A, LL.A, LH.A, HN.A, HL.A, HH.A)
+table.B <- rbind(LN.B, LL.B, LH.B, HN.B, HL.B, HH.B)
+table.AB <- rbind(LN.AB, LL.AB, LH.AB, HN.AB, HL.AB, HH.AB)
+rownames(table.A) <- c("LN","LL", "LH", "HN", "HL", "HH")
+rownames(table.B) <- c("LN","LL", "LH", "HN", "HL", "HH")
+rownames(table.AB) <- c("LN","LL", "LH", "HN", "HL", "HH")
+colnames(table.A) <- c("DGM1 (msm)", "DGM2 (c-clay)", "DGM3 (c-gumb)", "DGM4 (c-frank)", "DGM5 (f-norm)", "DGM6 (f-gam)")
+colnames(table.B) <- c("DGM1 (msm)", "DGM2 (c-clay)", "DGM3 (c-gumb)", "DGM4 (c-frank)", "DGM5 (f-norm)", "DGM6 (f-gam)")
+colnames(table.AB) <- c("DGM1 (msm)", "DGM2 (c-clay)", "DGM3 (c-gumb)", "DGM4 (c-frank)", "DGM5 (f-norm)", "DGM6 (f-gam)")
+
+### Print tables
+cat("**Table S", section, ".", 1, ": Mean (sd) of the number of uncensored events for outcome A across 1000 simulation iterations, n = 1000**", sep = "")
+cat('\n\n\n')
+kable(table.A)
+
+cat("**Table S", section, ".", 2, ": Mean (sd) of the number of uncensored events for outcome B across 1000 simulation iterations, n = 1000**", sep = "")
+cat('\n\n\n')
+kable(table.B)
+
+cat("**Table S", section, ".", 3, ": Mean (sd) of the number of uncensored events for outcome AB across 1000 simulation iterations, n = 1000**", sep = "")
+cat('\n\n\n')
+kable(table.AB)
+```
+
+# Section 6: Clinical example supplementary figures and tables
+
+```{r, echo=FALSE, results = 'asis'}
+### Set working directory
+rm(list=ls())
+setwd("../..")
+
+### Assign section 
+section <- 6
+### Assign counter
+counter <- 1
+
+### Source packages
+source("Project 4/code/sim_function_load_packages.R")
+### Load functions
+source("Project 4/code/p4_clinical_example_functions.R")
+
+### Load female and male data
+load("data_Aurum_65plus/data_intermediate/imputed_datesets_link_A_female_m20.RData")
+complete.data.1.female <- complete(mice.comb)
+
+load("data_Aurum_65plus/data_intermediate/imputed_datesets_link_A_male_m20.RData")
+complete.data.1.male <- complete(mice.comb)
+
+### Combine into single dataset
+complete.data.1 <- rbind(complete.data.1.female, complete.data.1.male)
+rm(complete.data.1.female, complete.data.1.male, dat.pre.imp.cdm.link.A, dat.pre.imp.cdm.link.B, data.for.imp, mice.comb)
+
+### Set seed
+set.seed(10101)
+
+### Create validation and development datasets by sampling at random from this dataset
+data.size <- 200000
+devel.prop <- 0.5
+sample.rows <- sample(1:nrow(complete.data.1), data.size, replace = FALSE)
+data.devel <- complete.data.1[sample.rows[1:(data.size*devel.prop)], ]
+data.valid <- complete.data.1[sample.rows[(data.size*devel.prop + 1):data.size], ]
+rm(complete.data.1)
+
+### Create cohort
+data.cohort <- rbind(data.frame(data.devel, data.type = "development"),
+                     data.frame(data.valid, data.type = "validation"))
+
+### Create a function to only calculate mean and sd of continuous variables
+my.render.cont <- function(x) {
+  with(stats.apply.rounding(stats.default(round(x, 2)), digits = 3, digits.pct = 2), c("", 
+                                                                                       "Mean (SD)"=sprintf("%s (&plusmn; %s)", MEAN, SD)))
+}
+
+
+### function to create table 1
+create.table1.hist <- function(data.in){
+  
+  ### Apply labels to variables
+  label(data.in$Smoking) <- "Smoking status"
+  label(data.in$Cholhdl_ratio) <- "Cholesterol/HDL ratio"
+  label(data.in$Ethnicity6) <- "Ethnicity"
+  
+  ### Define levels of categorical variables
+  levels(data.in$Smoking) <- c("Never", "Ex", "Current")
+  levels(data.in$Ethnicity6) <- c("White", "Mixed race", "South asian", "Black", "Chinese and other", "Other")
+  levels(data.in$IMD) <- c("1 (most deprived)", "2", "3", "4", "5 (least deprived)")
+
+  
+  ### Create the table 1
+  table1.out.hist <- table1(~ Age +
+                              gender +
+                              BMI +
+                              Cholhdl_ratio +
+                              Ethnicity6 +
+                              #Ethnicity16 +
+                              SBP +
+                              Smoking +
+                              #Smoking_anyhist
+                              IMD | data.type, 
+                            data = data.in, 
+                            render.missing = NULL,
+                            render.categorical = "FREQ (PCTnoNA%)",
+                            render.cont = my.render.cont)
+  return(table1.out.hist)
+}
+
+
+### Function to calculate rate
+calc.rate <- function(data.in, varname, var.in.time, var.in.ind, var.in.hist, cohort.in){
+  time.at.risk <- sum(data.in[ , var.in.time][data.in[ , var.in.hist] == 0 & data.in[ , "data.type"] == cohort.in])
+  number.events <- sum((data.in[ , var.in.ind] == 1)[data.in[ , var.in.hist] == 0 & data.in[ , "data.type"] == cohort.in])
+  rate <- number.events*365.25*1000/time.at.risk
+  n.at.risk <- sum(data.in[ , var.in.hist] == 0 & data.in[ , "data.type"] == cohort.in)
+  
+  output <- c(n.at.risk, time.at.risk, number.events, round(rate,2))
+  names(output) <- paste(varname, c(".n.at.risk", ".time.at.risk", ".number.events", ".rate"), sep = "")
+  return(output)
+}
+
+
+### Now use these functions to create a table for the output variables
+create.table1.events <- function(data.in){
+  
+  Diab_t2.rate.development <- calc.rate(data.in, "Diab_t2", "Diab_t2_ev_t", "Diab_t2_ev_c", "Diab_t2_hist", "development")
+  Diab_t2.rate.validation <- calc.rate(data.in, "Diab_t2", "Diab_t2_ev_t", "Diab_t2_ev_c", "Diab_t2_hist", "validation")
+  
+  HF.rate.development <- calc.rate(data.in, "HF", "HF_ev_t", "HF_ev_c", "HF_hist", "development")
+  HF.rate.validation <- calc.rate(data.in, "HF", "HF_ev_t", "HF_ev_c", "HF_hist", "validation")
+  
+  CHD_MI.rate.development <- calc.rate(data.in, "CHD_MI", "CHD_MI_ev_t", "CHD_MI_ev_c", "CHD_MI_hist", "development")
+  CHD_MI.rate.validation <- calc.rate(data.in, "CHD_MI", "CHD_MI_ev_t", "CHD_MI_ev_c", "CHD_MI_hist", "validation")
+  
+  Stroke_TIA.rate.development <- calc.rate(data.in, "Stroke_TIA", "Stroke_TIA_ev_t", "Stroke_TIA_ev_c", "Stroke_TIA_hist", "development")
+  Stroke_TIA.rate.validation <- calc.rate(data.in, "Stroke_TIA", "Stroke_TIA_ev_t", "Stroke_TIA_ev_c", "Stroke_TIA_hist", "validation")
+
+  
+  table1.out.event <- cbind(c(Diab_t2.rate.development,
+                              HF.rate.development,
+                              CHD_MI.rate.development,
+                              Stroke_TIA.rate.development),
+                            c(Diab_t2.rate.validation,
+                              HF.rate.validation,
+                              CHD_MI.rate.validation,
+                              Stroke_TIA.rate.validation))
+  
+  colnames(table1.out.event) <- c("development", "validation")
+  
+  return(table1.out.event)}
+
+
+### Create tables
+table1.events <- create.table1.events(data.cohort)
+table1.hist <- create.table1.hist(data.cohort)
+
+cat("**Table S", section, ".1: Baseline data for development and validation cohorts**", sep = "")
+kable(table1.hist)
+cat("**Table S", section, ".2: Outcome data for development and validation cohorts**", sep = "")
+kable(table1.events)
+
+
+### Now load the appropriate figures
+### Setwd
+setwd("Project 4/figures")
+
+        cat("\n\n\n")
+        cat("**Figure S", section, ".1: Graphical calibration curves for each method in the clinical example over the entire range of predicted risk**", sep = "")
+        cat("![](",
+            "clin.example.calib.knot5.modelC.n2e+05.png",
+            ")")
+
+### Now load the appropriate figures
+        cat("\n\n\n")
+        cat("**Figure S", section, ".2: Observed vs predicted risk by decile of predicted risk for each method in the clinical example**", sep = "")
+        cat("![](",
+            "clin.example.calib.decile.modelC.n2e+05.png",
+            ")")
+
+```

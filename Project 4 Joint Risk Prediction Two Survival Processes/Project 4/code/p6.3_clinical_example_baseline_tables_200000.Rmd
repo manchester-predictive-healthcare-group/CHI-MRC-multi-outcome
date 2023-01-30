@@ -1,0 +1,136 @@
+---
+title: "sim_results_create_Cstat_tables.Rmd"
+author: "Alex Pate"
+date: "28/03/2022"
+output: word_document
+classoption: landscape
+---
+
+```{r, echo=FALSE, results = 'asis'}
+### Set working directory
+rm(list=ls())
+setwd("/mnt/bmh01-rds/mrc-multi-outcome")
+getwd()
+
+### Source packages
+source("Project 4/code/sim_function_load_packages.R")
+### Load functions
+source("Project 4/code/sim_function_clinical_example.R")
+
+### Load female and male data
+load("data_Aurum_65plus/data_intermediate/imputed_datesets_link_A_female_m20.RData")
+complete.data.1.female <- complete(mice.comb)
+
+load("data_Aurum_65plus/data_intermediate/imputed_datesets_link_A_male_m20.RData")
+complete.data.1.male <- complete(mice.comb)
+
+### Combine into single dataset
+complete.data.1 <- rbind(complete.data.1.female, complete.data.1.male)
+rm(complete.data.1.female, complete.data.1.male, dat.pre.imp.cdm.link.A, dat.pre.imp.cdm.link.B, data.for.imp, mice.comb)
+
+### Set seed
+set.seed(10101)
+
+### Create validation and development datasets by sampling at random from this dataset
+data.size <- 200000
+devel.prop <- 0.5
+sample.rows <- sample(1:nrow(complete.data.1), data.size, replace = FALSE)
+data.devel <- complete.data.1[sample.rows[1:(data.size*devel.prop)], ]
+data.valid <- complete.data.1[sample.rows[(data.size*devel.prop + 1):data.size], ]
+rm(complete.data.1)
+
+### Create cohort
+data.cohort <- rbind(data.frame(data.devel, data.type = "development"),
+                     data.frame(data.valid, data.type = "validation"))
+
+### Create a function to only calculate mean and sd of continuous variables
+my.render.cont <- function(x) {
+  with(stats.apply.rounding(stats.default(round(x, 2)), digits = 3, digits.pct = 2), c("", 
+                                                                                       "Mean (SD)"=sprintf("%s (&plusmn; %s)", MEAN, SD)))
+}
+
+
+### function to create table 1
+create.table1.hist <- function(data.in){
+  
+  ### Apply labels to variables
+  label(data.in$Smoking) <- "Smoking status"
+  label(data.in$Cholhdl_ratio) <- "Cholesterol/HDL ratio"
+  label(data.in$Ethnicity6) <- "Ethnicity"
+  
+  ### Define levels of categorical variables
+  levels(data.in$Smoking) <- c("Never", "Ex", "Current")
+  levels(data.in$Ethnicity6) <- c("White", "Mixed race", "South asian", "Black", "Chinese and other", "Other")
+  levels(data.in$IMD) <- c("1 (most deprived)", "2", "3", "4", "5 (least deprived)")
+
+  
+  ### Create the table 1
+  table1.out.hist <- table1(~ Age +
+                              gender +
+                              BMI +
+                              Cholhdl_ratio +
+                              Ethnicity6 +
+                              #Ethnicity16 +
+                              SBP +
+                              Smoking +
+                              #Smoking_anyhist
+                              IMD | data.type, 
+                            data = data.in, 
+                            render.missing = NULL,
+                            render.categorical = "FREQ (PCTnoNA%)",
+                            render.cont = my.render.cont)
+  return(table1.out.hist)
+}
+
+
+### Function to calculate rate
+calc.rate <- function(data.in, varname, var.in.time, var.in.ind, var.in.hist, cohort.in){
+  time.at.risk <- sum(data.in[ , var.in.time][data.in[ , var.in.hist] == 0 & data.in[ , "data.type"] == cohort.in])
+  number.events <- sum((data.in[ , var.in.ind] == 1)[data.in[ , var.in.hist] == 0 & data.in[ , "data.type"] == cohort.in])
+  rate <- number.events*365.25*1000/time.at.risk
+  n.at.risk <- sum(data.in[ , var.in.hist] == 0 & data.in[ , "data.type"] == cohort.in)
+  
+  output <- c(n.at.risk, time.at.risk, number.events, round(rate,2))
+  names(output) <- paste(varname, c(".n.at.risk", ".time.at.risk", ".number.events", ".rate"), sep = "")
+  return(output)
+}
+
+
+### Now use these functions to create a table for the output variables
+create.table1.events <- function(data.in){
+  
+  Diab_t2.rate.development <- calc.rate(data.in, "Diab_t2", "Diab_t2_ev_t", "Diab_t2_ev_c", "Diab_t2_hist", "development")
+  Diab_t2.rate.validation <- calc.rate(data.in, "Diab_t2", "Diab_t2_ev_t", "Diab_t2_ev_c", "Diab_t2_hist", "validation")
+  
+  HF.rate.development <- calc.rate(data.in, "HF", "HF_ev_t", "HF_ev_c", "HF_hist", "development")
+  HF.rate.validation <- calc.rate(data.in, "HF", "HF_ev_t", "HF_ev_c", "HF_hist", "validation")
+  
+  CHD_MI.rate.development <- calc.rate(data.in, "CHD_MI", "CHD_MI_ev_t", "CHD_MI_ev_c", "CHD_MI_hist", "development")
+  CHD_MI.rate.validation <- calc.rate(data.in, "CHD_MI", "CHD_MI_ev_t", "CHD_MI_ev_c", "CHD_MI_hist", "validation")
+  
+  Stroke_TIA.rate.development <- calc.rate(data.in, "Stroke_TIA", "Stroke_TIA_ev_t", "Stroke_TIA_ev_c", "Stroke_TIA_hist", "development")
+  Stroke_TIA.rate.validation <- calc.rate(data.in, "Stroke_TIA", "Stroke_TIA_ev_t", "Stroke_TIA_ev_c", "Stroke_TIA_hist", "validation")
+
+  
+  table1.out.event <- cbind(c(Diab_t2.rate.development,
+                              HF.rate.development,
+                              CHD_MI.rate.development,
+                              Stroke_TIA.rate.development),
+                            c(Diab_t2.rate.validation,
+                              HF.rate.validation,
+                              CHD_MI.rate.validation,
+                              Stroke_TIA.rate.validation))
+  
+  colnames(table1.out.event) <- c("development", "validation")
+  
+  return(table1.out.event)}
+
+
+### Create tables
+table1.events <- create.table1.events(data.cohort)
+table1.hist <- create.table1.hist(data.cohort)
+
+kable(table1.hist)
+kable(table1.events)
+
+```

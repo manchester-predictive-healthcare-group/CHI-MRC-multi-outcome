@@ -1,0 +1,41 @@
+---
+title: "joint risk in CPRD dataset"
+author: "Alex Pate"
+date: "22/02/2022"
+output: word_document
+---
+
+```{r, echo=FALSE}
+library(knitr)
+setwd("/mnt/bmh01-rds/mrc-multi-outcome")
+
+### Cohort A CHD_MI + Diab
+load("Project 4/data/sim_calculate_overall_risk_CPRD_CHD_MI_Diab_cohortA.RData")
+
+CHD_MI_DIAB_cohortA <- data.frame("overall" = 100*c(risk.10y.CHD_MI, risk.10y.Diab_t2, risk.10y.CHD_MI_Diab, risk.10y.CHD_MI*risk.10y.Diab_t2),
+                                  "female" = 100*c(risk.10y.CHD_MI.female, risk.10y.Diab_t2.female, risk.10y.CHD_MI_Diab.female, 
+                                               risk.10y.CHD_MI.female*risk.10y.Diab_t2.female),
+                                  "male" = 100*c(risk.10y.CHD_MI.male, risk.10y.Diab_t2.male, risk.10y.CHD_MI_Diab.male, 
+                                             risk.10y.CHD_MI.male*risk.10y.Diab_t2.male))
+
+rownames(CHD_MI_DIAB_cohortA) <- c("CHD_MI", "Diab_t2", "Joint risk true", "Joint risk naive")
+
+print("Cohort A CHD_MI + Diab")
+kable(CHD_MI_DIAB_cohortA, digits = c(2,2,2))
+
+### Cohort A CVD + Diab
+load("Project 4/data/sim_calculate_overall_risk_CPRD_CVD_Diab_cohortA.RData")
+
+CVD_DIAB_cohortA <- data.frame("overall" = 100*c(risk.10y.CHD_MI, risk.10y.Stroke_TIA, risk.10y.CVD, 
+                                             risk.10y.Diab_t2, risk.10y.CVD_Diab, risk.10y.CVD*risk.10y.Diab_t2),
+                                  "female" = 100*c(risk.10y.CHD_MI.female, risk.10y.Stroke_TIA.female, risk.10y.CVD.female, 
+                                               risk.10y.Diab_t2.female, risk.10y.CVD_Diab.female, risk.10y.CVD.female*risk.10y.Diab_t2.female),
+                                  "male" = 100*c(risk.10y.CHD_MI.male, risk.10y.Stroke_TIA.male, risk.10y.CVD.male, 
+                                             risk.10y.Diab_t2.male, risk.10y.CVD_Diab.male, risk.10y.CVD.male*risk.10y.Diab_t2.male))
+
+rownames(CVD_DIAB_cohortA) <- c("CHD_MI", "Stroke_TIA", "Diab_t2", "CVD", "Joint risk true", "Joint risk naive")
+
+print("Cohort A CVD + Diab")
+kable(CVD_DIAB_cohortA, digits = c(2,2,2))
+
+```

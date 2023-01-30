@@ -1,0 +1,42 @@
+---
+title: "sim_results_create_Cstat_tables.Rmd"
+author: "Alex Pate"
+date: "28/03/2022"
+output: word_document
+classoption: landscape
+---
+
+```{r, echo=FALSE, results = 'asis'}
+### Set working directory
+rm(list=ls())
+setwd("/mnt/bmh01-rds/mrc-multi-outcome")
+getwd()
+
+### Source packages
+source("Project 4/code/sim_function_load_packages.R")
+### Load functions
+source("Project 4/code/sim_function_clinical_example.R")
+
+### set dp
+dp.in <- 2
+# 
+# model.type <- "B"
+# data.size <- 200000
+# load(paste("Project 4/data/compare_performance_models", model.type, "_n", data.size, ".RData", sep = ""))
+# 
+# paste("model.type = ", model.type, ", data.size = ", data.size, sep = "")
+# print("HarC")
+# kable(round(HarC.table, dp.in))
+# print("UnoC")
+# kable(round(UnoC.table, dp.in))
+
+model.type <- "C"
+data.size <- 200000
+load(paste("Project 4/data/compare_performance_models", model.type, "_n", data.size, ".RData", sep = ""))
+
+paste("model.type = ", model.type, ", data.size = ", data.size, sep = "")
+print("HarC")
+kable(t(round(HarC.table, dp.in)))
+print("UnoC")
+kable(t(round(UnoC.table, dp.in)))
+```
