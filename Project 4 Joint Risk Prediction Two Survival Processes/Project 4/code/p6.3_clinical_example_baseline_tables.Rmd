@@ -1,0 +1,120 @@
+---
+title: "sim_results_create_Cstat_tables.Rmd"
+author: "Alex Pate"
+date: "28/03/2022"
+output: word_document
+classoption: landscape
+---
+
+```{r, echo=FALSE, results = 'asis'}
+### Set working directory
+rm(list=ls())
+setwd("/mnt/bmh01-rds/mrc-multi-outcome")
+getwd()
+
+### Load functions
+source("Project 4/code/sim_function_clinical_example.R")
+
+### Load data
+variables.vec <- c("Age", "gender", "Smoking", "SBP", "Cholhdl_ratio", "IMD", "BMI", "Ethnicity6")
+model.type <- "C"
+source("Project 4/code/p4_clinical_example_load_data_200000_notransform.R")
+
+### Create a function to only calculate mean and sd of continuous variables
+my.render.cont <- function(x) {
+  with(stats.apply.rounding(stats.default(round(x, 2)), digits = 3, digits.pct = 2), c("", 
+                                                                                       "Mean (SD)"=sprintf("%s (&plusmn; %s)", MEAN, SD)))
+}
+
+
+### function to create table 1
+create.table1.hist <- function(data.in){
+  
+  ### Apply labels to variables
+  label(data.in$Smoking) <- "Smoking status"
+  label(data.in$Cholhdl_ratio) <- "Cholesterol/HDL ratio"
+  label(data.in$Ethnicity6) <- "Ethnicity"
+  
+  ### Define levels of categorical variables
+  levels(data.in$Smoking) <- c("Never", "Ex", "Current")
+  levels(data.in$Ethnicity6) <- c("White", "Mixed race", "South asian", "Black", "Chinese and other", "Other")
+  levels(data.in$IMD) <- c("1 (most deprived)", "2", "3", "4", "5 (least deprived)")
+
+  
+  ### Create the table 1
+  table1.out.hist <- table1(~ Age +
+                              gender +
+                              BMI +
+                              Cholhdl_ratio +
+                              Ethnicity6 +
+                              #Ethnicity16 +
+                              SBP +
+                              Smoking +
+                              #Smoking_anyhist
+                              IMD | data.type, 
+                            data = data.in, 
+                            render.missing = NULL,
+                            render.categorical = "FREQ (PCTnoNA%)",
+                            render.cont = my.render.cont)
+  return(table1.out.hist)
+}
+
+
+### Function to calculate rate
+calc.rate <- function(data.in, varname, var.in.time, var.in.ind, var.in.hist, cohort.in){
+  time.at.risk <- sum(data.in[ , var.in.time][data.in[ , var.in.hist] == 0 & data.in[ , "data.type"] == cohort.in])
+  number.events <- sum((data.in[ , var.in.ind] == 1)[data.in[ , var.in.hist] == 0 & data.in[ , "data.type"] == cohort.in])
+  rate <- number.events*365.25*1000/time.at.risk
+  n.at.risk <- sum(data.in[ , var.in.hist] == 0 & data.in[ , "data.type"] == cohort.in)
+  
+  output <- c(n.at.risk, time.at.risk, number.events, round(rate,2))
+  names(output) <- paste(varname, c(".n.at.risk", ".time.at.risk", ".number.events", ".rate"), sep = "")
+  return(output)
+}
+
+
+### Now use these functions to create a table for the output variables
+create.table1.events <- function(data.in){
+  
+  Diab_t2.rate.development <- calc.rate(data.in, "Diab_t2", "Diab_t2_ev_t", "Diab_t2_ev_c", "Diab_t2_hist", "development")
+  Diab_t2.rate.validation <- calc.rate(data.in, "Diab_t2", "Diab_t2_ev_t", "Diab_t2_ev_c", "Diab_t2_hist", "validation")
+  
+  CVD.rate.development <- calc.rate(data.in, "CVD", "CVD_ev_t", "CVD_ev_c", "CVD_hist", "development")
+  CVD.rate.validation <- calc.rate(data.in, "CVD", "CVD_ev_t", "CVD_ev_c", "CVD_hist", "validation")
+
+  
+  table1.out.event <- cbind(c(Diab_t2.rate.development,
+                              CVD.rate.development),
+                            c(Diab_t2.rate.validation,
+                              CVD.rate.validation))
+  
+  colnames(table1.out.event) <- c("development", "validation")
+  
+  return(table1.out.event)}
+
+
+### Calculate the tables for the outcome events
+data.cohort <- rbind(data.frame(data.devel, data.type = "development"),
+                     data.frame(data.valid, data.type = "validation"))
+
+### Calculate CVD variable
+data.cohort$CVD_ev_t <- pmin(data.cohort$CHD_MI_ev_t, data.cohort$Stroke_TIA_ev_t, data.cohort$HF_ev_t)
+data.cohort$CVD_ev_c <- as.factor(pmax(as.numeric(data.cohort$CHD_MI_ev_c == 1), 
+                                       as.numeric(data.cohort$Stroke_TIA_ev_c == 1), 
+                                       as.numeric(data.cohort$HF_ev_c == 1)))
+data.cohort$CVD_hist <- as.factor(pmax(as.numeric(data.cohort$CHD_MI_hist == 1), 
+                                       as.numeric(data.cohort$Stroke_TIA_hist == 1), 
+                                       as.numeric(data.cohort$HF_hist == 1)))
+
+### Calculate baseline tables
+table1.events <- create.table1.events(data.cohort)
+table1.hist <- create.table1.hist(data.cohort)
+
+### Edit the events table
+table1.events <- cbind(rep(c("Number at risk", "Time at risk (days)", "Number of events", "Rate (per 1000 person years)"), 2), table1.events)
+colnames(table1.events) <- c("Metric", "Development", "Validation")
+rownames(table1.events) <- c(rep("T2D", 4), rep("CVD", 4))
+
+kable(table1.events)
+kable(table1.hist)
+```

@@ -1,0 +1,29 @@
+#!/bin/bash --login
+#$ -S bin/bash
+#$ -cwd
+#$ -V
+
+module load compilers/intel/18.0.3
+module load libs/intel-18.0/gsl/2.5
+module load apps/gcc/R/4.0.2
+
+#$ -t 1-1000
+
+Rscript sim_run_s1.2_dgmclay.R $SGE_TASK_ID 1 1000 1000 > sim_run_s1.2_dgmclay_n1000v1000s.$SGE_TASK_ID.out
+
+Rscript sim_run_s2_dgmnocorr.R $SGE_TASK_ID 1 1000 1000 > sim_run_s2_dgmnocorr_n1000v1000.$SGE_TASK_ID.out
+
+Rscript sim_run_s2.1_dgmclay.R $SGE_TASK_ID 1 1000 1000 > sim_run_s2.1_dgmclay_n1000v1000s.$SGE_TASK_ID.out
+Rscript sim_run_s2.1_dgmgumb.R $SGE_TASK_ID 1 1000 1000 > sim_run_s2.1_dgmgumb_n1000v1000s.$SGE_TASK_ID.out
+Rscript sim_run_s2.1_dgmfrank.R $SGE_TASK_ID 1 1000 1000 > sim_run_s2.1_dgmfrank_n1000v1000s.$SGE_TASK_ID.out
+Rscript sim_run_s2.1_dgmmsm.R $SGE_TASK_ID 1 1000 1000 > sim_run_s2.1_dgmmsm_n1000v1000s.$SGE_TASK_ID.out
+Rscript sim_run_s2.1_dgmnormal.R $SGE_TASK_ID 1 1000 1000 > sim_run_s2.1_dgmnormal_n1000v1000s.$SGE_TASK_ID.out
+Rscript sim_run_s2.1_dgmgamma.R $SGE_TASK_ID 1 1000 1000 > sim_run_s2.1_dgmgamma_n1000v1000s.$SGE_TASK_ID.out
+
+Rscript sim_run_s2.2_dgmclay.R $SGE_TASK_ID 1 1000 1000 > sim_run_s2.2_dgmclay_n1000v1000s.$SGE_TASK_ID.out
+Rscript sim_run_s2.2_dgmgumb.R $SGE_TASK_ID 1 1000 1000 > sim_run_s2.2_dgmgumb_n1000v1000s.$SGE_TASK_ID.out
+Rscript sim_run_s2.2_dgmfrank.R $SGE_TASK_ID 1 1000 1000 > sim_run_s2.2_dgmfrank_n1000v1000s.$SGE_TASK_ID.out
+Rscript sim_run_s2.2_dgmmsm.R $SGE_TASK_ID 1 1000 1000 > sim_run_s2.2_dgmmsm_n1000v1000s.$SGE_TASK_ID.out
+Rscript sim_run_s2.2_dgmnormal.R $SGE_TASK_ID 1 1000 1000 > sim_run_s2.2_dgmnormal_n1000v1000s.$SGE_TASK_ID.out
+Rscript sim_run_s2.2_dgmgamma.R $SGE_TASK_ID 1 1000 1000 > sim_run_s2.2_dgmgamma_n1000v1000s.$SGE_TASK_ID.out
+
