@@ -1,0 +1,145 @@
+---
+title: "p9_event_rates"
+author: "Alex Pate"
+date: "26/01/2023"
+output: word_document
+---
+
+```{r, echo=FALSE}
+library(knitr)
+
+### Set working directory
+setwd("/mnt/bmh01-rds/mrc-multi-outcome/Project 4/")
+
+### Scenario LN
+load(paste("data/event_rates_s1_nocorr.RData", sep = ""))
+LN.A <- paste(round(mean(output.object$n.events.A)), " (", round(sd(output.object$n.events.A)), ")", sep = "")
+LN.B <- paste(round(mean(output.object$n.events.B)), " (", round(sd(output.object$n.events.B)), ")", sep = "")
+LN.AB <- paste(round(mean(output.object$n.events.AB)), " (", round(sd(output.object$n.events.AB)), ")", sep = "")
+
+### Scenario LL
+load(paste("data/event_rates_s1.1.RData", sep = ""))
+
+LL.A <- c(paste(round(mean(output.object[["msm"]]$n.events.A)), " (", round(sd(output.object[["msm"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["c.clay"]]$n.events.A)), " (", round(sd(output.object[["c.clay"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["c.gumb"]]$n.events.A)), " (", round(sd(output.object[["c.gumb"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["c.frank"]]$n.events.A)), " (", round(sd(output.object[["c.frank"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["f.normal"]]$n.events.A)), " (", round(sd(output.object[["f.normal"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["f.gamma"]]$n.events.A)), " (", round(sd(output.object[["f.gamma"]]$n.events.A)), ")", sep = ""))
+
+LL.B <- c(paste(round(mean(output.object[["msm"]]$n.events.B)), " (", round(sd(output.object[["msm"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["c.clay"]]$n.events.B)), " (", round(sd(output.object[["c.clay"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["c.gumb"]]$n.events.B)), " (", round(sd(output.object[["c.gumb"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["c.frank"]]$n.events.B)), " (", round(sd(output.object[["c.frank"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["f.normal"]]$n.events.B)), " (", round(sd(output.object[["f.normal"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["f.gamma"]]$n.events.B)), " (", round(sd(output.object[["f.gamma"]]$n.events.B)), ")", sep = ""))
+
+LL.AB <- c(paste(round(mean(output.object[["msm"]]$n.events.AB)), " (", round(sd(output.object[["msm"]]$n.events.AB)), ")", sep = ""),
+          paste(round(mean(output.object[["c.clay"]]$n.events.AB)), " (", round(sd(output.object[["c.clay"]]$n.events.AB)), ")", sep = ""),
+          paste(round(mean(output.object[["c.gumb"]]$n.events.AB)), " (", round(sd(output.object[["c.gumb"]]$n.events.AB)), ")", sep = ""),
+          paste(round(mean(output.object[["c.frank"]]$n.events.AB)), " (", round(sd(output.object[["c.frank"]]$n.events.AB)), ")", sep = ""),
+          paste(round(mean(output.object[["f.normal"]]$n.events.AB)), " (", round(sd(output.object[["f.normal"]]$n.events.AB)), ")", sep = ""),
+          paste(round(mean(output.object[["f.gamma"]]$n.events.AB)), " (", round(sd(output.object[["f.gamma"]]$n.events.AB)), ")", sep = ""))
+
+
+### Scenario LH
+load(paste("data/event_rates_s1.2.RData", sep = ""))
+
+LH.A <- c(paste(round(mean(output.object[["msm"]]$n.events.A)), " (", round(sd(output.object[["msm"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["c.clay"]]$n.events.A)), " (", round(sd(output.object[["c.clay"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["c.gumb"]]$n.events.A)), " (", round(sd(output.object[["c.gumb"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["c.frank"]]$n.events.A)), " (", round(sd(output.object[["c.frank"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["f.normal"]]$n.events.A)), " (", round(sd(output.object[["f.normal"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["f.gamma"]]$n.events.A)), " (", round(sd(output.object[["f.gamma"]]$n.events.A)), ")", sep = ""))
+
+LH.B <- c(paste(round(mean(output.object[["msm"]]$n.events.B)), " (", round(sd(output.object[["msm"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["c.clay"]]$n.events.B)), " (", round(sd(output.object[["c.clay"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["c.gumb"]]$n.events.B)), " (", round(sd(output.object[["c.gumb"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["c.frank"]]$n.events.B)), " (", round(sd(output.object[["c.frank"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["f.normal"]]$n.events.B)), " (", round(sd(output.object[["f.normal"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["f.gamma"]]$n.events.B)), " (", round(sd(output.object[["f.gamma"]]$n.events.B)), ")", sep = ""))
+
+LH.AB <- c(paste(round(mean(output.object[["msm"]]$n.events.AB)), " (", round(sd(output.object[["msm"]]$n.events.AB)), ")", sep = ""),
+          paste(round(mean(output.object[["c.clay"]]$n.events.AB)), " (", round(sd(output.object[["c.clay"]]$n.events.AB)), ")", sep = ""),
+          paste(round(mean(output.object[["c.gumb"]]$n.events.AB)), " (", round(sd(output.object[["c.gumb"]]$n.events.AB)), ")", sep = ""),
+          paste(round(mean(output.object[["c.frank"]]$n.events.AB)), " (", round(sd(output.object[["c.frank"]]$n.events.AB)), ")", sep = ""),
+          paste(round(mean(output.object[["f.normal"]]$n.events.AB)), " (", round(sd(output.object[["f.normal"]]$n.events.AB)), ")", sep = ""),
+          paste(round(mean(output.object[["f.gamma"]]$n.events.AB)), " (", round(sd(output.object[["f.gamma"]]$n.events.AB)), ")", sep = ""))
+          
+
+### Scenario HN
+load(paste("data/event_rates_s2_nocorr.RData", sep = ""))
+HN.A <- paste(round(mean(output.object$n.events.A)), " (", round(sd(output.object$n.events.A)), ")", sep = "")
+HN.B <- paste(round(mean(output.object$n.events.B)), " (", round(sd(output.object$n.events.B)), ")", sep = "")
+HN.AB <- paste(round(mean(output.object$n.events.AB)), " (", round(sd(output.object$n.events.AB)), ")", sep = "")
+
+### Scenario HL
+load(paste("data/event_rates_s2.1.RData", sep = ""))
+
+HL.A <- c(paste(round(mean(output.object[["msm"]]$n.events.A)), " (", round(sd(output.object[["msm"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["c.clay"]]$n.events.A)), " (", round(sd(output.object[["c.clay"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["c.gumb"]]$n.events.A)), " (", round(sd(output.object[["c.gumb"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["c.frank"]]$n.events.A)), " (", round(sd(output.object[["c.frank"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["f.normal"]]$n.events.A)), " (", round(sd(output.object[["f.normal"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["f.gamma"]]$n.events.A)), " (", round(sd(output.object[["f.gamma"]]$n.events.A)), ")", sep = ""))
+
+HL.B <- c(paste(round(mean(output.object[["msm"]]$n.events.B)), " (", round(sd(output.object[["msm"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["c.clay"]]$n.events.B)), " (", round(sd(output.object[["c.clay"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["c.gumb"]]$n.events.B)), " (", round(sd(output.object[["c.gumb"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["c.frank"]]$n.events.B)), " (", round(sd(output.object[["c.frank"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["f.normal"]]$n.events.B)), " (", round(sd(output.object[["f.normal"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["f.gamma"]]$n.events.B)), " (", round(sd(output.object[["f.gamma"]]$n.events.B)), ")", sep = ""))
+
+HL.AB <- c(paste(round(mean(output.object[["msm"]]$n.events.AB)), " (", round(sd(output.object[["msm"]]$n.events.AB)), ")", sep = ""),
+          paste(round(mean(output.object[["c.clay"]]$n.events.AB)), " (", round(sd(output.object[["c.clay"]]$n.events.AB)), ")", sep = ""),
+          paste(round(mean(output.object[["c.gumb"]]$n.events.AB)), " (", round(sd(output.object[["c.gumb"]]$n.events.AB)), ")", sep = ""),
+          paste(round(mean(output.object[["c.frank"]]$n.events.AB)), " (", round(sd(output.object[["c.frank"]]$n.events.AB)), ")", sep = ""),
+          paste(round(mean(output.object[["f.normal"]]$n.events.AB)), " (", round(sd(output.object[["f.normal"]]$n.events.AB)), ")", sep = ""),
+          paste(round(mean(output.object[["f.gamma"]]$n.events.AB)), " (", round(sd(output.object[["f.gamma"]]$n.events.AB)), ")", sep = ""))
+
+
+### Scenario HH
+load(paste("data/event_rates_s2.2.RData", sep = ""))
+
+HH.A <- c(paste(round(mean(output.object[["msm"]]$n.events.A)), " (", round(sd(output.object[["msm"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["c.clay"]]$n.events.A)), " (", round(sd(output.object[["c.clay"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["c.gumb"]]$n.events.A)), " (", round(sd(output.object[["c.gumb"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["c.frank"]]$n.events.A)), " (", round(sd(output.object[["c.frank"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["f.normal"]]$n.events.A)), " (", round(sd(output.object[["f.normal"]]$n.events.A)), ")", sep = ""),
+          paste(round(mean(output.object[["f.gamma"]]$n.events.A)), " (", round(sd(output.object[["f.gamma"]]$n.events.A)), ")", sep = ""))
+
+HH.B <- c(paste(round(mean(output.object[["msm"]]$n.events.B)), " (", round(sd(output.object[["msm"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["c.clay"]]$n.events.B)), " (", round(sd(output.object[["c.clay"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["c.gumb"]]$n.events.B)), " (", round(sd(output.object[["c.gumb"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["c.frank"]]$n.events.B)), " (", round(sd(output.object[["c.frank"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["f.normal"]]$n.events.B)), " (", round(sd(output.object[["f.normal"]]$n.events.B)), ")", sep = ""),
+          paste(round(mean(output.object[["f.gamma"]]$n.events.B)), " (", round(sd(output.object[["f.gamma"]]$n.events.B)), ")", sep = ""))
+
+HH.AB <- c(paste(round(mean(output.object[["msm"]]$n.events.AB)), " (", round(sd(output.object[["msm"]]$n.events.AB)), ")", sep = ""),
+          paste(round(mean(output.object[["c.clay"]]$n.events.AB)), " (", round(sd(output.object[["c.clay"]]$n.events.AB)), ")", sep = ""),
+          paste(round(mean(output.object[["c.gumb"]]$n.events.AB)), " (", round(sd(output.object[["c.gumb"]]$n.events.AB)), ")", sep = ""),
+          paste(round(mean(output.object[["c.frank"]]$n.events.AB)), " (", round(sd(output.object[["c.frank"]]$n.events.AB)), ")", sep = ""),
+          paste(round(mean(output.object[["f.normal"]]$n.events.AB)), " (", round(sd(output.object[["f.normal"]]$n.events.AB)), ")", sep = ""),
+          paste(round(mean(output.object[["f.gamma"]]$n.events.AB)), " (", round(sd(output.object[["f.gamma"]]$n.events.AB)), ")", sep = ""))
+          
+### Create tables of event rates for A, B an dAB
+table.A <- rbind(LN.A, LL.A, LH.A, HN.A, HL.A, HH.A)
+table.B <- rbind(LN.B, LL.B, LH.B, HN.B, HL.B, HH.B)
+table.AB <- rbind(LN.AB, LL.AB, LH.AB, HN.AB, HL.AB, HH.AB)
+rownames(table.A) <- c("LN","LL", "LH", "HN", "HL", "HH")
+rownames(table.B) <- c("LN","LL", "LH", "HN", "HL", "HH")
+rownames(table.AB) <- c("LN","LL", "LH", "HN", "HL", "HH")
+colnames(table.A) <- c("msm","c-clay", "c-gumb", "c-frank", "f-normal", "f-gamma")
+colnames(table.B) <- c("msm","c-clay", "c-gumb", "c-frank", "f-normal", "f-gamma")
+colnames(table.AB) <- c("msm","c-clay", "c-gumb", "c-frank", "f-normal", "f-gamma")
+
+### Print tables
+print("TABLE A")
+kable(table.A)
+print("TABLE B")
+kable(table.B)
+print("TABLE AB")
+kable(table.AB)
+
+```
+
