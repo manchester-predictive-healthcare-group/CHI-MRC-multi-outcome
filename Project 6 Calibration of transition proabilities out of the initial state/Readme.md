@@ -1,10 +1,11 @@
+# Directory structure #
+
 All code is ran from the 'code' directory. All data files are stored in the 'data' directory. All figures are saved into the 'Figures' directory. 
 
 The .Rmd file to generate the supplementary figures is also stored in the Figures directory.
 
-##################
+
 # Code structure #
-##################
 
 All .R files have an initial line which clears the workspace and then sets the working directory to be the root directory where 'code', 'data' and 'Figures' are stored. All code is run relative to this root directory. Alternatively an R project can be launced in this root directory.
 
