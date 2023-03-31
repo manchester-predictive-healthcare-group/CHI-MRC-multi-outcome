@@ -1,0 +1,12 @@
+#!/bin/bash --login
+#$ -S bin/bash
+#$ -cwd
+#$ -V
+
+module load compilers/intel/18.0.3
+module load libs/intel-18.0/gsl/2.5
+module load apps/gcc/R/4.0.2
+
+#$ -t 1-6000
+
+Rscript p3.1.3_large_sample_analysis_pv_calc_pctls.R 200000 10 $SGE_TASK_ID > p3.1.3_large_sample_analysis_pv_calc_npctls10.$SGE_TASK_ID.out

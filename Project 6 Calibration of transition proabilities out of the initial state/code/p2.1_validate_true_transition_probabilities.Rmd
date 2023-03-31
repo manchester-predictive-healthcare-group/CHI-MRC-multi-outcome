@@ -1,0 +1,30 @@
+---
+title: "Untitled"
+author: "Alex Pate"
+date: "14/11/2022"
+output: word_document
+---
+
+```{r, echo=FALSE}
+### Set working directory
+rm(list=ls())
+setwd("/mnt/bmh01-rds/mrc-multi-outcome/Project_6")
+getwd()
+
+### Load packages and functions
+source("code/z_functions.R")
+source("code/z_load_packages.R")
+source("code/z_functions_true_transition_probs.R")
+
+### DGM1
+differences <- data.frame(matrix(NA, nrow = 5, ncol = 5))
+for (set in 1:5){
+  print(paste("set =", set))
+  load(paste("data/validate_true_transition_probabilities_DGM1_set", set, ".RData", sep = ""))
+#   print(events(cohort.mstate[["data.wide"]])[["Frequencies"]][,"no event"]/n.cohort)
+#   print(true.trans.probs)
+  differences[set, ] <- events(cohort.mstate[["data.mstate"]])[["Frequencies"]][,"no event"]/n.cohort - true.trans.probs
+}
+
+print("DGM-1")
+kable(differences)
