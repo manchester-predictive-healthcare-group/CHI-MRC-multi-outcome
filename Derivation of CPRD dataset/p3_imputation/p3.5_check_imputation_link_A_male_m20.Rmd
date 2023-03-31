@@ -1,0 +1,137 @@
+---
+title: "check imputation"
+author: "Alex Pate"
+date: "10/01/2022"
+output: word_document
+---
+
+```{r, echo=FALSE}
+library(mice)
+library(knitr)
+
+### Set working directory
+setwd("/mnt/bmh01-rds/mrc-multi-outcome")
+
+### Load workspace
+load("data_Aurum_65plus/data_intermediate/imputed_datesets_link_A_male_m20.RData")
+
+print("BMI convergence plot")
+plot(mice.comb,c("BMI"))
+print("BMI density plot")
+densityplot(mice.comb,~BMI)
+
+
+print("Systolic blood pressure convergence plot")
+plot(mice.comb,c("SBP"))
+print("Systolic blood pressure density plot")
+densityplot(mice.comb,~SBP)
+
+
+print("Cholesterol convergence plot")
+plot(mice.comb,c("Cholhdl_ratio"))
+print("Cholesterol density plot")
+densityplot(mice.comb,~Cholhdl_ratio)
+
+
+print('Smoking Distribution')
+print('Non missing data')
+smoking.nmiss<-100*prop.table(table(data.for.imp$Smoking))
+names(smoking.nmiss)<-c("Never","Ex","Current")
+kable(smoking.nmiss,digits=c(2,2,2))
+
+
+print('Imputed data')
+smoking.imputed<-
+100*rbind(prop.table(table(mice.comb$imp[["Smoking"]][1])),
+prop.table(table(mice.comb$imp[["Smoking"]][2])),
+prop.table(table(mice.comb$imp[["Smoking"]][3])),
+prop.table(table(mice.comb$imp[["Smoking"]][4])),
+prop.table(table(mice.comb$imp[["Smoking"]][5])),
+prop.table(table(mice.comb$imp[["Smoking"]][6])),
+prop.table(table(mice.comb$imp[["Smoking"]][7])),
+prop.table(table(mice.comb$imp[["Smoking"]][8])),
+prop.table(table(mice.comb$imp[["Smoking"]][9])),
+prop.table(table(mice.comb$imp[["Smoking"]][10])),
+prop.table(table(mice.comb$imp[["Smoking"]][11])),
+prop.table(table(mice.comb$imp[["Smoking"]][12])),
+prop.table(table(mice.comb$imp[["Smoking"]][13])),
+prop.table(table(mice.comb$imp[["Smoking"]][14])),
+prop.table(table(mice.comb$imp[["Smoking"]][15])),
+prop.table(table(mice.comb$imp[["Smoking"]][16])),
+prop.table(table(mice.comb$imp[["Smoking"]][17])),
+prop.table(table(mice.comb$imp[["Smoking"]][18])),
+prop.table(table(mice.comb$imp[["Smoking"]][19])),
+prop.table(table(mice.comb$imp[["Smoking"]][20])))
+
+colnames(smoking.imputed)<-c("Never","Ex","Current")
+kable(smoking.imputed,digits=c(2,2,2))
+
+
+print('Ethnicity Distribution')
+print('Non missing data')
+
+Ethnicity.nmiss<-100*prop.table(table(data.for.imp$Ethnicity6))
+names(Ethnicity.nmiss)<-c("White", "Mixed race", "South asian", "Black", "Chinese and other")
+kable(Ethnicity.nmiss,digits=c(2,2,2,2,2))
+
+print('Imputed data')
+Ethnicity.imputed<-
+  100*rbind(prop.table(table(mice.comb$imp[["Ethnicity6"]][1])),
+        prop.table(table(mice.comb$imp[["Ethnicity6"]][2])),
+        prop.table(table(mice.comb$imp[["Ethnicity6"]][3])),
+        prop.table(table(mice.comb$imp[["Ethnicity6"]][4])),
+        prop.table(table(mice.comb$imp[["Ethnicity6"]][5])),
+        prop.table(table(mice.comb$imp[["Ethnicity6"]][6])),
+        prop.table(table(mice.comb$imp[["Ethnicity6"]][7])),
+        prop.table(table(mice.comb$imp[["Ethnicity6"]][8])),
+        prop.table(table(mice.comb$imp[["Ethnicity6"]][9])),
+        prop.table(table(mice.comb$imp[["Ethnicity6"]][10])),
+        prop.table(table(mice.comb$imp[["Ethnicity6"]][11])),
+        prop.table(table(mice.comb$imp[["Ethnicity6"]][12])),
+        prop.table(table(mice.comb$imp[["Ethnicity6"]][13])),
+        prop.table(table(mice.comb$imp[["Ethnicity6"]][14])),
+        prop.table(table(mice.comb$imp[["Ethnicity6"]][15])),
+        prop.table(table(mice.comb$imp[["Ethnicity6"]][16])),
+        prop.table(table(mice.comb$imp[["Ethnicity6"]][17])),
+        prop.table(table(mice.comb$imp[["Ethnicity6"]][18])),
+        prop.table(table(mice.comb$imp[["Ethnicity6"]][19])),
+        prop.table(table(mice.comb$imp[["Ethnicity6"]][20])))
+
+colnames(Ethnicity.imputed)<-c("White", "Mixed race", "South asian", "Black", "Chinese and other")
+kable(Ethnicity.imputed,digits=c(2,2,2,2,2))
+
+
+print('IMD Distribution')
+print('Non missing data')
+IMD.nmiss<-100*prop.table(table(data.for.imp$IMD))
+names(IMD.nmiss)<-c("1 (most deprived)", "2", "3", "4", "5 (least deprived)")
+kable(IMD.nmiss,digits=c(2,2,2,2,2))
+
+
+print('Imputed data')
+IMD.imputed<-
+100*rbind(prop.table(table(mice.comb$imp[["IMD"]][1])),
+prop.table(table(mice.comb$imp[["IMD"]][2])),
+prop.table(table(mice.comb$imp[["IMD"]][3])),
+prop.table(table(mice.comb$imp[["IMD"]][4])),
+prop.table(table(mice.comb$imp[["IMD"]][5])),
+prop.table(table(mice.comb$imp[["IMD"]][6])),
+prop.table(table(mice.comb$imp[["IMD"]][7])),
+prop.table(table(mice.comb$imp[["IMD"]][8])),
+prop.table(table(mice.comb$imp[["IMD"]][9])),
+prop.table(table(mice.comb$imp[["IMD"]][10])),
+prop.table(table(mice.comb$imp[["IMD"]][11])),
+prop.table(table(mice.comb$imp[["IMD"]][12])),
+prop.table(table(mice.comb$imp[["IMD"]][13])),
+prop.table(table(mice.comb$imp[["IMD"]][14])),
+prop.table(table(mice.comb$imp[["IMD"]][15])),
+prop.table(table(mice.comb$imp[["IMD"]][16])),
+prop.table(table(mice.comb$imp[["IMD"]][17])),
+prop.table(table(mice.comb$imp[["IMD"]][18])),
+prop.table(table(mice.comb$imp[["IMD"]][19])),
+prop.table(table(mice.comb$imp[["IMD"]][20])))
+
+colnames(IMD.imputed)<-c("1 (most deprived)", "2", "3", "4", "5 (least deprived)")
+kable(IMD.imputed,digits=c(2,2,2,2,2))
+```
+

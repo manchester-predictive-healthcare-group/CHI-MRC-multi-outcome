@@ -1,0 +1,54 @@
+---
+title: "Tables for Project 5 n100000 no death"
+author: "Alex Pate"
+date: "21/09/2021"
+output: word_document
+---
+
+
+```{r, echo=FALSE}
+setwd("/mnt/bmh01-rds/mrc-multi-outcome")
+
+options(scipen = 999)
+
+load("data_Aurum_65plus/data_intermediate/create_table1.RData")
+
+library(knitr)
+
+
+print("No link - cohort A")
+print("Predictor variables")
+kable(table1.nolink.A.hist)
+print("Outcome events")
+kable(table1.nolink.A.events)
+print("Missing")
+kable(table.miss.nolink.A, digits = c(2,2,2,2,2,2))
+
+
+print("Linkage required - cohort A")
+print("Predictor variables")
+kable(table1.link.A.hist)
+print("Outcome events")
+kable(table1.link.A.events)
+print("Missing")
+kable(table.miss.link.A, digits = c(2,2,2,2,2,2))
+
+
+print("No link - cohort B")
+print("Predictor variables")
+kable(table1.nolink.B.hist)
+print("Outcome events")
+kable(table1.nolink.B.events)
+print("Missing")
+kable(table.miss.nolink.B, digits = c(2,2,2,2,2,2))
+
+
+print("Linkage required - cohort B")
+print("Predictor variables")
+kable(table1.link.B.hist)
+print("Outcome events")
+kable(table1.link.B.events)
+print("Missing")
+kable(table.miss.link.B, digits = c(2,2,2,2,2,2))
+
+```
