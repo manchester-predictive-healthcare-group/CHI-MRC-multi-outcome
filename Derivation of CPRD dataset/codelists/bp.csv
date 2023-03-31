@@ -1,0 +1,31 @@
+"medcodeid","Term","OriginalReadCode","CleansedReadCode","SnomedCTConceptId","SnomedCTDescriptionId","Release","EmisCodeCategoryId"
+461166013,"[V]Examination of blood pressure","ZV70B","ZV70B00",274785000,410648013,NA,32
+458812014,"Average 24 hour systolic blood pressure","246W","246W.00",314449000,458812014,NA,2
+458809011,"Average day interval systolic blood pressure","246Y","246Y.00",314446007,458809011,NA,2
+458808015,"Average night interval systolic blood pressure","246b","246b.00",314445006,458808015,NA,2
+458803012,"Average systolic blood pressure","246l","246l.00",314440001,458803012,NA,2
+2378631000000110,"Baseline blood pressure","246n","246n.00",928021000000108,2378631000000110,NA,2
+1928511000006116,"Baseline systolic blood pressure","EMISNQBA30","",1928511000006100,1928511000006116,NA,2
+2418961000000111,"Baseline systolic blood pressure","246n1","246n100",716579001,3306694016,NA,2
+64172013,"Elevated blood pressure","G20-1","G20..11",24184005,196353013,NA,32
+317911017,"Low blood pressure reading","R1y3","R1y3.00",271870002,406863012,NA,32
+254079018,"Lying blood pressure reading","246C","246C.00",163033001,254079018,NA,2
+2159157015,"Lying systolic blood pressure","246S","246S.00",407556006,2159157015,NA,2
+2616321000000118,"Non-invasive central blood pressure","246o","",1036531000000108,2616321000000118,NA,2
+2616361000000114,"Non-invasive central systolic blood pressure","246o0","",1036551000000101,2616361000000114,NA,2
+5295021000006119,"Non-invasive systolic arterial pressure","^ESCTNO529502","",251070002,374205018,NA,31
+254064013,"O/E - blood pressure","246-2","246..12",163020007,254064013,NA,2
+254084012,"O/E - blood pressure decreased","246F","246F.00",163036009,254084012,NA,2
+254063019,"O/E - blood pressure reading","246","246..00",163020007,254063019,NA,2
+923841000006113,"O/E - blood pressure reading","PCNQOE2","",923841000006109,923841000006113,NA,42
+254091010,"O/E-blood pressure reading NOS","246Z","246Z.00",163020007,254063019,NA,2
+317910016,"Raised blood pressure","R1y2","R1y2.00",24184005,1784950015,NA,32
+254083018,"Sitting blood pressure reading","246E","246E.00",163035008,254083018,NA,2
+2159155011,"Sitting systolic blood pressure","246Q","246Q.00",407554009,2159155011,NA,2
+254080015,"Standing blood pressure reading","246D","246D.00",163034007,254080015,NA,2
+1780182014,"Standing systolic blood pressure","246N","246N.00",400974009,1780182014,NA,2
+114311000006111,"Systolic arterial pressure","2469","2469.00",72313002,120159016,NA,2
+5527191000006114,"Systolic blood pressure","^ESCTSY552719","",271649006,406507015,NA,2
+3676271000006117,"Systolic blood pressure","^ESCTSY367627","",72313002,120163011,NA,2
+1808011000006111,"Systolic blood pressure - left arm","EMISNQSY8","",1808011000006107,1808011000006111,NA,2
+1808041000006110,"Systolic blood pressure - right arm","EMISNQSY9","",1808041000006106,1808041000006110,NA,2

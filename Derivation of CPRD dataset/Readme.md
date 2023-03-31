@@ -13,3 +13,7 @@ The p2.6 file extracts baseline data for all variables which are of type 'histor
 The p2.7 files extract outcome data (time until event, and a censoring indicator).
 
 p3 files import the cohort into R and run multiple imputation.
+
+More details are provided on what each of the programs do in the Data Extraction document. This document was produced for personal use and therefore may be difficult to follow, however is being provided as may provide additional information.
+
+Codelists have been provided in the 'codelists' folder. These codelists have not been put together by our research team. A fully referenced guide to where all of these codelists have been taken from (all publically available online) can be found in the word document: Data extraction document.docx

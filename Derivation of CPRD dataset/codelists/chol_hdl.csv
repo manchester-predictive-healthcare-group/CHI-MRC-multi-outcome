@@ -1,0 +1,7 @@
+"medcodeid","Term","OriginalReadCode","CleansedReadCode","SnomedCTConceptId","SnomedCTDescriptionId","Release","EmisCodeCategoryId"
+259243019,"Serum random HDL (high density lipoprotein) cholesterol level","44PC","44PC.00",1026461000000104,2599971000000117,NA,34
+259242012,"Serum fasting HDL (high density lipoprotein) cholesterol level","44PB","44PB.00",1026451000000102,2599931000000119,NA,34
+1822511000006110,"Test request : Serum HDL cholesterol level","EMISREQ|44P5.","44P5.00",1822511000006106,1822511000006110,NA,46
+259564016,"Plasma random HDL (high density lipoprotein) cholesterol level","44d2","44d2.00",1028831000000106,2600041000000114,NA,34
+259567011,"Plasma fasting HDL (high density lipoprotein) cholesterol level","44d3","44d3.00",1028841000000102,2600031000000117,NA,34
+259232010,"Serum high density lipoprotein cholesterol level","44P5","44P5.00",1005681000000107,2577901000000110,NA,34

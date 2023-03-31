@@ -1,0 +1,18 @@
+"medcodeid","Term","OriginalReadCode","CleansedReadCode","SnomedCTConceptId","SnomedCTDescriptionId","Release","EmisCodeCategoryId"
+1942831000006114,"eGFR (estimated glomerular filtration rate) using creatinine Chronic Kidney Disease Epidemiology Collaboration equation per 1.73 square metres","451N","451N.00",1011481000000105,2579541000000113,NA,34
+1942821000006111,"eGFR (estimated glomerular filtration rate) using cystatin C Chronic Kidney Disease Epidemiology Collaboration equation per 1.73 square metres","451M","451M.00",1011491000000107,2565071000000119,NA,34
+1540241000006111,"GFR (glomerular filtration rate) calculated by abbreviated Modification of Diet in Renal Disease Study Group calculation adjusted for African American origin","451G","451G.00",996231000000108,2581641000000115,NA,34
+976481000006110,"GFR (glomerular filtration rate) calculated by abbreviated Modification of Diet in Renal Disease Study Group calculation","451E","451E.00",1020291000000106,2569781000000116,NA,34
+8352981000006116,"eGFR (estimated glomerular filtration rate) using creatinine CKD-EPI (Chronic Kidney Disease Epidemiology Collaboration) equation","^ESCTEG835298","",963621000000102,2455271000000114,NA,31
+8352951000006112,"eGFR (estimated glomerular filtration rate) using cystatin C CKD-EPI (Chronic Kidney Disease Epidemiology Collaboration) equation","^ESCTEG835295","",963601000000106,2455281000000111,NA,31
+8294821000006118,"eGFR (estimated glomerular filtration rate) using CKD-Epi (Chronic Kidney Disease Epidemiology Collaboration) formula","^ESCTEG829482","",857971000000104,2221401000000117,NA,34
+12621931000006112,"eGFR (estimated glomerular filtration rate) by laboratory calculation","^ESCT1262193","",1107411000000104,2771501000000110,NA,31
+12491261000006120,"eGFR (estimated glomerular filtration rate) using CKD-Epi (Chronic Kidney Disease Epidemiology Collaboration) formula per 1.73 square metres","^ESCT1249126","",857971000000104,2220291000000118,NA,34
+1866321000006117,"Estimated glomerular filtration rate using Chronic Kidney Disease Epidemiology Collaboration formula","451K","451K.00",857971000000104,2220261000000112,NA,34
+8050441000006118,"Glomerular filtration rate calculated by abbreviated Modification of Diet in Renal Disease Study Group calculation","^ESCTGL805044","",166181000000100,226321000000112,NA,31
+8069731000006118,"Glomerular filtration rate calculated by abbreviated Modification of Diet in Renal Disease Study Group calculation adjusted for African American origin","^ESCTGL806973","",222521000000103,354051000000115,NA,31
+8352971000006119,"Estimated glomerular filtration rate using creatinine Chronic Kidney Disease Epidemiology Collaboration equation","^ESCTES835297","",963621000000102,2455171000000119,NA,31
+8352941000006110,"Estimated glomerular filtration rate using cystatin C Chronic Kidney Disease Epidemiology Collaboration equation","^ESCTES835294","",963601000000106,2455121000000118,NA,31
+8294801000006111,"Estimated glomerular filtration rate using Chronic Kidney Disease Epidemiology Collaboration formula","^ESCTES829480","",857971000000104,8294801000006111,NA,34
+8250311000006118,"Estimation of glomerular filtration rate","^ESCTES825031","",791801000000102,1770241000000116,NA,31
+12621921000006110,"Estimated glomerular filtration rate by laboratory calculation","^ESCT1262192","",1107411000000104,2771211000000114,NA,31

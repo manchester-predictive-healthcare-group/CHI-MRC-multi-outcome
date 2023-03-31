@@ -1,0 +1,3 @@
+"medcodeid","Term","OriginalReadCode","CleansedReadCode","SnomedCTConceptId","SnomedCTDescriptionId","Release","EmisCodeCategoryId"
+133205018,"Glomerular filtration rate","451F","451F.00",80274001,133205018,NA,34
+12680441000006112,"GFR - glomerular filtration rate","^ESCT1268044","",80274001,2773141000000116,NA,34

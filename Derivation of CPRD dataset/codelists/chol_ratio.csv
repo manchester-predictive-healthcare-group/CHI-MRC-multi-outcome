@@ -1,0 +1,5 @@
+"medcodeid","Term","OriginalReadCode","CleansedReadCode","SnomedCTConceptId","SnomedCTDescriptionId","Release","EmisCodeCategoryId"
+279462018,"High density lipoprotein/total cholesterol ratio","44PG","44PG.00",1031421000000101,2602691000000112,NA,34
+259250015,"Total cholesterol:HDL (high density lipoprotein) ratio","44PF","44PF.00",1028551000000102,2602701000000112,NA,34
+458249011,"Serum cholesterol/high density lipoprotein ratio","44lF","44lF.00",1015681000000109,2574851000000110,NA,34
+457911015,"Cholesterol/HDL ratio","44l2","44l2.00",313811003,457911015,NA,34
