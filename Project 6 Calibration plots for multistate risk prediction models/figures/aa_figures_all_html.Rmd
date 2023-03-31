@@ -1,0 +1,178 @@
+---
+title: "Supplementary material part 2 - supplementary figures"
+author: "Alex Pate"
+date: "17/01/2023"
+output: html_document
+---
+
+Associated manuscript: Assessing the calibration of transition probabilities in a multistate model out of the initial state
+
+# Section 1 - Large sample analysis: moderate calibration (non-informative censoring)
+
+The first section of this document contains the plots assessing the moderate calibration in the large development sample analysis for the pseudo-value and MLR-IPCW methods in the non-informative censoring (NIC) scenario. To showcase each methods ability to appropriately assess non-linear patterns of miscalibration, there is a seperate plot for each method, containing the calibration plots for the perfectly calibrated, over predicting and under predicting transition probabilities. These plots are of the same type as Figure 2 from the main manuscript.
+
+```{r, echo=FALSE, results = 'asis'}
+library(knitr)
+
+### Assign cohort size
+n.cohort <- 200000
+
+### Assign number of percentiles
+n.pctls <- 20
+
+### Create a counter
+counter <- 1
+
+### Loop through different scenarios and types of predicted probabilities
+for (method in c("PV", "MLRIPCW")){
+     scen.label <- "NIC"
+        cat("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+        cat("\n\n\n")
+        cat("**Figure S", counter, ": Assessment of moderate calibration for the pseudo-value approach in scenario NIC, large sample analysis**", sep = "")
+        cat(" \n\n")
+        cat("![](",paste("gg_large_sample_moderate_main_N", n.cohort, "_M1C1_npctls", n.pctls, "_", method, ".png", sep = ""),")")
+        counter <- counter + 1
+      }
+      
+```
+
+# Section 2 - Large sample analysis: moderate calibration (weakly and strongly informative censoring)
+
+The second section of this document contains the plots assessing the moderate calibration in the large development sample analysis for the BLR-IPCW, pseudo-value and MLR-IPCW methods in the weakly and strongly informative censoring scenarios (WIC and SIC). To compare the bias of each method in the presence of informative censoring, there is a seperate plot for each type of predicted transition probability, where all three methods (BLR-IPCW, pseudo-value and MLR-IPCW) are compared. These plots are of the same type as Figures 3 and 4 from the main manuscript.
+
+
+```{r, echo=FALSE, results = 'asis'}
+
+### Create a vector that will be used for naming figures
+tp.type <- c("Perfectly calibrated transition probabilities", 
+             "Over predicting transition probabilities", 
+             "Under predicting transition probabilities")
+
+### Loop through different scenarios and types of predicted probabilities
+for (scen.m in c("M1")){
+    for (scen.c in c("C2", "C3")){
+      for (i in 2:3){
+        if (scen.c == "C2"){
+          scen.label <- "WIC"
+        } else if (scen.c == "C3"){
+          scen.label <- "SIC"
+        }
+        cat("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+        cat("\n\n\n")
+        cat("**Figure S", counter, ": Assessment of moderate calibration for each method**", sep = "")
+        cat(" \n\n")
+        cat("Scenario = ", scen.label, ", ", tp.type[i], sep = "")
+        cat("![](",paste("gg_large_sample_moderate_main_N", n.cohort, "_", scen.m, scen.c, "_npctls", n.pctls, "_est", i, ".png", sep = ""),")")
+        counter <- counter + 1
+      }
+    }
+  }
+
+```
+
+
+# Section 3 - Large sample analysis: moderate and mean calibration sensitivity analyses
+
+The third section of this document contains the plots assessing how robust BLR-IPCW and MLR-IPCW are to misspecification of the weights. We considered four options: 
+
+-BLR-IPCW: weights estimated from the data using perfectly specified model, as was done in the main manuscript.
+
+-BLR: no inverse probability of censoring weights were applied in the calibration models.
+
+-BLR-IPCW-MISS: weights were estimated from the data using a misspecified model that did not adjust for the predictor variables (a Kaplan-Meier estimate of being censored).
+
+-BLR-IPCW-DGM: weights were calculated directly from the data generating mechanism, rather than being estimated from the data.
+
+Note that the above is done for both BLR and MLR.
+
+We expect BLR-IPCW-DGM to be optimal. We think the most important comparison is with BLR-IPCW-MISS, which applies the weighting, but in a sub-optimal manner. The important conclusions from these figures are that in scenarios WIC and SIC, even when the weights are misspecified (BLR-IPCW-MISS and MLR-IPCW-MISS), there is not a huge drop in performance. If one fails to adjust for weights at all ('BLR' or 'MLR' approaches), there is a considerable drop in performance. This is even true for assessing mean calibration, and is most evident in Figure XXXX.
+
+
+```{r, echo=FALSE, results = 'asis'}
+
+
+### Loop through different scenarios and types of predicted probabilities
+for (scen.m in c("M1")){
+    for (scen.c in c("C1", "C2", "C3")){
+      for (i in 1:3){
+                cat("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+        cat("\n\n\n")
+        cat("Figure S", counter, ": Misspecification of weights, BLR", sep = "")
+        cat("\n\n")
+        cat("Scenario = ", scen.m, scen.c, ", ", tp.type[i], sep = "")
+        cat("![](",paste("gg_large_sample_moderate_sens_blr_N", n.cohort, "_", scen.m, scen.c, "_est", i, ".png", sep = ""),")")
+        counter <- counter + 1
+      }
+    }
+  }
+
+
+### Loop through different scenarios and types of predicted probabilities
+for (scen.m in c("M1")){
+    for (scen.c in c("C1", "C2", "C3")){
+      for (i in 1:3){
+                cat("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+        cat("\n\n\n")
+        cat("Figure S", counter, ": Misspecification of weights, MLR", sep = "")
+        cat("\n\n")
+        cat("Scenario = ", scen.m, scen.c, ", ", tp.type[i], sep = "")
+        cat("![](",paste("gg_large_sample_moderate_sens_mlr_N", n.cohort, "_", scen.m, scen.c, "_est", i, ".png", sep = ""),")")
+        counter <- counter + 1
+      }
+    }
+  }
+
+cat("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+        cat("\n\n\n")
+        cat("Figure S", counter, ": Bias (CI) in estimation of mean calibration, misspecification of weights for BLR.", sep = "")
+        cat("\n\n")
+        cat("Scenario = ", scen.m, scen.c, ", ", tp.type[i], sep = "")
+        cat("![](",paste("gg_sens_blr_large_sample_mean_N", n.cohort, "_npctls", n.pctls, ".png", sep = ""),")")
+        counter <- counter + 1
+
+cat("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+        cat("\n\n\n")
+        cat("Figure S", counter, ": Bias (CI) in estimation of mean calibration, misspecification of weights for MLR.", sep = "")
+        cat("\n\n")
+        cat("Scenario = ", scen.m, scen.c, ", ", tp.type[i], sep = "")
+        cat("![](",paste("gg_sens_mlr_large_sample_mean_N", n.cohort, "_npctls", n.pctls, ".png", sep = ""),")")
+        counter <- counter + 1
+
+```
+
+
+# Section 4 - Small sample analysis: mean calibration
+
+This section contains the mean calibration plots (median and 2.5 - 97.5 percentile range) for the small sample analysis when patients were grouped into a smaller number of groups (5 and 10) before estimating mean calibration using AJ. Results are also presented for sample size N = 1500, although results could not be obtained for N = 1500 and 20 groups for calibration, as the groups were too small and the Aalen-Johansen estimator could not be estimated.
+
+
+```{r, echo=FALSE, results = 'asis'}
+
+for (n.cohort in c(3000, 1500)){
+    for (n.pctls in c(10, 5)){
+      cat("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+      cat("\n\n\n")
+        cat("Figure S", counter, ": Small sample analysis. Median and 2.5 - 97.5 percentile range in bias of each estimator for mean calibration. N = ", n.cohort, ", groups = ", n.pctls, ".", sep = "")
+        cat("\n\n")
+        cat("Scenario = ", scen.m, scen.c, ", ", tp.type[i], sep = "")
+        cat("![](",paste("gg_small_sample_mean_N", n.cohort, "_npctls", n.pctls, "_median.png", sep = ""),")")
+        counter <- counter + 1
+
+  }
+}
+```
+
+# Section 5 - Clinical example
+
+This section contains the moderate calibration plot for the clinical example, when using a development dataset of size N = 100,000. The models (N = 5,000 and N = 100,000) were both validated in the same validation dataset of size N = 100,000. The closer grouping of points in the MLR-IPCW calibration scatter plot is evident for the model with development sample size N = 100,000, indicating a better calibrated model.
+
+```{r, echo=FALSE, results = 'asis'}
+
+      cat("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+        cat("\n\n\n")
+        cat("Figure S", counter, ": Moderate calibration according to each method (development sample size N = 100,000)", sep = "")
+        cat("\n\n")
+        cat("![](",paste("gg_ce_moderate_N", 100000, ".png", sep = ""),")")
+        counter <- counter + 1
+
+```
