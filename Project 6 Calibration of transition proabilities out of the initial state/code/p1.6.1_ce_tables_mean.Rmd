@@ -1,0 +1,66 @@
+---
+title: "p1.6.1 ce results tables"
+author: "Alex Pate"
+date: "10/01/2023"
+output: word_document
+---
+
+```{r, echo=FALSE}
+### Set working directory
+rm(list=ls())
+setwd("/mnt/bmh01-rds/mrc-multi-outcome/Project_6")
+getwd()
+
+### Load packages
+source("code/z_load_packages.R")
+
+### Read in n.cohort
+n.cohort <- 5000
+
+### Load in original model
+load(paste("data/ce_fit_csh_msm_N", n.cohort, ".RData", sep = ""))
+
+### Load the workspace containing results
+load(paste("data/ce_assess_calib_N", n.cohort, ".RData", sep = ""))
+
+### Define qn for confidence intervals
+qn <- qnorm(0.975, 0, 1)
+
+### Create a table with results
+attr(data.mstate, "trans") <- tmat
+kable(events(complete.data.prep.devel)$Frequencies)
+kable(events(data.mstate)$Frequencies)
+
+
+### Create main table
+  table.main <- rbind(
+                    paste(round(calib.mean.aj, 3), 
+                          "(", 
+                          round(calib.mean.aj - qn*obs.aj.se, 3), 
+                          ", ",
+                          round(calib.mean.aj + qn*obs.aj.se, 3),
+                          ")", sep = ""),
+                    paste(round(calib.mean.blr.ipcw$diff.pred.obs, 3), 
+                          "(", 
+                          round(calib.mean.blr.ipcw$diff.pred.obs - 
+                                  qn*calib.mean.blr.ipcw.se[["se"]][paste("diff.pred.obs", 1:6, sep = "")], 3), 
+                          ", ",
+                          round(calib.mean.blr.ipcw$diff.pred.obs + 
+                                  qn*calib.mean.blr.ipcw.se[["se"]][paste("diff.pred.obs", 1:6, sep = "")], 3),
+                          ")", sep = ""),
+                    paste(round(calib.mean.mlr.ipcw$diff.pred.obs, 3), 
+                          "(", 
+                          round(calib.mean.mlr.ipcw$diff.pred.obs - 
+                                  qn*calib.mean.mlr.ipcw.se[["se"]][paste("diff.pred.obs", 1:6, sep = "")], 3), 
+                          ", ",
+                          round(calib.mean.mlr.ipcw$diff.pred.obs + 
+                                  qn*calib.mean.mlr.ipcw.se[["se"]][paste("diff.pred.obs", 1:6, sep = "")], 3),
+                          ")", sep = ""),
+                    round(calib.mean.pv, 3)
+                    )        
+  rownames(table.main) <- c("AJ", "BLR-IPCW", "MLR-IPCW", "PV")
+
+### Print main table
+kable(table.main)
+
+```

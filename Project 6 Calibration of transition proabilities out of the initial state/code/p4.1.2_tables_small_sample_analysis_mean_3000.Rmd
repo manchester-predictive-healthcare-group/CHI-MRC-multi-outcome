@@ -1,0 +1,143 @@
+---
+title: "TEMP_summarise_large_sample_M1C1"
+author: "Alex Pate"
+date: "24/11/2022"
+output: word_document
+---
+
+```{r, echo=FALSE, results = 'asis'}
+### Set working directory
+rm(list=ls())
+setwd("/mnt/bmh01-rds/mrc-multi-outcome/Project_6")
+getwd()
+
+### Load packages
+source("code/z_load_packages.R")
+
+### Pick n.cohort
+n.cohort <- 3000
+
+for (scen in c(do.call(paste0, expand.grid(c("M1", "M2", "M3"), c("C1", "C2", "C3"))))){
+
+### Load worksapce
+load(paste("data/small_sample_analysis_mean_", scen, "_n", n.cohort, ".RData", sep = ""))
+
+### Define qn for confidence intervals
+qn <- qnorm(0.975, 0, 1)
+
+### Create a table for the sensitivity analysis of the IPCW methods
+### Create a table for main output
+tables.sens <- vector("list", 4)
+tables.main <- vector("list", 4)
+
+for (i in 1:3){
+  ### Main table
+  tables.main[[i]] <- rbind(
+  paste(round(colMeans(calib.true.list[[i]]), 3),
+        "(",
+        round(apply(calib.true.list[[i]], 2, quantile, 0.025), 3),
+        ", ",
+        round(apply(calib.true.list[[i]], 2, quantile, 0.975), 3),
+        ")", sep = ""),
+  paste(round(colMeans(calib.aj.int.list[[i]]), 3),
+        "(",
+        round(apply(calib.aj.int.list[[i]], 2, quantile, 0.025), 3),
+        ", ",
+        round(apply(calib.aj.int.list[[i]], 2, quantile, 0.975), 3),
+        ")", sep = ""),
+  paste(round(colMeans(calib.blr.diff.list[[i]][["IPCW.PSPEC"]]), 3),
+        "(",
+        round(apply(calib.blr.diff.list[[i]][["IPCW.PSPEC"]], 2, quantile, 0.025), 3),
+        ", ",
+        round(apply(calib.blr.diff.list[[i]][["IPCW.PSPEC"]], 2, quantile, 0.975), 3),
+        ")", sep = ""),
+  paste(round(colMeans(calib.mlr.diff.list[[i]][["IPCW.PSPEC"]]), 3),
+        "(",
+        round(apply(calib.mlr.diff.list[[i]][["IPCW.PSPEC"]], 2, quantile, 0.025), 3),
+        ", ",
+        round(apply(calib.mlr.diff.list[[i]][["IPCW.PSPEC"]], 2, quantile, 0.975), 3),
+        ")", sep = "")
+)  
+  rownames(tables.main[[i]]) <- c("TRUE", "AJ", "BLR-IPCW", "MLR-IPCW")
+
+  ### Sensitivity table
+  tables.sens[[i]] <- rbind(
+  paste(round(colMeans(calib.true.list[[i]]), 3),
+        "(",
+        round(apply(calib.true.list[[i]], 2, quantile, 0.025), 3),
+        ", ",
+        round(apply(calib.true.list[[i]], 2, quantile, 0.975), 3),
+        ")", sep = ""),
+  paste(round(colMeans(calib.blr.diff.list[[i]][["IPCW.PSPEC"]]), 3),
+        "(",
+        round(apply(calib.blr.diff.list[[i]][["IPCW.PSPEC"]], 2, quantile, 0.025), 3),
+        ", ",
+        round(apply(calib.blr.diff.list[[i]][["IPCW.PSPEC"]], 2, quantile, 0.975), 3),
+        ")", sep = ""),
+  paste(round(colMeans(calib.blr.diff.list[[i]][["NO.WEIGHT"]]), 3),
+        "(",
+        round(apply(calib.blr.diff.list[[i]][["NO.WEIGHT"]], 2, quantile, 0.025), 3),
+        ", ",
+        round(apply(calib.blr.diff.list[[i]][["NO.WEIGHT"]], 2, quantile, 0.975), 3),
+        ")", sep = ""),
+  paste(round(colMeans(calib.blr.diff.list[[i]][["IPCW.MSPEC"]]), 3),
+        "(",
+        round(apply(calib.blr.diff.list[[i]][["IPCW.MSPEC"]], 2, quantile, 0.025), 3),
+        ", ",
+        round(apply(calib.blr.diff.list[[i]][["IPCW.MSPEC"]], 2, quantile, 0.975), 3),
+        ")", sep = ""),
+  paste(round(colMeans(calib.blr.diff.list[[i]][["IPCW.DGMSPEC"]]), 3),
+        "(",
+        round(apply(calib.blr.diff.list[[i]][["IPCW.DGMSPEC"]], 2, quantile, 0.025), 3),
+        ", ",
+        round(apply(calib.blr.diff.list[[i]][["IPCW.DGMSPEC"]], 2, quantile, 0.975), 3),
+        ")", sep = ""),
+  paste(round(colMeans(calib.mlr.diff.list[[i]][["IPCW.PSPEC"]]), 3),
+        "(",
+        round(apply(calib.mlr.diff.list[[i]][["IPCW.PSPEC"]], 2, quantile, 0.025), 3),
+        ", ",
+        round(apply(calib.mlr.diff.list[[i]][["IPCW.PSPEC"]], 2, quantile, 0.975), 3),
+        ")", sep = ""),
+  paste(round(colMeans(calib.mlr.diff.list[[i]][["NO.WEIGHT"]]), 3),
+        "(",
+        round(apply(calib.mlr.diff.list[[i]][["NO.WEIGHT"]], 2, quantile, 0.025), 3),
+        ", ",
+        round(apply(calib.mlr.diff.list[[i]][["NO.WEIGHT"]], 2, quantile, 0.975), 3),
+        ")", sep = ""),
+  paste(round(colMeans(calib.mlr.diff.list[[i]][["IPCW.MSPEC"]]), 3),
+        "(",
+        round(apply(calib.mlr.diff.list[[i]][["IPCW.MSPEC"]], 2, quantile, 0.025), 3),
+        ", ",
+        round(apply(calib.mlr.diff.list[[i]][["IPCW.MSPEC"]], 2, quantile, 0.975), 3),
+        ")", sep = ""),
+  paste(round(colMeans(calib.mlr.diff.list[[i]][["IPCW.DGMSPEC"]]), 3),
+        "(",
+        round(apply(calib.mlr.diff.list[[i]][["IPCW.DGMSPEC"]], 2, quantile, 0.025), 3),
+        ", ",
+        round(apply(calib.mlr.diff.list[[i]][["IPCW.DGMSPEC"]], 2, quantile, 0.975), 3),
+        ")", sep = "")
+)  
+  rownames(tables.sens[[i]]) <- c("TRUE",  "BLR-IPCW", "BLR", "BLR-IPCW.m", "BLR-IPCW.DGM", "MLR-IPCW", "MLR", "MLR-IPCW.m", "MLR-IPCW.DGM")
+}
+
+print(paste("SCENARIO = ", scen))
+cat("\n")
+print(paste("SCENARIO = ", scen))
+cat("\n")
+print(paste("SCENARIO = ", scen))
+cat("\n")
+
+### Now print the results
+print("MAIN")
+tables.main <- do.call("rbind", tables.main)
+print(kable(tables.main))
+cat("\n")
+
+print("SENS")
+tables.sens <- do.call("rbind", tables.sens)
+print(kable(tables.sens))
+cat("\n")
+}
+
+```
+
