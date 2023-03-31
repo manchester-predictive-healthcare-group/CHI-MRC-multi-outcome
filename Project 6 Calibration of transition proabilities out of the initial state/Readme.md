@@ -21,8 +21,8 @@ p1.X files run the clinical example. This code assumes the CPRD dataset has alre
 
 p2.X files generate the data for the simulation.
 
-p3.X files run the large validation sample analysis.
+p3.X files run the large validation sample simulation.
 
-p4.X files run the small validation sample analysis.
+p4.X files run the small validation sample simulation.
 
 All code is commented. If any questions please contact me.
