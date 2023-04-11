@@ -1,0 +1,408 @@
+---
+title: "calibmsm: An R package for calibration plots of a multistate model using inverse probability of censoring weights"
+output: 
+  rmarkdown::html_vignette:
+    number_sections: true
+vignette: >
+  %\VignetteIndexEntry{calibmsm: An R package for calibration plots of a multistate model using inverse probability of censoring weights}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+Risk prediction models enable the prediction of clinical events in either diagnostic or prognostic settings REF XXXX and are used widely to inform clinical practice.XXXX Multistate models are becoming more commonly developed in a risk prediction setting. REF XXXX The use of a multistate model for prediction is relevant when the development of an intermediate condition occuring post index date may have an impact on the risk of future outcomes of interest. All risk prediction models developed for use in clinical practice should be validated in a relevant cohort prior to implementation.REF XXXX. A key part of the validation process is assessment of the calibration of the model. REF XXXX. Ideally calibration curves should be produced which allow evaluation of the calibration over the entire distribution of predicted risk (corresponding to moderate assessment of calibration).
+
+The `mstate` REF XXXX package provides a comprehensive set of tools to develop a multistate model and predict transition probabilities for individuals in a cohort of interest. However, currently no software exists to aid researchers in assessing the calibration of a multistate model that has been developed. `calibmsm` has been developed to enable researchers to produce calibration curves and scatter plots using the BLR-IPCW and MLR-IPCW approaches outlined by Pate et al. The work in this paper extends their framework to assess the calibration of transition probabilities out of any state $j$ at any time $s$ using landmarking REF XXXX, give details on stabilisation of weights, and outline the process for producing confidence intervals.
+
+De wreede et al REF XXXX used EBMT data REF XXXX to showcase how to develop, and the benefits of developing, a multistate model for clinical prediction. In this study, we show how to assess the calibration of a model developed on the same EBMT data. An overview of the methodology is given in section 2. The clinical setting for our example and steps for data preperation and are described in section 3. In section 4, we show how to estimate calibration curves and scatter plots using `calibmsm`. In section 5 we demonstrate how to implement a bootstrapping procedure to estimate confidence intervals for the calibration curves. 
+
+# Methodology 
+
+## Setup
+Let $X(t) \in {1, ..., K}$ be a multistate survival process with $K$ states. We assume a multistate model has already been developed and we want to assess the calibration of the predicted transition probabilities, $\hat{p}_{j,k}(s, t)$, in a cohort of interest. The transition probabilities are the probability of being in state $k$ at time $t$, if in state $j$ at time $s$. The aim is to estimate observed event probabilities: 
+
+$$o_{j,k}(s,t) = P[X(t)=k|X(s) = j, \hat{p}_{j,k}(s,t)]$$
+
+This can be estimated by fitting an appropriate model in a landmark cohort of individuals present in state $j$ at time $s$. We propose doing this using cross sectional calibration techniques (i.e. methods to assess the calibration of models predicting binary or polytomous outcomes) in the cohort of individuals uncensored at time $t$. 
+Unless censoring is non-informative and there are no absorbing states, calibration must be assessed in a cohort reweighted using inverse probability of censoring weights. Calibration models, and process for calculating weights, is detailed in sections 2.2 - 2.4.
+
+## Estimation of weights
+
+The estimand for the weights is $w_{j}(s,t)$, the inverse of the probability of being uncensored at time $t$ if in state $j$ at time $s$: 
+
+$$w_{j}(s,t) = \frac{1}{P[t_{cens} > t|t > s, X(s) = j, \boldsymbol{Z},\boldsymbol{X(t)}]},$$
+where $\boldsymbol{X(t)}$ denotes the history of the multistate survival process up to time $t$, including the transition times. First the estimator $\hat{P}[t_{cens} > t|t > s, X(s) = j, \boldsymbol{Z}]$ is calculated by developing an appropriate survival model. The outcome in this model is the time until censoring occurs. Moving into an absorbing state acts as the censoring mechanism in this model. $\boldsymbol{X(t)}$ is explicitly conditioned on when defining $w_{j}(s,t)$ because the weights must reflect that censoring can no longer be observed for an individual if they enter an absorbing state at some time $t_{abs} < t$. Therefore 
+
+$$\hat{P}[t_{cens} > t|t > s, X(s) = j, \boldsymbol{Z},\boldsymbol{X(t)}] = \hat{P}[t_{cens} > t_{abs}|t > s, X(s) = j, \boldsymbol{Z}]$$ 
+
+if $\boldsymbol{X(t)}$ is in an absorbing state, and 
+
+$$\hat{P}[t_{cens} > t|t > s, X(s) = j, \boldsymbol{Z},\boldsymbol{X(t)}] = \hat{P}[t_{cens} > t|t > s, X(s) = j, \boldsymbol{Z}]$$ 
+
+otherwise. In `calibmsm` a cox proportional hazards model where all predictors $\boldsymbol{Z}$ are assumed to have a linear effect on the log-hazard is used to estimate $\hat{P}[t_{cens} > t|t > s, X(s) = j, \boldsymbol{Z}]$. However users can also input their own vector of weights. Given the BLR-IPCW and MLR-IPCW approaches are both reliant on correct estimation of the weights, we encourage users to take the time to carefully estimate weights themselves using non-linear functions of $\boldsymbol{Z}$ and interaction terms when appropriate.
+
+Stabilised weights can be estimated by multiplying by the weights $\hat{w}_{j}(s, t)$ by the mean probability of being uncensored, estimated through an intercept only model:
+
+
+$$\hat{w}_{j}^{stab}(s, t) = \frac{\hat{P}[t_{cens} > t|t > s, X(s) = j]}{\hat{P}[t_{cens} > t|t > s, X(s) = j, \boldsymbol{Z},\boldsymbol{X(t)}]}.$$
+
+Note there is no dependence on $\boldsymbol{X(t)}$ in the numerator. Another option is to estimate $w(s,t)$, which is the inverse of the probability of being uncensored at time $t$ if uncensored at time $s$: 
+
+$$w(s,t) = \frac{1}{P[t_{cens} > t|t > s, \boldsymbol{Z},\boldsymbol{X(t)}]},$$
+
+using the same approach as for $w_{j}(s,t)$. If the censoring mechanism is non-informative after conditioning on the predictors $\boldsymbol{Z}$, then $w(s,t) = w_{j}(s,t)$, and any consistent estimator for $w(s,t)$ will be a consistent estimator of $w_{j}(s,t)$. The advantage is that $\hat{w}(s,t)$ is calculated by developing a model in the cohort of individuals uncensored at time $s$, which is a larger cohort than those uncensored and in state $j$ at time $s$. Therefore $\hat{w}(s,t)$ will be a more precise estimator than $\hat{w}_{j}(s,t)$. On the contrary, if the assumption of non-informative censoring after adjusting for $\boldsymbol{Z}$ does not hold there is a risk of bias.
+
+## BLR-IPCW
+
+Let $I_{k}(t)$ be an indicator for whether an individual is in state $k$ at time $t$. $I_{k}(t)$ is then modeled using a flexible approach with $\hat{p}_{j, k}(s, t)$ as the sole predictor. This model is fit in the reweighted landmark cohort (in state $j$ at time $s$) of individuals uncensored at time $t$. We suggest using a loess smoother:
+
+$$I_{k}(t) = loess(\hat{p}_{j, k}(s, t)),$$
+or a logistic regression model with restricted cubic splines:
+
+$$logit(I_{k}(t)) = rcs(logit(\hat{p}_{j, k}(s, t))).$$
+
+Any flexible model for binary outcomes could be used, but these are the most common and are implemented in this package. Observed event probabilities $o_{j,k}(s,t)$ are then generated as fitted values from these models. The calibration curve is then plotted using the set of points $\{\hat{p}_{k}(t), \hat{o}_{j,k}(s,t)\}$.
+
+## MLR-IPCW
+
+Let $I_{X}(t)$ be an polytomous indicator variable $I_{X}(t) \in {1, ..., K}$ such that $I_{X}(t) = k$ if an individual is in state $k$ at time $t$. The nominal recalibration framework of van Hoorde et al., REF XXXX is then applied to the reweighted landmark cohort of individuals uncensored at time $t$. First calculate the log-ratios:
+
+$$\hat{LP}_{k} = ln\left(\frac{\hat{p}_{k}(t)}{\hat{p}_{1}(t)}\right)$$ 
+
+Then fit the following multinomial logistic regression model: 
+
+$$ln\left(\frac{P[I_{X}(t) = k]}{P[I_{X}(t) = 1]}\right) = \alpha_{k} + \sum_{h=2}^{K} \beta_{k,h}*s_{k}(\hat{LP}_{h}),$$ 
+
+for $k > 1$, and where $s$ is a vector spline smoother. REF XXXX. Again, observed event probabilities $\hat{o}_{j,k}(s,t)$ are then generated as fitted values from this model. This results in a calibration scatter plot as opposed to a calibration curve due to all states being modeled simultaneously, as opposed to a "one vs all" approach. The scatter occurs because the observed event probabilities for state $k$ vary depending on the predicted transition probabilities of the other states. This is a stronger REF XXXX form of calibration than that evaluated by BLR-IPCW, and will also result in observed event probabilities which sum to 1.
+
+# Clinical setting and data preperation
+
+We utilise data from the European Group for Blood and Marrow Transplantation REF XXXX, containing multistate survival data after a transplant for patients with blood cancer.The start of follow up is the day of the transplant and the initial state is alive and in remission. There are three intermediate events ($2$: recovery, $3$: adverse event, or $4$: recovery + adverse event), and two absorbing states ($5$: relapse and $6$: death). This data is available from the `mstate` package REF XXXX. 
+
+Two datasets are provided to enable assessment of the calibration of these transition probabilities. The first is `ebmtcal`, which is the same as the `ebmt` dataset provided in `mstate`, with two extra variables derived: time until censoring (`dtcens`) and an indicator for whether censoring was observed (`dtcens.s = 1`) or an absorbing state was entered (`dtcens.s = 0`). This dataset contains baseline information on year of transplant `year`, age at transplant `age`, prophylaxis given `proph`, and whether the donor was gender matched `match`. The second dataset provided is `msebmtcal`, which is the `ebmt` dataset converted into `msdata` format using the process outlined in de Wreede et al. REF XXXX. It contains all transition times, an event indicator for each transition, as well as a `trans` attribute, containing the transition matrix.
+
+```{r}
+library(calibmsm)
+library(dplyr)
+
+data("ebmtcal")
+data("msebmtcal")
+
+head(ebmtcal)
+
+head(msebmtcal)
+```
+
+In the work of de Wreede et al. XXXX, the focus is on predicting transition probabilities at times $s = 0$ and $s = 100$, and comparing prognosis for patients with different predictor variables. We therefore focus on assessing the calibration of the transition probabilities made at these times. We estimate transition probabilities for each individual by developing a model exactly as demonstrated in de Wreede et al., REF XXXX. The predicted transitions probabilities from each state $j$ at times $s = 0$ and $s = 100$ are contained in stacked datasets `tps0` and `tps100` respectively. We used a leave-one-out approach when estimating these transition probabilities, meaning we can develop and validate the models on the same dataset, and any assessment of model performance will be free from in-sample optimism.
+
+```{r}
+data("tps0")
+data("tps100")
+
+head(tps0)
+
+head(tps100)
+```
+
+The reason for the structure of the data is as follows. The `ebmtcal` dataset has one row per individual and provides the basis for assessing calibration. The models to estimate the observed event probabilities are fit within this dataset. The predicted risks are provided separately, rather than within `ebmtcal` given there is more than one predicted transition probability for each individual (states $j$ and times $s$). The `msebmtcal` dataset is required to identify which individuals are in state $j$ at time $s$ in order to apply the landmarking. The code for deriving all these datasets is provided in the supplementary material [**NOTE: MOVE THIS CODE INTO R PACKAGE DOCUMENTATION AS WELL XXXX**].
+
+# Assessing calibration using calibration curves and calibration scatter plots
+
+The procedure for producing calibration plots requires the use of two functions. The first function, `calc_calib_blr` or `calc_calib_mlr`, calculates the data for the calibration plot. The second function, `plot.calib_blr` or `plot.calib_mlr`, produces the plot. This approach allows users flexibility in producing their own plots. 
+
+## Plots out of state $j = 1$ at time $s = 0$
+
+We start by producing calibration curves for the predicted transition probabilities out of state $j = 1$ at time $s = 0$. Given all individuals start in state $1$, there is no need to consider the transition probabilities out of states $j \neq 1$ at time $s = 0$. We start by assigning the time at which calibration is assessed to be 5 years (1826 days). We then estimate the observed event probabilities for the transition into each state using the function `calc_calib_blr`. The `data.mstate` argument requires an object of class `msdata`. The `data.raw` argument requires a `data.frame` with variables `dtcens` and `dtcens.s`, plus any baseline variables $\boldsymbol{Z}$ used to estimate the weights. The predicted transition probabilities from state $j = 1$ at time $s = 0$ are extracted from the object `tps0`. We choose to estimate the calibration curves using restricted cubic splines, and 3 knots are chosen given the reasonably small size of the dataset. Weights are estimated using the in-built estimation procedure and the predictor variables `year, agecl, proph` and `match`. The `w.landmark.type` argument assigns whether weights are estimated using all individuals uncensored at time $s$, or only those uncensored and in state $j$ at time $s$, as discussed in section [Estimation of weights]. The maximum weight (`w.max = 10`) and stabilisation of weights (`stabilised = FALSE`) are left as default.
+
+```{r}
+t.eval <- 1826 
+
+dat.calib.blr <- calc_calib_blr(data.mstate = msebmtcal,
+                                data.raw = ebmtcal,
+                                j=1,
+                                s=0,
+                                t.eval = t.eval,
+                                tp.pred = tps0 %>% dplyr::filter(j == 1) %>% dplyr::select(any_of(paste("pstate", 1:6, sep = ""))),
+                                curve.type = "rcs",
+                                rcs.nk = 3,
+                                w.covs = c("year", "agecl", "proph", "match"))
+```
+
+The first element of `dat.calib.blr` (named `plotdata`) contains 6 data frames for the calibration curves of the transition probabilities into each of the six states, $\k \in {1,2,3,4,5,6}$. Each data frame contains three columns, `id`: the identifier of each individual; `pred`: the predicted transition probabilities; `obs`: the observed event probabilities. These data frames have less rows than `ebmtcal` because calibration can only be assessed in individuals uncensored at time `t.eval`. The second element (named `metadata`) is a metadata argument containing a vector of the possible transitions from state $j$ (all states cannot necessarily be reached from state $j$), the size of the confidence interval (currently `false`), and the type of calibration curve (`rcs` or `loess`).
+
+```{r}
+str(dat.calib.blr[["plotdata"]])
+
+str(dat.calib.blr[["metadata"]])
+```
+
+Calibration curves can then be generated using the S3 generic `plot` function.
+
+```{r, fig.width = 7.5, fig.height = 5}
+plot(dat.calib.blr, combine = TRUE, nrow = 2, ncol = 3)
+```
+
+**NOTE: The plots look bad when rendered within the html document. I can get them to look nice if I save them using Cairo graphics, and then insert into the document. This will be done for publication.**
+
+We can see a lot of variation in the calibration of the transition probabilities into each of the different states. The calibration into states 4 and 6 looks quite good, although there is under prediction and over prediction amongst individuals with the lowest and highest predicted risks respectively. State 2 has good calibration over the majority of the predicted risks but over predicts a lot for individuals with the highest predicted risks. State 1 is over predicted for almost the entire range of predicted risks, whereas state 3 is under predicted over the entire range of predicted risk. Most importantly, the calibration of the transition probabilities into state 5 (Relapse) is extremely poor. The observed event probabilities are not a monotonically increasing function of the predicted transition probabilities. Relapse is a key clinical outcome in this clinical setting. How to estimate confidence intervals for these curves is detailed in section [Estimating confidence intervals for the calibration curves].
+
+Next we use the MLR-IPCW to evaluate calibration which produces a calibration scatter plot. The process is identical except the use of the function `calc_calib_mlr`.
+
+```{r, fig.width = 7.5, fig.height = 5}
+dat.calib.mlr <- calc_calib_mlr(data.mstate = msebmtcal,
+                                        data.raw = ebmtcal,
+                                        j=1,
+                                        s=0,
+                                        t.eval = 1826,
+                                        tp.pred = tps0 %>% dplyr::filter(j == 1) %>% dplyr::select(any_of(paste("pstate", 1:6, sep = ""))),
+                                        smoother.type = "sm.ps",
+                                        w.covs = c("year", "agecl", "proph", "match"),
+                                        w.landmark.type = "all")
+
+plot(dat.calib.mlr, combine = TRUE)
+```
+
+It can be seen there is a great deal of variation in calibration of the transition probabilities into each state $k$ depending on the predicted transition probabilities into states $\neq k$. One valuable insight from these plots is that the variance in the calibration of the transition probabilities into state 6, is smaller than that of state 4, despite these two states both having similar (arguably state 4 had better) calibration according to the BLR-IPCW plots. This insight can be gained because MLR-IPCW is a stronger form of calibration assessment than BLR-IPCW, as calibration is effectively being assessed within different levels of the predictor variables (which drive the predicted transition probabilities of all states). This type of calibration assessment also requires a bigger sample size as the confidence intervals around the observed event probabilities will be bigger than for BLR-IPCW. Furthermore, it is not clear how to present confidence intervals for all data points simultaneously. Given the relatively small number of data points we do not focus on the calibration scatter plots for the remainder of this example. 
+
+In the work of de Wreede et al REF XXXX, focus then shifts to comparing survival rates when $s = 100$ depending on whether an individual has had an adverse event (state $3$) or remains in state $1$. Our focus now shifts to assessing the calibration of these transition probabilities. This is done using the landmarking approach described in section 2. In `calibmsm`, the process remains the same, changing the inputted values `j` and `s`, and providing the appropriate predicted transition probabilities into `tp.pred`. We start by producing the calibration plots for $j = 1$ and $s = 100$.
+
+```{r, fig.width = 5, fig.height = 5}
+dat.calib.blr.j1.s100 <- calc_calib_blr(data.mstate = msebmtcal,
+                                data.raw = ebmtcal,
+                                j=1,
+                                s=100,
+                                t.eval = t.eval,
+                                tp.pred = tps100 %>% dplyr::filter(j == 1) %>% dplyr::select(any_of(paste("pstate", 1:6, sep = ""))),
+                                curve.type = "rcs",
+                                rcs.nk = 3,
+                                w.covs = c("year", "agecl", "proph", "match"))
+
+plot(dat.calib.blr.j1.s100, combine = TRUE, nrow = 2, ncol = 2)
+```
+
+There are only four calibration plots because no individuals in state $j = 1$ at time $s = 100$ are in states $3$ (adverse event) or $4$ (recovery + adverse event) after 1826 days. This is possibly due to the definition of an adverse event (must occur within a certain number of days after the transplant) **NOTE: CHECK IF I CAN CONFIRM THIS**. The predicted transition probabilities are very poor. Only for state $6$ is the observed risk a monotonically increasing function of the predicted transition probability. Next we produce calibration plots for $j = 3$ and $s = 100$.
+
+```{r, fig.width = 5, fig.height = 5}
+dat.calib.blr.j3.s100 <- calc_calib_blr(data.mstate = msebmtcal,
+                                data.raw = ebmtcal,
+                                j=3,
+                                s=100,
+                                t.eval = t.eval,
+                                tp.pred = tps100 %>% dplyr::filter(j == 3) %>% dplyr::select(any_of(paste("pstate", 1:6, sep = ""))),
+                                curve.type = "rcs",
+                                rcs.nk = 3,
+                                w.covs = c("year", "agecl", "proph", "match"))
+
+plot(dat.calib.blr.j3.s100, combine = TRUE, nrow = 2, ncol = 2)
+```
+
+Again there are only four possible states that an individual may have moved into, although this includes states $3$ (adverse event) and $4$ (recovery + adverse event), instead of $1$ (transplant) and $2$ (recovery). In general the calibration plots are better than for $j = 1$, but large levels of miscalibration remain. Again the calibration of state $5$ is very poor, although the shape resembles a concave curve, rather than a convex one. This makes it difficult to base any clinical decisions on the predicted transition probabilities for relapse. On the contrary, the transition probabilities into death are reasonably well calibrated for both $j = 1$ and $j = 3$, (barring those with predicted risks bigger than 35% for $j = 3$). This supports any clinical decisions based on the risk of death after survival for 100 days.
+
+So far we have been basing all conclusions on the estimated calibration curves, giving no thought to the variability with which these curves have been estimated. Estimation of the confidence interval around performance metrics is of paramount importance and the process for producing these is detailed in the next section.
+
+# Estimating confidence intervals for the calibration curves
+
+A process for estimating the confidence intervals around the calibration curves using bootstrapping has been built into the `calc_calib_blr` function. It goes:
+1. Resample validation dataset with replacement
+2. Landmark the dataset for assessment of calibration
+3. Calculate weights (note these may be calculated using either of the approaches outlined in section [Estimation of weights] through the argument `w.landmark.type`)
+4. Fit calibration model in landmarked dataset
+5. Generate fitted observed event probabilities for a fixed vector predicted transition probabilities (specifically the predicted transition probabilities from the non-bootstrapped landmarked dataset)
+
+We first produce confidence intervals for the calibration curves of the transition probabilities out of state $j = 1$ at time $s = 0$ using the internal procedure. To enable this the size of the confidence interval `CI` and the number of bootstrap replicates `CI.R.boot` must be specified.
+
+```{r, fig.width = 7.5, fig.height = 5}
+dat.calib.blr <- calc_calib_blr(data.mstate = msebmtcal,
+                                data.raw = ebmtcal,
+                                j=1,
+                                s=0,
+                                t.eval = t.eval,
+                                tp.pred = tps0 %>% dplyr::filter(j == 1) %>% dplyr::select(any_of(paste("pstate", 1:6, sep = ""))),
+                                curve.type = "rcs",
+                                rcs.nk = 3,
+                                w.covs = c("year", "agecl", "proph", "match"),
+                                CI = 95,
+                                CI.R.boot = 100)
+
+plot(dat.calib.blr)
+
+```
+
+The confidence intervals for the transitions out of state $j = 1$ at $s = 100$ into states $k = 4$ and $6$ both contain the line of prefect calibration across the entire range of predicted risk. In the previous section, we discussed how for states $k = 4$ and $6$ calibration became imperfect for individuals with the lowest/highest predicted risks. These plots indicate this was possibly due to random variation, rather than biased estimation of the predicted transition probabilities, an issue that may be resolved by validating the model in a larger validation sample. On the contrary, we get confirmation that the calibration for transition probabilities into states $k = 1, 3$ and $5$ are miscalibrated over a large range of the predicted risks as the line of perfect calibration is outside of the confidence interval.
+
+**Confidence intervals can be produced for any of the calibration plots produced in the previous section (do we want to show confidence intervals for any of the other calibration plots shown in the previous section????)**
+
+```{r, fig.width = 5, fig.height = 5, echo = FALSE}
+# dat.calib.blr.j1.s100 <- calc_calib_blr(data.mstate = msebmtcal,
+#                                 data.raw = ebmtcal,
+#                                 j=1,
+#                                 s=100,
+#                                 t.eval = t.eval,
+#                                 tp.pred = tps100 %>% dplyr::filter(j == 1) %>% dplyr::select(any_of(paste("pstate", 1:6, sep = ""))),
+#                                 curve.type = "rcs",
+#                                 rcs.nk = 3,
+#                                 w.covs = c("year", "agecl", "proph", "match"),
+#                                 CI = 95,
+#                                 CI.R.boot = 100)
+# 
+# plot(dat.calib.blr.j1.s100, combine = TRUE, nrow = 2, ncol = 2)
+# 
+# dat.calib.blr.j1.s100 <- calc_calib_blr(data.mstate = msebmtcal,
+#                                 data.raw = ebmtcal,
+#                                 j=1,
+#                                 s=100,
+#                                 t.eval = t.eval,
+#                                 tp.pred = tps100 %>% dplyr::filter(j == 1) %>% dplyr::select(any_of(paste("pstate", 1:6, sep = ""))),
+#                                 curve.type = "rcs",
+#                                 rcs.nk = 3,
+#                                 w.covs = c("year", "agecl", "proph", "match"),
+#                                 w.stabilised = TRUE,
+#                                 CI = 95,
+#                                 CI.R.boot = 100)
+# 
+# plot(dat.calib.blr.j1.s100, combine = TRUE, nrow = 2, ncol = 2)
+```
+
+While this approach is accessible, it may lead to a misspecified model for the  weights given the user has so little control over the functional form of the predict variables $\boldsymbol{Z}$. We encourage users to explore their data and produce a more suitable model to estimate the weights. The process for doing this utilises a call to `calc_calib_blr` to estimate the calibration curve and specifying the `weights` argument. To estimate the confidence interval this must be done in conjunction with the `boot` package, as is shown below. The `data.pred.plot` argument must be specified to ensure observed event probabilities are generated over the same vectors of predicted transition probabilities for each bootstrap sample, otherwise the confidence intervals cannot be plotted. We use the `calc_weights` function to estimate the weights in each bootstrap sample, which fits the same model that is used in the internal procedure. In practice, the point of estimating the confidence intervals manually is to define a more accurate model to estimate the weights yourself.
+
+```{r, fig.width = 7.5, fig.height = 5}
+###
+### Step 1: Define the set of predicted risks over which we want to plot the calibration plots
+###
+
+### This should be the individuals uncensored at time t.eval
+ids.uncens <- ebmtcal %>% subset(dtcens > t.eval | (dtcens < t.eval & dtcens.s == 0)) %>% dplyr::pull(id)
+### Extract the predicted risks  for these individuals
+data.pred.plot <- tps0 %>% dplyr::filter(j == 1 & id %in% ids.uncens) %>% dplyr::select(any_of(paste("pstate", 1:6, sep = "")))
+### Assign tp.pred so it can be bootstrapped
+tp.pred <- tps0 %>% dplyr::filter(j == 1) %>% dplyr::select(any_of(paste("pstate", 1:6, sep = "")))
+
+###
+### Step 2: Create the calibration curve
+###
+
+### Calculate inverse probability of censoring weights
+### We use the same function that is used internally in calc_calib_blr
+weights.manual <- calc_weights(data.mstate = msebmtcal,
+                                     data.raw = ebmtcal,
+                                     covs = c("year", "agecl", "proph", "match"),
+                                     t.eval = t.eval,
+                                     s = 0,
+                                     landmark.type = "state",
+                                     j = 1,
+                                     max.weight = 10,
+                                     stabilised = FALSE)$ipcw
+
+### Calculate calibration curve using the manually calculated weights and extract the observed event rates
+dat.calib.boot.manual <- calc_calib_blr(data.mstate = msebmtcal,
+                                        data.raw = ebmtcal,
+                                        j=1,
+                                        s=0,
+                                        t.eval = t.eval,
+                                        tp.pred = tp.pred,
+                                        curve.type = "rcs",
+                                        rcs.nk = 3,
+                                        weights = weights.manual,
+                                        data.pred.plot = data.pred.plot)
+
+###
+### Step 3: Bootstrap this process manually
+###
+
+### Write a function which will calculate a calibration curve for state.k for a bootstrapped dataset
+calc_obs_boot <- function(data, indices, tp.pred, state.k){
+
+  ### Bootstrap dataset and predicted transition probabilities
+  data.boot <- data[indices,]
+  tp.pred.boot <- tp.pred[indices, ]
+
+  ### Calculate weights
+  ### THIS FUNCTION SHOULD BE REPLACED WITH YOUR OWN
+  weights.manual <- calc_weights(data.mstate = msebmtcal,
+                                 data.raw = data.boot,
+                                 covs = c("year", "agecl", "proph", "match"),
+                                 t.eval = t.eval,
+                                 s = 0,
+                                 landmark.type = "state",
+                                 j = 1,
+                                 max.weight = 10,
+                                 stabilised = FALSE)$ipcw
+
+  ### Calculate calibration curve and extract observed event rates
+  curve.obs <- calc_calib_blr(data.mstate = msebmtcal,
+                              data.raw = data.boot,
+                              j=1,
+                              s=0,
+                              t.eval = t.eval,
+                              tp.pred = tp.pred.boot,
+                              curve.type = "rcs",
+                              rcs.nk = 3,
+                              weights = weights.manual,
+                              data.pred.plot = data.pred.plot,
+                              transitions.out = state.k)[["plotdata"]][[paste("state", state.k, sep = "")]]$obs
+
+  return(curve.obs)
+
+}
+
+### Define alpha for CI's
+alpha <- (1-95/100)/2
+
+### Extract what states an individual can move into from state j (states with a non-zero predicted risk)
+valid.transitions <- which(colSums(tp.pred) != 0)
+
+### Create dataset for output
+plot.data.list <- vector("list", length(valid.transitions))
+
+### Run bootstrapping and create data for plots
+for (k in 1:length(valid.transitions)){
+
+  ### Assign state k
+  state.k <- valid.transitions[k]
+
+  ### Run bootstrapping
+  boot.obs <- boot::boot(ebmtcal, calc_obs_boot, R = 100, tp.pred = tp.pred, state.k = state.k)$t
+
+  ### Extract confidence bands
+  lower <- apply(boot.obs, 2, stats::quantile, probs = alpha, na.rm = TRUE)
+  upper <- apply(boot.obs, 2, stats::quantile, probs = 1-alpha, na.rm = TRUE)
+
+  ### Assign output
+  plot.data.list[[k]] <- data.frame(
+    "pred" = dat.calib.boot.manual[["plotdata"]][[k]]$pred,
+    "obs" = dat.calib.boot.manual[["plotdata"]][[k]]$obs,
+    "obs.lower" = lower,
+    "obs.upper" = upper)
+
+}
+
+### Create metadata
+metadata <- list("valid.transitions"= valid.transitions,
+                 "CI" = 95,
+                 "curve.type" = "rcs")
+
+### Create object of class and structure outputted by calc_calc_blr
+dat.calib.blr.manual <- list("plotdata" = plot.data.list, "metadata" = metadata)
+attr(dat.calib.blr.manual, "class") <- "calib_blr"
+
+### Plot and compare to inbuilt process
+plot(dat.calib.blr.manual)
+```
+
+This Figure is very similar to Figure XXXX. This is to be expected given we have used the same model to calculate the weights that is used in the internal procedure, and verifies that the above procedure for calculating the confidence interval is successful.
+
+# Discussion
+
+Multistate models are a useful and unique tool for prediction, allowing predictions to be made after key predictive events happen post baseline. Development of multistate models for prediction is becoming more common, yet validation of such models is still very uncommon. A major barrier to implementation of statistical techniques is often the availability of software. [REF XXXX Knowledge translation in biostatistics: a survey of current practices, preferences, and barriers to the dissemination and uptake of new statistical methods]. This package has been developed to aid in the implementation of the techniques proposed by Pate et al. The BLR-IPCW and MLR-IPCW methods implemented in this paper have been shown to give an unbiased assessment of calibration under non-informative censoring mechanisms, and a predominately unbiased assessment of calibration under strongly informative censoring [REF PATE XXXX]. Despite this, further research validating these methods performance in a wider range of simulation scenarios, and by a different research group [A plea for neutral comparison studies in computational sciences XXXXX], would be highly valuable [Phases of methodological research in biostatistics—Building the evidence base for new methods XXXX]. Such work should be made easier by the availability of `calibmsm`.
+
+Further to this point, it is possible to use the `calibmsm` to validate competing risks models given these are a special case of a multistate models. However, graphical calibration curves already exist for assessing the calibration of a competing risks model [REF XXXX AUSTIN]. When fitting graphical calibration curves, it is assumed that censoring is independent of the outcome after conditioning on the complementary log-log transformation of the predicted risk, and the assumption of proportional hazards is made. When implementing BLR-IPCW, the assumption of independence between the censoring mechanism and the outcome in the reweighted population is made. These are different approaches to dealing with the same problem. Grahpical calibration curves have the advantage that only one models need to be fit and calibration can be assessed at every possible follow up time $t$. Beyond this, it is unclear in which approach is preferable. Simulations comparing these approaches when the aforementioned assumptions do and do not hold would be valuable.
+
+We have ran a series of sensitivity analyses in this study which are presented in the supplementary material. First, we produced equivalent calibration plots using pseudo-values based on the Aalen-Johansen estimator. This approach was found to have similar performance to BLR-IPCW by Pate et al. This method has not been included in `calibmsm` due to the computational time taken to apply this method. Agreement between the calibration plots would provide some validation to the results produced by BLR-IPCW. We wanted to measure its performance closely due to reliance on correct estimation of the weights. **NOT DONE THIS ANALYSIS YET, WILL UPDATE ONCE I HAVE RESULTS**. Second, we compared the calibration curves of BLR-IPCW with the graphical calibration curves **NOT DONE THIS ANALYSIS YET, WILL UPDATE ONCE I HAVE RESULTS**. Thirdly, I want to do some validation of the stabalised weights. This will probably not be included in the paper, but currently stabilising the weights is not really changing the size of the confidence interval, so I want to verify behaviour is as expected.

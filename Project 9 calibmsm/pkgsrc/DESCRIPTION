@@ -1,0 +1,30 @@
+Package: calibmsm
+Title: Calibration plots for the transition probabilities from a multistate model
+Version: 0.0.0.9000
+Authors@R:
+  person("Alexander", "Pate", , "alexander.pate@manchester.ac.uk", role = c("aut", "cre"),
+         comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: What the package does (one paragraph).
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Imports: 
+    boot,
+    dplyr,
+    ggplot2,
+    ggpubr,
+    Hmisc,
+    magrittr,
+    rms,
+    stats,
+    survival,
+    tidyr,
+    VGAM
+Depends: 
+    R (>= 2.10),
+LazyData: true
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
