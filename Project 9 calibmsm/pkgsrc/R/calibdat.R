@@ -31,8 +31,6 @@ extract_ids_states <- function(data.mstate, tmat, j, t.eval){
 }
 
 
-
-
 ###
 ### 2.2) Calculate calibration using binary logistic regression framework with inverse probability of censoring weights.
 ### Calibration model uses restricted cubic splines.
@@ -55,6 +53,7 @@ extract_ids_states <- function(data.mstate, tmat, j, t.eval){
 #' @param w.landmark.type Whether weights are estimated in all individuals uncensored at time s ('all') or only in individuals uncensored and in state j at time s ('state')
 #' @param w.max Maximum bound forinverse probability of censoring weights
 #' @param w.stabilised Indicates whether inverse probability of censoring weights should be stabilised or not
+#' @param w.max.follow NEEDS BETTER DESCRIPTION Maximum follow up for model calculating inverse probability of censoring weights
 #' @param CI Size of confidence intervals as a %
 #' @param CI.R.boot Number of bootstrap replicates when estimating the confidence interval for the calibration curve
 #' @param data.pred.plot Dataframe or matrix of predicted risks for each possible transition over which to plot the calibration curves. Must have one column for every possible transition.
@@ -62,7 +61,7 @@ extract_ids_states <- function(data.mstate, tmat, j, t.eval){
 #'
 #' @export
 calc_calib_blr <- function(data.mstate, data.raw, j, s, t.eval, tp.pred, curve.type = "rcs", rcs.nk = 3, loess.span, loess.degree,
-                           weights = NULL, w.covs, w.landmark.type = "state", w.max = 10, w.stabilised = FALSE, CI = FALSE, CI.R.boot,
+                           weights = NULL, w.covs, w.landmark.type = "state", w.max = 10, w.stabilised = FALSE, w.max.follow = NULL, CI = FALSE, CI.R.boot,
                            data.pred.plot = NULL, transitions.out = NULL){
 
 
@@ -216,7 +215,8 @@ calc_calib_blr <- function(data.mstate, data.raw, j, s, t.eval, tp.pred, curve.t
                             landmark.type = w.landmark.type,
                             j = j,
                             max.weight = w.max,
-                            stabilised = w.stabilised)
+                            stabilised = w.stabilised,
+                            max.follow = w.max.follow)
 
     ## Add to data.boot
     data.boot.lmk.js <- dplyr::left_join(data.boot.lmk.js, dplyr::distinct(weights), by = dplyr::join_by(id))
@@ -271,7 +271,8 @@ calc_calib_blr <- function(data.mstate, data.raw, j, s, t.eval, tp.pred, curve.t
                             landmark.type = w.landmark.type,
                             j = j,
                             max.weight = w.max,
-                            stabilised = w.stabilised)
+                            stabilised = w.stabilised,
+                            max.follow = w.max.follow)
 
     ## Add to data.boot
     data.boot.lmk.js <- dplyr::left_join(data.boot.lmk.js, dplyr::distinct(weights), by = dplyr::join_by(id))

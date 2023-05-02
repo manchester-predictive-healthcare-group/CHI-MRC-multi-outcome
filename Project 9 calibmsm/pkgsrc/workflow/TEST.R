@@ -13,6 +13,51 @@ data("tps0")
 data("tps100")
 str(class(msebmtcal))
 typeof(msebmtcal)
+rownames(ebmtcal) <- NULL
+rownames(tps0) <- NULL
+rownames(tps100) <- NULL
+head(ebmtcal)
+head(tps0)
+
+
+
+##########################
+### Test weights ###
+####################
+
+weights.manual <- calc_weights(data.mstate = msebmtcal,
+                               data.raw = ebmtcal,
+                               covs = c("year", "agecl", "proph", "match"),
+                               t.eval = 1826,
+                               s = 0,
+                               landmark.type = "state",
+                               j = 1,
+                               max.weight = 10,
+                               stabilised = FALSE)$ipcw
+
+weights.manual.2 <- calc_weights(data.mstate = msebmtcal,
+                                 data.raw = ebmtcal,
+                                 covs = c("year", "agecl", "proph", "match"),
+                                 t.eval = 1826,
+                                 s = 0,
+                                 landmark.type = "state",
+                                 j = 1,
+                                 max.weight = 10,
+                                 stabilised = FALSE,
+                                 max.follow = "t.eval")$ipcw
+
+temp <- cbind(ebmtcal, weights.manual)
+temp2 <- cbind(ebmtcal, weights.manual.2)
+
+head(weights.manual)
+head(weights.manual.2)
+hist(weights.manual, breaks = 50)
+hist(weights.manual.2, breaks = 50)
+sum(is.na(weights.manual))
+sum(is.na(weights.manual.2))
+mean()
+
+max(weights.manual, na.rm = TRUE)
 
 ##########################
 ### STAB WEIGHTS STUFF ###
@@ -133,11 +178,14 @@ library(calibmsm)
 
 install.packages("rlang")
 devtools::document()
+getwd()
 rm(list=ls())
 load_all()
 calc_calib_mlr
 devtools::check(vignettes = FALSE)
 devtools::install()
+
+calibmsm::
 
 load_all()
 dat.calib.mlr.j1.s0.s <- calc_calib_mlr(data.mstate = msebmtcal,

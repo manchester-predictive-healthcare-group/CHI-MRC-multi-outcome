@@ -13,7 +13,8 @@ calc_weights(
   landmark.type = NULL,
   j = NULL,
   max.weight = 10,
-  stabilised = FALSE
+  stabilised = FALSE,
+  max.follow = NULL
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ calc_weights(
 \item{max.weight}{Maximum bound for weights}
 
 \item{stabilised}{Indicates whether weights should be stabilised or not}
+
+\item{max.follow}{NEEDS BETTER DESCRIPTION Maximum follow up for model calculating inverse probability of censoring weights}
 }
 \description{
 Calculate inverse probability of censoring weights for a group of individuals in state j at time s

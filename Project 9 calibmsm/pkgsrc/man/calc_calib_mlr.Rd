@@ -11,7 +11,7 @@ calc_calib_mlr(
   s,
   t.eval,
   tp.pred,
-  smoother.type,
+  smoother.type = "sm.ps",
   ps.int = 4,
   degree = 3,
   s.df = 4,

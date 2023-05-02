@@ -20,6 +20,7 @@ calc_calib_blr(
   w.landmark.type = "state",
   w.max = 10,
   w.stabilised = FALSE,
+  w.max.follow = NULL,
   CI = FALSE,
   CI.R.boot,
   data.pred.plot = NULL,
@@ -56,6 +57,8 @@ calc_calib_blr(
 \item{w.max}{Maximum bound forinverse probability of censoring weights}
 
 \item{w.stabilised}{Indicates whether inverse probability of censoring weights should be stabilised or not}
+
+\item{w.max.follow}{NEEDS BETTER DESCRIPTION Maximum follow up for model calculating inverse probability of censoring weights}
 
 \item{CI}{Size of confidence intervals as a \%}
 
