@@ -50,7 +50,9 @@ usethis::use_data(tps100, overwrite = TRUE)
 ###
 ### Add R-CMD-CHECK
 ###
+usethis::use_readme_rmd()
 usethis::use_github_action("check-standard")
+devtools::build_readme()
 
 ###
 ### Install package
