@@ -2,7 +2,7 @@
 % Please edit documentation in R/calibdat.R
 \name{calc_calib_mlr}
 \alias{calc_calib_mlr}
-\title{Create data for calibration curves using a binary logistic regression framework with inverse probability of censoring weights}
+\title{Create data for calibration curves using a multinomial logistic regression framework with inverse probability of censoring weights}
 \usage{
 calc_calib_mlr(
   data.mstate,
@@ -52,10 +52,27 @@ calc_calib_mlr(
 
 \item{w.landmark.type}{Whether weights are estimated in all individuals uncensored at time s ('all') or only in individuals uncensored and in state j at time s ('state')}
 
-\item{w.max}{Maximum bound forinverse probability of censoring weights}
+\item{w.max}{Maximum bound for inverse probability of censoring weights}
 
 \item{w.stabilised}{Indicates whether inverse probability of censoring weights should be stabilised or not}
+
+\item{w.max.follow}{Maximum follow up for model calculating inverse probability of censoring weights. Reducing this to \code{t.eval} + 1 may aid in the proportional hazards assumption being met in this model.}
 }
 \description{
-Create data for calibration curves using a binary logistic regression framework with inverse probability of censoring weights
+Creates the underlying data for the calibration plots. Observed event
+probabilities at time \code{t.eval} are estimated for inputted predicted
+transition probabilities \code{tp.pred} out of state \code{j} at time \code{s}.
+\code{calc_calib_mlr} estimates calibration scatter plots using a multinomial logistic
+framework in combination with landmarking and inverse probability of
+censoring weights.
+
+Two datasets for the same cohort of inidividuals must be provided. A \code{msdata}
+format dataset generated using the \code{mstate} package. A \code{data.frame} with one
+row per individual, relevant variables for estimating the weights, and a time
+until censoring varaible (\code{dtcens}) and indicator (\code{dtcens.s}). Weights are
+estimated using a cox-proportional hazard model and assuming linear
+functional form of the variables defined in \code{w.covs}. We urge users to
+specify their own modwl for estimating the weights. Confidence intervals for
+the calibration scatter plots cannot be produced as it is currently unclear how
+to present such data.
 }

@@ -119,7 +119,7 @@ for (state in 1:6){
   data.sort.groups[[state]] <- vector("list", 3)
   group.size <- vector("numeric", 3)
   for (group in 1:3){
-    data.sort.groups[[state]][[group]] <- vector("list", 3)
+    data.sort.groups[[state]][[group]] <- vector("list", n.pctls)
     group.size[group] <- nrow(data.raw.list.sort.temp[[group]])/n.pctls
     for (pctl in 1:n.pctls){
       data.sort.groups[[state]][[group]][[pctl]] <-
@@ -134,14 +134,14 @@ for (state in 1:6){
   ### Create a list to store them
   obs.aj.groups[[state]] <- vector("list", 3)
   for (group in 1:3){
-    obs.aj.groups[[state]][[group]] <- vector("list", 3)
+    obs.aj.groups[[state]][[group]] <- vector("list", n.pctls)
   }
 
   ### Calculate obs.aj for each group
   for (group in 1:3){
     for (pctl in 1:n.pctls){
       print(paste("Calc obs.aj = ", state, "group = ", group, "pctl = ", pctl, Sys.time()))
-      obs.aj.groups[[state]][[group]] <-
+      obs.aj.groups[[state]][[group]][[pctl]] <-
         calc.calib.aj.ce(data.mstate = base::subset(data.mstate, id %in% data.sort.groups[[state]][[group]][[pctl]]$id),
                          tmat = attributes(data.mstate)$trans,
                          t.eval = t.eval)$obs.aj
@@ -149,15 +149,6 @@ for (state in 1:6){
     }
   }
 }
-
-str(data.sort.groups[[1]][[1]][[1]])
-str(data.sort.groups[[1]][[1]][[2]])
-str(data.sort.groups[[1]][[1]][[3]])
-str(data.sort.groups[[1]][[2]][[1]])
-str(data.sort.groups[[1]][[2]][[2]])
-str(data.sort.groups[[1]][[2]][[3]])
-str(data.sort.groups[[1]][[1]][[1]])
-str(data.sort.groups[[1]][[1]][[1]])
 
 ##########################################
 ### Now to calculate the pseudo-values ###
@@ -167,7 +158,7 @@ str(data.sort.groups[[1]][[1]][[1]])
 pv.out.groups <- vector("list", 6)
 
 ### Run through and calculate pseudo-values
-for (state in 1:6){
+for (state in 2:6){
   ### Create output list
   pv.out.groups[[state]] <- vector("list", 3)
   for(group in 1:3){
@@ -216,9 +207,6 @@ save.image("workflow/supp_pseudo_year_pctl.RData")
 ################################################
 ### Now calculate moderate calibration plots ###
 ################################################
-
-str(pv.out.groups[[3]])
-head(pv.out.groups[[1]])
 
 ###
 ### 4.3) Calculate calibration using pseudo values
@@ -276,8 +264,6 @@ calc.calib.pv.moderate.ce <- function(pv.comb, p.est){
   return(output.object)
 
 }
-
-str(pv.comb)
 
 ### Create plots
 plots.pv.j1s0 <- calc.calib.pv.moderate.ce(pv.comb, dplyr::select(data.raw, paste("pstate", 1:6, sep = "")))

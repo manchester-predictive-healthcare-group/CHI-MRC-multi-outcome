@@ -2,7 +2,7 @@
 % Please edit documentation in R/calibplot.R
 \name{plot.calib_mlr}
 \alias{plot.calib_mlr}
-\title{Create data for calibration curves using a binary logistic regression framework with inverse probability of censoring weights}
+\title{Plot calibration scatter plots}
 \usage{
 \method{plot}{calib_mlr}(x, ..., combine = TRUE, ncol = NULL, nrow = NULL)
 }
@@ -18,5 +18,7 @@
 \item{nrow}{Number of rows for combined calibration plot}
 }
 \description{
-Create data for calibration curves using a binary logistic regression framework with inverse probability of censoring weights
+Creates calibration plots for the transition probabilities of a multistate model
+using data estimated from \code{calc_calib_mlr}. Such data was estimated using the
+multinomial logistic regression framework with inverse probability of censoring weights.
 }

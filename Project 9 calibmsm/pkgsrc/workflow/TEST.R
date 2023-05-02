@@ -5,6 +5,9 @@ a <- 3
 b <- 4
 rm(list=ls())
 load_all()
+
+?calibmsm::calc_calib_mlr
+
 library(devtools)
 data("ebmtcal")
 data("msebmtcal")
@@ -18,7 +21,7 @@ rownames(tps0) <- NULL
 rownames(tps100) <- NULL
 head(ebmtcal)
 head(tps0)
-
+?dplyr::mutate
 
 
 ##########################

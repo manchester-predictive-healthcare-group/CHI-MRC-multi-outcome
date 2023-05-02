@@ -1,4 +1,9 @@
-#' Create data for calibration curves using a binary logistic regression framework with inverse probability of censoring weights
+#' Plot calibration curves
+#'
+#' @description
+#' Creates calibration plots for the transition probabilities of a multistate model
+#' using data estimated from `calc_calib_blr`. Such data was estimated using the
+#'  binary logistic regression framework with inverse probability of censoring weights.
 #'
 #' @param x Object of type 'calib_blr' generated from calc_calib_blr
 #' @param ... Other
@@ -96,7 +101,12 @@ plot.calib_blr <- function(x, ..., combine = TRUE, ncol = NULL, nrow = NULL){
 }
 
 
-#' Create data for calibration curves using a binary logistic regression framework with inverse probability of censoring weights
+#' Plot calibration scatter plots
+#'
+#' @description
+#' Creates calibration plots for the transition probabilities of a multistate model
+#' using data estimated from `calc_calib_mlr`. Such data was estimated using the
+#'multinomial logistic regression framework with inverse probability of censoring weights.
 #'
 #' @param x Object of type 'calib_mlr' generated from calc_calib_mlr
 #' @param ... Other

@@ -55,6 +55,16 @@ usethis::use_github_action("check-standard")
 devtools::build_readme()
 
 ###
+### Create website
+###
+usethis::use_pkgdown()
+pkgdown::build_site()
+usethis::use_pkgdown_github_pages()
+usethis::create_github_token()
+gitcreds::gitcreds_set()
+install.packages("gitcreds")
+gh_token_help()
+###
 ### Install package
 ###
 devtools::install()

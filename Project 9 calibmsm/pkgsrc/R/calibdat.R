@@ -31,19 +31,38 @@ extract_ids_states <- function(data.mstate, tmat, j, t.eval){
 }
 
 
-###
-### 2.2) Calculate calibration using binary logistic regression framework with inverse probability of censoring weights.
-### Calibration model uses restricted cubic splines.
-###
-#' Create data for calibration curves using a binary logistic regression framework with inverse probability of censoring weights
+#' Create data for calibration curves using a binary logistic regression
+#' framework with inverse probability of censoring weights
 #'
-#' @param data.mstate Validation data in msdata format.
+#' @description
+#' Creates the underlying data for the calibration plots. Observed event
+#' probabilities at time `t.eval` are estimated for inputted predicted
+#' transition probabilities `tp.pred` out of state `j` at time `s`.
+#' `calc_calib_blr` estimates calibration curves using a binary logistic
+#' framework in combination with landmarking and inverse probability of
+#' censoring weights. A choice between restricted cubic splines and loess
+#' smoothers for estimating the calibration curve can be made using `curve.type`.
+#'
+#' Two datasets for the same cohort of inidividuals must be provided. A `msdata`
+#' format dataset generated using the `mstate` package. A `data.frame` with one
+#' row per individual, relevant variables for estimating the weights, and a time
+#' until censoring varaible (`dtcens`) and indicator (`dtcens.s`). Weights are
+#' estimated using a cox-proportional hazard model and assuming linear
+#' functional form of the variables defined in `w.covs`. We urge users to
+#' specify their own model for estimating the weights. Confidence intervals for
+#' the calibration curves can be estimated using bootstrapping. This procedure
+#' uses the internal method for estimating weights, we therefore encourage
+#' users to specify their own bootstrapping procedure, which incorporates their
+#' own model for estimating the weights. Details on how to do this are provided
+#' in the vignette.
+#'
+#' @param data.mstate Validation data in `msdata` format.
 #' @param data.raw Validation data in data.frame (one row per individual).
 #' @param t.eval Follow up time at which to calculate weights.
 #' @param j Landmark state at which predictions were made
 #' @param s Landmark time at which predictions were made
 #' @param t.eval Follow up time at which calibration is to be assessed
-#' @param tp.pred Vector of predicted transition probabilities at time t.eval
+#' @param tp.pred Matrix of predicted transition probabilities at time t.eval, if in state j at time s. There must be a seperate column for the predicted transition probabilities into every state, even if these predicted transition probabilities are 0.
 #' @param curve.type Whether calibration curves are estimated using restricted cubic splines ('rcs') or loess smoothers ('loess')
 #' @param rcs.nk Number of knots when curves are estimated using restricted cubic splines
 #' @param loess.span Span when curves are estimated using loess smoothers
@@ -51,9 +70,9 @@ extract_ids_states <- function(data.mstate, tmat, j, t.eval){
 #' @param weights Vector of inverse probability of censoring weights
 #' @param w.covs Character vector of variable names to adjust for when calculating inverse probability of censoring weights
 #' @param w.landmark.type Whether weights are estimated in all individuals uncensored at time s ('all') or only in individuals uncensored and in state j at time s ('state')
-#' @param w.max Maximum bound forinverse probability of censoring weights
+#' @param w.max Maximum bound for inverse probability of censoring weights
 #' @param w.stabilised Indicates whether inverse probability of censoring weights should be stabilised or not
-#' @param w.max.follow NEEDS BETTER DESCRIPTION Maximum follow up for model calculating inverse probability of censoring weights
+#' @param w.max.follow Maximum follow up for model calculating inverse probability of censoring weights. Reducing this to `t.eval` + 1 may aid in the proportional hazards assumption being met in this model.
 #' @param CI Size of confidence intervals as a %
 #' @param CI.R.boot Number of bootstrap replicates when estimating the confidence interval for the calibration curve
 #' @param data.pred.plot Dataframe or matrix of predicted risks for each possible transition over which to plot the calibration curves. Must have one column for every possible transition.
@@ -526,13 +545,26 @@ calc_calib_blr <- function(data.mstate, data.raw, j, s, t.eval, tp.pred, curve.t
   return(output.object.comb)
 }
 
-
-
-###
-### 2.3) Calculate calibration using multinomial logistic regression framework with inverse probability of censoring weights.
-### Calibration model uses nominal recalibration framework of van Hoorde.
-###
-#' Create data for calibration curves using a binary logistic regression framework with inverse probability of censoring weights
+#
+#' Create data for calibration curves using a multinomial logistic regression framework with inverse probability of censoring weights
+#'
+#' @description
+#' Creates the underlying data for the calibration plots. Observed event
+#' probabilities at time `t.eval` are estimated for inputted predicted
+#' transition probabilities `tp.pred` out of state `j` at time `s`.
+#' `calc_calib_mlr` estimates calibration scatter plots using a multinomial logistic
+#' framework in combination with landmarking and inverse probability of
+#' censoring weights.
+#'
+#' Two datasets for the same cohort of inidividuals must be provided. A `msdata`
+#' format dataset generated using the `mstate` package. A `data.frame` with one
+#' row per individual, relevant variables for estimating the weights, and a time
+#' until censoring varaible (`dtcens`) and indicator (`dtcens.s`). Weights are
+#' estimated using a cox-proportional hazard model and assuming linear
+#' functional form of the variables defined in `w.covs`. We urge users to
+#' specify their own modwl for estimating the weights. Confidence intervals for
+#' the calibration scatter plots cannot be produced as it is currently unclear how
+#' to present such data.
 #'
 #' @param data.mstate Validation data in msdata format.
 #' @param data.raw Validation data in data.frame (one row per individual).
@@ -548,8 +580,9 @@ calc_calib_blr <- function(data.mstate, data.raw, j, s, t.eval, tp.pred, curve.t
 #' @param weights Vector of inverse probability of censoring weights
 #' @param w.covs Character vector of variable names to adjust for when calculating inverse probability of censoring weights
 #' @param w.landmark.type Whether weights are estimated in all individuals uncensored at time s ('all') or only in individuals uncensored and in state j at time s ('state')
-#' @param w.max Maximum bound forinverse probability of censoring weights
+#' @param w.max Maximum bound for inverse probability of censoring weights
 #' @param w.stabilised Indicates whether inverse probability of censoring weights should be stabilised or not
+#' @param w.max.follow Maximum follow up for model calculating inverse probability of censoring weights. Reducing this to `t.eval` + 1 may aid in the proportional hazards assumption being met in this model.
 #'
 #' @export
 calc_calib_mlr <- function(data.mstate, data.raw, j, s, t.eval, tp.pred, smoother.type = "sm.ps", ps.int = 4, degree = 3, s.df = 4, niknots = 4,
@@ -634,7 +667,8 @@ calc_calib_mlr <- function(data.mstate, data.raw, j, s, t.eval, tp.pred, smoothe
                           landmark.type = w.landmark.type,
                           j = j,
                           max.weight = w.max,
-                          stabilised = w.stabilised)
+                          stabilised = w.stabilised,
+                          max.follow = w.max.follow)
 
   ## Add to data.boot
   data.raw.lmk.js.uncens <- dplyr::left_join(data.raw.lmk.js.uncens, dplyr::distinct(weights), by = dplyr::join_by(id))

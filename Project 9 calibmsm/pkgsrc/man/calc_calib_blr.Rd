@@ -2,7 +2,8 @@
 % Please edit documentation in R/calibdat.R
 \name{calc_calib_blr}
 \alias{calc_calib_blr}
-\title{Create data for calibration curves using a binary logistic regression framework with inverse probability of censoring weights}
+\title{Create data for calibration curves using a binary logistic regression
+framework with inverse probability of censoring weights}
 \usage{
 calc_calib_blr(
   data.mstate,
@@ -28,7 +29,7 @@ calc_calib_blr(
 )
 }
 \arguments{
-\item{data.mstate}{Validation data in msdata format.}
+\item{data.mstate}{Validation data in \code{msdata} format.}
 
 \item{data.raw}{Validation data in data.frame (one row per individual).}
 
@@ -38,7 +39,7 @@ calc_calib_blr(
 
 \item{t.eval}{Follow up time at which calibration is to be assessed}
 
-\item{tp.pred}{Vector of predicted transition probabilities at time t.eval}
+\item{tp.pred}{Matrix of predicted transition probabilities at time t.eval, if in state j at time s. There must be a seperate column for the predicted transition probabilities into every state, even if these predicted transition probabilities are 0.}
 
 \item{curve.type}{Whether calibration curves are estimated using restricted cubic splines ('rcs') or loess smoothers ('loess')}
 
@@ -54,11 +55,11 @@ calc_calib_blr(
 
 \item{w.landmark.type}{Whether weights are estimated in all individuals uncensored at time s ('all') or only in individuals uncensored and in state j at time s ('state')}
 
-\item{w.max}{Maximum bound forinverse probability of censoring weights}
+\item{w.max}{Maximum bound for inverse probability of censoring weights}
 
 \item{w.stabilised}{Indicates whether inverse probability of censoring weights should be stabilised or not}
 
-\item{w.max.follow}{NEEDS BETTER DESCRIPTION Maximum follow up for model calculating inverse probability of censoring weights}
+\item{w.max.follow}{Maximum follow up for model calculating inverse probability of censoring weights. Reducing this to \code{t.eval} + 1 may aid in the proportional hazards assumption being met in this model.}
 
 \item{CI}{Size of confidence intervals as a \%}
 
@@ -69,5 +70,24 @@ calc_calib_blr(
 \item{transitions.out}{Transitions for which to calculate calibration curves. Will do all possible transitions if left as NULL.}
 }
 \description{
-Create data for calibration curves using a binary logistic regression framework with inverse probability of censoring weights
+Creates the underlying data for the calibration plots. Observed event
+probabilities at time \code{t.eval} are estimated for inputted predicted
+transition probabilities \code{tp.pred} out of state \code{j} at time \code{s}.
+\code{calc_calib_blr} estimates calibration curves using a binary logistic
+framework in combination with landmarking and inverse probability of
+censoring weights. A choice between restricted cubic splines and loess
+smoothers for estimating the calibration curve can be made using \code{curve.type}.
+
+Two datasets for the same cohort of inidividuals must be provided. A \code{msdata}
+format dataset generated using the \code{mstate} package. A \code{data.frame} with one
+row per individual, relevant variables for estimating the weights, and a time
+until censoring varaible (\code{dtcens}) and indicator (\code{dtcens.s}). Weights are
+estimated using a cox-proportional hazard model and assuming linear
+functional form of the variables defined in \code{w.covs}. We urge users to
+specify their own model for estimating the weights. Confidence intervals for
+the calibration curves can be estimated using bootstrapping. This procedure
+uses the internal method for estimating weights, we therefore encourage
+users to specify their own bootstrapping procedure, which incorporates their
+own model for estimating the weights. Details on how to do this are provided
+in the vignette.
 }

@@ -167,15 +167,18 @@ calc_weights_OLD <- function(data.mstate, data.raw, covs, t.eval, s, landmark.ty
 }
 
 
-###
-### 1.2) Function to calculate IPC weights estimating the model from the data
-###
-
-### The dataset data.raw must have a time until censoring variable (dtcens) and a an event indicator (dtcens.s)
-### - dtcens.s = 1 if censoring is observed at time dtcens, dtcens.s = 0 otherwise.
-### - The variable dtcens is the time until an individual has been censored, or the time until they have reached an absorbing state. If
-###   and individual reached an absorbing state, dtcens.s = 0 (event indicator = 0, as censoring has not been observed)
-#' Calculate inverse probability of censoring weights for a group of individuals in state j at time s
+#' Calculate inverse probability of censoring weights at time `t.eval` for a landmark group of individuals.
+#'
+#' @description
+#' Primarily used internally, this function has been exported to allow users to reproduce results in the vignette when
+#' estimating confidence intervals using bootstrapping manually.
+#'
+#' Fits a cox proportional hazards model to individuals in a landmark cohort, predicting the probability of being censored
+#' at time `t.eval`. This landmark cohort may either be all individuals uncensored at time `s`, or those uncensored
+#' and in state `j` at time `s`. All predictors in `w.covs` are assumed to have a linear effect on the hazard.
+#' Weights are estimated for all individuals in `data.raw`, even if they will not be used in the analysis as they do not meet the landmarking
+#' requirements. If an individual enters an absorbing state prior to `t.eval`, we estimate the probability of being censored
+#' before the time of entry into the absorbing state, rather than at `t.eval`. Details on this are provided in the associated vignette.
 #'
 #' @param data.mstate Validation data in msdata format
 #' @param data.raw Validation data in data.frame (one row per individual)
@@ -186,7 +189,7 @@ calc_weights_OLD <- function(data.mstate, data.raw, covs, t.eval, s, landmark.ty
 #' @param j Landmark state at which predictions were made (only required in landmark.type = 'state')
 #' @param max.weight Maximum bound for weights
 #' @param stabilised Indicates whether weights should be stabilised or not
-#' @param max.follow NEEDS BETTER DESCRIPTION Maximum follow up for model calculating inverse probability of censoring weights
+#' @param max.follow Maximum follow up for model calculating inverse probability of censoring weights. Reducing this to `t.eval` + 1 may aid in the proportional hazards assumption being met in this model.
 #'
 #' @export
 calc_weights <- function(data.mstate, data.raw, covs, t.eval, s, landmark.type = NULL, j = NULL, max.weight = 10, stabilised = FALSE, max.follow = NULL){
