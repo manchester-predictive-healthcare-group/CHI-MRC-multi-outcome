@@ -2,7 +2,7 @@
 % Please edit documentation in R/weights.R
 \name{calc_weights}
 \alias{calc_weights}
-\title{Calculate inverse probability of censoring weights for a group of individuals in state j at time s}
+\title{Calculate inverse probability of censoring weights at time \code{t.eval} for a landmark group of individuals.}
 \usage{
 calc_weights(
   data.mstate,
@@ -36,8 +36,16 @@ calc_weights(
 
 \item{stabilised}{Indicates whether weights should be stabilised or not}
 
-\item{max.follow}{NEEDS BETTER DESCRIPTION Maximum follow up for model calculating inverse probability of censoring weights}
+\item{max.follow}{Maximum follow up for model calculating inverse probability of censoring weights. Reducing this to \code{t.eval} + 1 may aid in the proportional hazards assumption being met in this model.}
 }
 \description{
-Calculate inverse probability of censoring weights for a group of individuals in state j at time s
+Primarily used internally, this function has been exported to allow users to reproduce results in the vignette when
+estimating confidence intervals using bootstrapping manually.
+
+Fits a cox proportional hazards model to individuals in a landmark cohort, predicting the probability of being censored
+at time \code{t.eval}. This landmark cohort may either be all individuals uncensored at time \code{s}, or those uncensored
+and in state \code{j} at time \code{s}. All predictors in \code{w.covs} are assumed to have a linear effect on the hazard.
+Weights are estimated for all individuals in \code{data.raw}, even if they will not be used in the analysis as they do not meet the landmarking
+requirements. If an individual enters an absorbing state prior to \code{t.eval}, we estimate the probability of being censored
+before the time of entry into the absorbing state, rather than at \code{t.eval}. Details on this are provided in the associated vignette.
 }

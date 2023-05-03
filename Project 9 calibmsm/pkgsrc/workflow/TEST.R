@@ -22,7 +22,7 @@ rownames(tps100) <- NULL
 head(ebmtcal)
 head(tps0)
 ?dplyr::mutate
-
+devtools::document()
 
 ##########################
 ### Test weights ###
