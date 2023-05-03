@@ -25,8 +25,7 @@ calc_calib_blr(
   CI = FALSE,
   CI.R.boot,
   data.pred.plot = NULL,
-  transitions.out = NULL,
-  PUDDING
+  transitions.out = NULL
 )
 }
 \arguments{
@@ -66,7 +65,7 @@ calc_calib_blr(
 
 \item{CI.R.boot}{Number of bootstrap replicates when estimating the confidence interval for the calibration curve}
 
-\item{data.pred.plot}{Dataframe or matrix of predicted risks for each possible transition over which to plot the calibration curves. Must have one column for every possible transition.}
+\item{data.pred.plot}{Data frame or matrix of predicted risks for each possible transition over which to plot the calibration curves. Must have one column for every possible transition.}
 
 \item{transitions.out}{Transitions for which to calculate calibration curves. Will do all possible transitions if left as NULL.}
 }

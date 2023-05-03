@@ -42,13 +42,13 @@
 #' @param w.max.follow Maximum follow up for model calculating inverse probability of censoring weights. Reducing this to `t.eval` + 1 may aid in the proportional hazards assumption being met in this model.
 #' @param CI Size of confidence intervals as a %
 #' @param CI.R.boot Number of bootstrap replicates when estimating the confidence interval for the calibration curve
-#' @param data.pred.plot Dataframe or matrix of predicted risks for each possible transition over which to plot the calibration curves. Must have one column for every possible transition.
+#' @param data.pred.plot Data frame or matrix of predicted risks for each possible transition over which to plot the calibration curves. Must have one column for every possible transition.
 #' @param transitions.out Transitions for which to calculate calibration curves. Will do all possible transitions if left as NULL.
 #'
 #' @export
 calc_calib_blr <- function(data.mstate, data.raw, j, s, t.eval, tp.pred, curve.type = "rcs", rcs.nk = 3, loess.span, loess.degree,
                            weights = NULL, w.covs, w.landmark.type = "state", w.max = 10, w.stabilised = FALSE, w.max.follow = NULL, CI = FALSE, CI.R.boot,
-                           data.pred.plot = NULL, transitions.out = NULL, PUDDING){
+                           data.pred.plot = NULL, transitions.out = NULL){
 
 
 # data.mstate <- msebmtcal
@@ -81,7 +81,6 @@ calc_calib_blr <- function(data.mstate, data.raw, j, s, t.eval, tp.pred, curve.t
   ### Check if people have specified internal bootstrap and only for specific weights...
 
   ### Check if transitions.out is only specified for non-zero columns
-  test <- randomvariable
 
   ### If a vector of weights has been provided, add it to the dataset
   if (!is.null(weights)){

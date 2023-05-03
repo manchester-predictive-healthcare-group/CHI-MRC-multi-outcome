@@ -38,7 +38,7 @@
 #'
 #' @export
 calc_calib_mlr <- function(data.mstate, data.raw, j, s, t.eval, tp.pred, smoother.type = "sm.ps", ps.int = 4, degree = 3, s.df = 4, niknots = 4,
-                           weights = NULL, w.covs, w.landmark.type = "state", w.max = 10, w.stabilised = FALSE, w.max.follow = NULL){
+                           weights = NULL, w.covs, w.landmark.type = "state", w.max = 10, w.stabilised = FALSE, w.max.follow = NULL, PUDDING){
 
   # data.mstate <- msebmtcal
   # data.raw <- ebmtcal

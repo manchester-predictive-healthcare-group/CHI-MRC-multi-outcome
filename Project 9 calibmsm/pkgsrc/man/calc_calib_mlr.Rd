@@ -21,7 +21,7 @@ calc_calib_mlr(
   w.landmark.type = "state",
   w.max = 10,
   w.stabilised = FALSE,
-  w.max.follow.TEST = NULL,
+  w.max.follow = NULL,
   PUDDING
 )
 }
@@ -58,7 +58,7 @@ calc_calib_mlr(
 
 \item{w.stabilised}{Indicates whether inverse probability of censoring weights should be stabilised or not}
 
-\item{w.max.follow.TEST}{Maximum follow up for model calculating inverse probability of censoring weights. Reducing this to \code{t.eval} + 1 may aid in the proportional hazards assumption being met in this model.}
+\item{w.max.follow}{Maximum follow up for model calculating inverse probability of censoring weights. Reducing this to \code{t.eval} + 1 may aid in the proportional hazards assumption being met in this model.}
 }
 \description{
 Creates the underlying data for the calibration plots. Observed event
