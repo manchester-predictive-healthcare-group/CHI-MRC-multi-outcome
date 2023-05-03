@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 
 ## Badge checks
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/manchester-predictive-healthcare-group/CHI-MRC-multi-outcome/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/manchester-predictive-healthcare-group/CHI-MRC-multi-outcome/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://https://github.com/manchester-predictive-healthcare-group/CHI-MRC-multi-outcome/tree/main/Project%209%20calibmsm/pkgsrc/.github/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/manchester-predictive-healthcare-group/CHI-MRC-multi-outcome/tree/main/Project%209%20calibmsm/pkgsrc/.github/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 ## Summary
