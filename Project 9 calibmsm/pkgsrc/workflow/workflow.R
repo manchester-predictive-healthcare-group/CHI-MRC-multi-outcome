@@ -60,10 +60,12 @@ devtools::build_readme()
 usethis::use_pkgdown()
 pkgdown::build_site()
 usethis::use_pkgdown_github_pages()
-usethis::create_github_token()
-gitcreds::gitcreds_set()
-install.packages("gitcreds")
-gh_token_help()
+# gh_token_help()
+# usethis::create_github_token()
+# gitcreds::gitcreds_set()
+
+
+
 ###
 ### Install package
 ###
