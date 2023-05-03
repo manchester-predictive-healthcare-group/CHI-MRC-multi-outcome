@@ -18,7 +18,6 @@
 #' @param max.weight Maximum bound for weights
 #' @param stabilised Indicates whether weights should be stabilised or not
 #'
-#' @export
 calc_weights_OLD <- function(data.mstate, data.raw, covs, t.eval, s, landmark.type = NULL, j = NULL, max.weight = 10, stabilised = FALSE){
 
   ### Create a new outcome, which is the time until censored from s

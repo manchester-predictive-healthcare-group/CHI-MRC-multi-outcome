@@ -33,4 +33,3 @@ Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
-URL: https://manchester-predictive-healthcare-group.github.io/CHI-MRC-multi-outcome/tree/main/Project%209%20calibmsm/pkgsrc/
