@@ -21,8 +21,7 @@ calc_calib_mlr(
   w.landmark.type = "state",
   w.max = 10,
   w.stabilised = FALSE,
-  w.max.follow = NULL,
-  PUDDING
+  w.max.follow = NULL
 )
 }
 \arguments{

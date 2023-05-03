@@ -69,6 +69,7 @@ getwd()
 ###
 ### Install package
 ###
+getwd()
 load_all()
 calc_calib_blr
 devtools::document()
@@ -76,3 +77,4 @@ devtools::check(vignettes = FALSE)
 calibmsm::calc_calib_blr
 devtools::install()
 devtools::check()
+library(dplyr)
