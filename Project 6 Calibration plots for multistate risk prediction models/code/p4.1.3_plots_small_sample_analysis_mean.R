@@ -126,7 +126,7 @@ data.dw.facet$tpnum <- factor(data.dw.facet$tpnum, levels = c("Perfect", "Over p
 gg.dw <- dwplot(data.dw.facet) + #scale_x_continuous(breaks = seq(-0.15, 0, 0.05)) 
   facet_grid(rows = vars(tpnum), cols = vars(state))  + 
   geom_vline(xintercept = 0, linetype = "dashed") + 
-  xlab("Bias") + ylab("Scenario")
+  xlab("Bias") + ylab("Scenario") + scale_x_continuous(breaks = seq(-0.025, 0.05, 0.025), labels = function(x) ifelse(x == 0, "0", x))
 
 ### Save main plot
 CairoPNG(paste("figures/gg_small_sample_mean_N", n.cohort, "_npctls", n.pctls, "_mean.png", sep = ""), 
@@ -171,10 +171,10 @@ for (tpnum in 1:3){
 ###
 data.dw.facet <- do.call("rbind", lapply(data.dw, function(x){do.call("rbind", x)}))
 data.dw.facet$tpnum <- factor(data.dw.facet$tpnum, levels = c("Perfect", "Over predict", "Under predict"))
-gg.dw <- dwplot(data.dw.facet) + #scale_x_continuous(breaks = seq(-0.15, 0, 0.05)) 
+gg.dw <- dwplot(data.dw.facet) + 
   facet_grid(rows = vars(tpnum), cols = vars(state))  + 
   geom_vline(xintercept = 0, linetype = "dashed") + 
-  xlab("Bias") + ylab("Scenario")
+  xlab("Bias") + ylab("Scenario") + scale_x_continuous(breaks = seq(-0.025, 0.05, 0.025), labels = function(x) ifelse(x == 0, "0", x))
 
 ### Save main plot
 CairoPNG(paste("figures/gg_small_sample_mean_N", n.cohort, "_npctls", n.pctls, "_median.png", sep = ""), 

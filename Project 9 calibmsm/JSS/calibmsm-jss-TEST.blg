@@ -1,0 +1,53 @@
+This is BibTeX, Version 0.99d (TeX Live 2021/W32TeX)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: calibmsm-jss-TEST.aux
+The style file: jss.bst
+Case mismatch error between cite keys vanCalster2016 and VanCalster2016
+---line 67 of file calibmsm-jss-TEST.aux
+ : \citation{vanCalster2016
+ :                         }
+I'm skipping whatever remains of this command
+Database file #1: refs.bib
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+You've used 21 entries,
+            3215 wiz_defined-function locations,
+            831 strings with 10277 characters,
+and the built_in function-call counts, 26535 in all, are:
+= -- 2727
+> -- 666
+< -- 10
++ -- 249
+- -- 229
+* -- 2025
+:= -- 3082
+add.period$ -- 118
+call.type$ -- 21
+change.case$ -- 163
+chr.to.int$ -- 22
+cite$ -- 21
+duplicate$ -- 2779
+empty$ -- 2046
+format.name$ -- 289
+if$ -- 5384
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 258
+newline$ -- 149
+num.names$ -- 84
+pop$ -- 1308
+preamble$ -- 1
+purify$ -- 160
+quote$ -- 0
+skip$ -- 386
+stack$ -- 0
+substring$ -- 3004
+swap$ -- 644
+text.length$ -- 1
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 186
+warning$ -- 0
+while$ -- 172
+width$ -- 0
+write$ -- 349
+(There was 1 error message)

@@ -1,0 +1,187 @@
+\begin{thebibliography}{21}
+\newcommand{\enquote}[1]{``#1''}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi:\discretionary{}{}{}#1}\else
+  \providecommand{\doi}{doi:\discretionary{}{}{}\begingroup
+  \urlstyle{rm}\Url}\fi
+\providecommand{\eprint}[2][]{\url{#2}}
+
+\bibitem[{Aalen and Johansen(1978)}]{Aalen1978}
+Aalen OO, Johansen S (1978).
+\newblock \enquote{{An Empirical Transition Matrix for Non-Homogeneous Markov
+  Chains Based on Censored Observations}.}
+\newblock \emph{Scandinavian Journal of Statistics}, \textbf{5}(3), 141--150.
+
+\bibitem[{Austin(2016)}]{Austin2016}
+Austin PC (2016).
+\newblock \enquote{{Variance estimation when using inverse probability of
+  treatment weighting (IPTW) with survival analysis}.}
+\newblock \emph{Statistics in Medicine}, \textbf{35}(30), 5642--5655.
+\newblock ISSN 10970258.
+\newblock \doi{10.1002/sim.7084}.
+
+\bibitem[{Dafni(2011)}]{Dafni2011}
+Dafni U (2011).
+\newblock \enquote{{Landmark analysis at the 25-year landmark point}.}
+\newblock \emph{Circulation: Cardiovascular Quality and Outcomes},
+  \textbf{4}(3), 363--371.
+\newblock ISSN 19417713.
+\newblock \doi{10.1161/CIRCOUTCOMES.110.957951}.
+
+\bibitem[{de~Wreede \emph{et~al.}(2011)de~Wreede, Fiocco, and
+  Putter}]{DeWreede2011}
+de~Wreede LC, Fiocco M, Putter H (2011).
+\newblock \enquote{{mstate: An R Package for the Analysis of Competing Risks
+  and Multi-State Models}.}
+\newblock \emph{Journal of Statistical Software}, \textbf{38}(7).
+
+\bibitem[{EBMT(2023)}]{EBMT2023}
+EBMT (2023).
+\newblock \enquote{{Data from the European Society for Blood and Marrow
+  Transplantation}.}
+\newblock
+  \urlprefix\url{https://search.r-project.org/CRAN/refmans/mstate/html/EBMT-data.html}.
+
+\bibitem[{Hernan and Robins(2020)}]{Hernan2020}
+Hernan M, Robins J (2020).
+\newblock \enquote{{12.2 Estimating IP weights via modeling}.}
+\newblock In \emph{Causal Inference: What If}, chapter 12.2. Chapman &
+  Hall/CRC, Boca Raton.
+
+\bibitem[{Le-Rademacher \emph{et~al.}(2018)Le-Rademacher, Peterson, Therneau,
+  Sanford, Stone, and Mandrekar}]{Le-Rademacher2018}
+Le-Rademacher JG, Peterson RA, Therneau TM, Sanford BL, Stone RM, Mandrekar SJ
+  (2018).
+\newblock \enquote{{Application of multi-state models in cancer clinical
+  trials}.}
+\newblock \emph{Clinical Trials}, \textbf{15}(5), 489--498.
+\newblock ISSN 17407753.
+\newblock \doi{10.1177/1740774518789098}.
+
+\bibitem[{Lintu \emph{et~al.}(2022)Lintu, Shreyas, and Kamath}]{Lintu2022}
+Lintu MK, Shreyas KM, Kamath A (2022).
+\newblock \enquote{{A multi-state model for kidney disease progression}.}
+\newblock \emph{Clinical Epidemiology and Global Health}, \textbf{13}(December
+  2021), 100946.
+\newblock ISSN 22133984.
+\newblock \doi{10.1016/j.cegh.2021.100946}.
+\newblock \urlprefix\url{https://doi.org/10.1016/j.cegh.2021.100946}.
+
+\bibitem[{Masia \emph{et~al.}(2017)Masia, Padilla, Moreno, Barber, Iribarren,
+  Romero, and LIST}]{Masia2017}
+Masia M, Padilla S, Moreno S, Barber X, Iribarren JA, Romero J, LIST NTFA
+  (2017).
+\newblock \enquote{{Prediction of long-term outcomes of HIV- infected patients
+  developing non-AIDS events using a multistate approach}.}
+\newblock \emph{PLoS ONE}, \textbf{112}, 1--16.
+
+\bibitem[{Putter \emph{et~al.}(2007)Putter, Fiocco, and Geskus}]{Putter2007}
+Putter H, Fiocco M, Geskus RB (2007).
+\newblock \enquote{{Tutorial in biostatistics: Competing risks and multi-state
+  models}.}
+\newblock \emph{Statistics in medicine}, \textbf{26}(11), 2389--2430.
+\newblock \doi{10.1002/sim}.
+
+\bibitem[{Putter and Spitoni(2018)}]{Putter2018}
+Putter H, Spitoni C (2018).
+\newblock \enquote{{Non-parametric estimation of transition probabilities in
+  non-Markov multi-state models: The landmark Aalen–Johansen estimator}.}
+\newblock \emph{Statistical Methods in Medical Research}, \textbf{27}(7),
+  2081--2092.
+\newblock ISSN 14770334.
+\newblock \doi{10.1177/0962280216674497}.
+
+\bibitem[{Putter \emph{et~al.}(2006)Putter, {Van Hage}, {De Bock}, Elgalta, and
+  {Van De Velde}}]{Putter2006}
+Putter H, {Van Hage} JD, {De Bock} GH, Elgalta R, {Van De Velde} CJ (2006).
+\newblock \enquote{{Estimation and prediction in a multi-state model for breast
+  cancer}.}
+\newblock \emph{Biometrical Journal}, \textbf{48}(3), 366--380.
+\newblock ISSN 03233847.
+\newblock \doi{10.1002/bimj.200510218}.
+
+\bibitem[{Sperrin \emph{et~al.}(2022)Sperrin, Riley, Collins, and
+  Martin}]{Sperrin2022}
+Sperrin M, Riley RD, Collins GS, Martin GP (2022).
+\newblock \enquote{{Targeted validation: validating clinical prediction models
+  in their intended population and setting}.}
+\newblock \emph{Diagnostic and Prognostic Research}, \textbf{6}(1), 4--9.
+\newblock ISSN 2397-7523.
+\newblock \doi{10.1186/s41512-022-00136-8}.
+\newblock \urlprefix\url{https://doi.org/10.1186/s41512-022-00136-8}.
+
+\bibitem[{Steyerberg and {Harrell Jr}(2016)}]{Steyerberg2016}
+Steyerberg EW, {Harrell Jr} FE (2016).
+\newblock \enquote{{Prediction models need appropriate internal,
+  internal-external, and external validation}.}
+\newblock \emph{Journal of Clinical Epidemiology}, \textbf{69}, 245--247.
+\newblock \doi{10.1016/j.jclinepi.2015.04.005}.
+
+\bibitem[{{Van Calster} \emph{et~al.}(2019){Van Calster}, McLernon, {Van
+  Smeden}, Wynants, Steyerberg, Bossuyt, Collins, MacAskill, Moons, and
+  Vickers}]{VanCalster2019}
+{Van Calster} B, McLernon DJ, {Van Smeden} M, Wynants L, Steyerberg EW, Bossuyt
+  P, Collins GS, MacAskill P, Moons KG, Vickers AJ (2019).
+\newblock \enquote{{Calibration: The Achilles heel of predictive analytics}.}
+\newblock \emph{BMC Medicine}, \textbf{17}(1), 1--7.
+\newblock ISSN 17417015.
+\newblock \doi{10.1186/s12916-019-1466-7}.
+
+\bibitem[{{Van Calster} \emph{et~al.}(2016){Van Calster}, Nieboer, Vergouwe,
+  {De Cock}, Pencina, and Steyerberg}]{VanCalster2016}
+{Van Calster} B, Nieboer D, Vergouwe Y, {De Cock} B, Pencina MJ, Steyerberg EW
+  (2016).
+\newblock \enquote{{A calibration hierarchy for risk models was defined: From
+  utopia to empirical data}.}
+\newblock \emph{Journal of Clinical Epidemiology}, \textbf{74}, 167--176.
+\newblock ISSN 18785921.
+\newblock \doi{10.1016/j.jclinepi.2015.12.005}.
+\newblock \urlprefix\url{http://dx.doi.org/10.1016/j.jclinepi.2015.12.005}.
+
+\bibitem[{{Van Hoorde} \emph{et~al.}(2015){Van Hoorde}, {Van Huffel},
+  Timmerman, Bourne, and {Van Calster}}]{VanHoorde2015}
+{Van Hoorde} K, {Van Huffel} S, Timmerman D, Bourne T, {Van Calster} B (2015).
+\newblock \enquote{{A spline-based tool to assess and visualize the calibration
+  of multiclass risk predictions}.}
+\newblock \emph{Journal of Biomedical Informatics}, \textbf{54}, 283--293.
+\newblock ISSN 15320464.
+\newblock \doi{10.1016/j.jbi.2014.12.016}.
+\newblock \urlprefix\url{http://dx.doi.org/10.1016/j.jbi.2014.12.016}.
+
+\bibitem[{{Van Hoorde} \emph{et~al.}(2014){Van Hoorde}, Vergouwe, Timmerman,
+  {Van Huffel}, Steyerberg, and {Van Calster}}]{VanHoorde2014}
+{Van Hoorde} K, Vergouwe Y, Timmerman D, {Van Huffel} S, Steyerberg W, {Van
+  Calster} B (2014).
+\newblock \enquote{{Assessing calibration of multinomial risk prediction
+  models}.}
+\newblock \emph{Statistics in Medicine}, \textbf{33}(15), 2585--2596.
+\newblock \doi{10.1002/sim.6114}.
+
+\bibitem[{van Houwelingen(2007)}]{Houwelingen2007}
+van Houwelingen HC (2007).
+\newblock \enquote{{Dynamic Prediction by Landmarking in Event History
+  Analysis}.}
+\newblock \emph{Scandinavian Journal of Statistics}, \textbf{34}(1), 70--85.
+
+\bibitem[{van Smeden \emph{et~al.}(2021)van Smeden, Reitsma, Riley, Collins,
+  and Moons}]{VanSmeden2021}
+van Smeden M, Reitsma JB, Riley RD, Collins GS, Moons KG (2021).
+\newblock \enquote{{Clinical prediction models: diagnosis versus prognosis}.}
+\newblock \emph{Journal of Clinical Epidemiology}, \textbf{132}, 142--145.
+\newblock ISSN 18785921.
+\newblock \doi{10.1016/j.jclinepi.2021.01.009}.
+\newblock \urlprefix\url{http://dx.doi.org/10.1016/j.jclinepi.2021.01.009}.
+
+\bibitem[{Yee(2015)}]{Yee2015}
+Yee TW (2015).
+\newblock \emph{{Vector Generalized Linear and Additive Models}}.
+\newblock 1 edition. Springer New York, NY.
+\newblock ISBN 978-1-4939-4198-8.
+\newblock \doi{10.1007/978-1-4939-2818-7}.
+\newblock
+  \urlprefix\url{https://link.springer.com/book/10.1007/978-1-4939-2818-7}.
+
+\end{thebibliography}
