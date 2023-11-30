@@ -47,13 +47,17 @@ for (i in 1:3){
                            calib.blr.list[[i]][["plots.list"]])
   
   ### Create main plots
-  plots.blr.sens.gg <- ggarrange(plotlist = plots.blr.sens.list, nrow = 4, ncol = 5)
+  plots.blr.sens.gg <- ggarrange(plotlist = plots.blr.sens.list, nrow = 4, ncol = 5, common.legend = TRUE, legend = "bottom")
   plots.blr.sens.gg <- 
     annotate_figure(plots.blr.sens.gg, left = "       BLR                           BLR-IPCW-MISS                             BLR-IPCW-DGM                             BLR-IPCW")
   
   ### Save main plot
   CairoPNG(paste("figures/gg_large_sample_moderate_sens_blr_N", n.cohort, "_", scen, "_est", i, ".png", sep = ""), 
            dpi = 300, width = 15, height = 10, unit = "in")
+  print(plots.blr.sens.gg)
+  dev.off()
+  CairoPDF(paste("figures/gg_large_sample_moderate_sens_blr_N", n.cohort, "_", scen, "_est", i, ".pdf", sep = ""), 
+           width = 15, height = 10)
   print(plots.blr.sens.gg)
   dev.off()
   
@@ -67,13 +71,17 @@ for (i in 1:3){
                            calib.mlr.list[[i]][["plots.list"]])
   
   ### Create main plots
-  plots.mlr.sens.gg <- ggarrange(plotlist = plots.mlr.sens.list, nrow = 4, ncol = 5)
+  plots.mlr.sens.gg <- ggarrange(plotlist = plots.mlr.sens.list, nrow = 4, ncol = 5, common.legend = TRUE, legend = "bottom")
   plots.mlr.sens.gg <- 
     annotate_figure(plots.mlr.sens.gg, left = "       MLR                           MLR-IPCW-MISS                             MLR-IPCW-DGM                             MLR-IPCW")
   
   ### Save main plot
   CairoPNG(paste("figures/gg_large_sample_moderate_sens_mlr_N", n.cohort, "_", scen, "_est", i, ".png", sep = ""), 
            dpi = 300, width = 15, height = 10, unit = "in")
+  print(plots.mlr.sens.gg)
+  dev.off()
+  CairoPDF(paste("figures/gg_large_sample_moderate_sens_mlr_N", n.cohort, "_", scen, "_est", i, ".pdf", sep = ""), 
+           width = 15, height = 10)
   print(plots.mlr.sens.gg)
   dev.off()
   

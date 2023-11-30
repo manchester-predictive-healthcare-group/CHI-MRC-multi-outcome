@@ -95,7 +95,7 @@ data.dw.facet$tpnum <- factor(data.dw.facet$tpnum, levels = c("Perfect", "Over p
 gg.dw <- dwplot(data.dw.facet) +# scale_x_continuous(breaks = seq(-0.15, 0, 0.05)) 
   facet_grid(rows = vars(tpnum), cols = vars(state))  + 
   geom_vline(xintercept = 0, linetype = "dashed") + 
-  xlab("Bias") + ylab("Scenario")
+  xlab("Bias") + ylab("Scenario") + scale_x_continuous(labels = function(x) ifelse(x == 0, "0", x))
 
 ### Save main plot
 CairoPNG(paste("figures/gg_large_sample_mean_N", n.cohort, "_npctls", n.pctls, ".png", sep = ""), 

@@ -2832,14 +2832,21 @@ calc.calib.blr.mod <- function(data.mstate, data.raw, t.eval, p.est){
     ### Create the plots
     plots.list[[i]] <- ggplot(data = data.raw %>% subset(!is.na(data.raw$state.poly)) %>% slice(1:10000) %>% 
                                 arrange(pred) %>% select(patid, pred, obs, obs.true)) +
-      geom_line(aes(x = pred, y = obs), color = "red") +
-      geom_line(aes(x = pred, y = obs.true), color = "blue", linetype = "dotted") +
+      geom_line(aes(x = pred, y = obs, color = "Estimated")) +
+      geom_line(aes(x = pred, y = obs.true, color = "True"), linetype = "twodash") +
+      geom_abline(intercept = 0, slope = 1, linetype = "dashed") + 
+      scale_color_manual(values = c("red", "blue")) +
+      guides(color = guide_legend(override.aes = list(linetype = c(1,6)))) +
+      labs(color = "Calibration plot") +
       geom_abline(intercept = 0, slope = 1, linetype = "dashed") + 
       xlab("Predicted risk") + ylab("Observed risk") + 
-      xlim(c(0, max(data.raw$pred[!is.na(data.raw$state.poly)]))) + 
-      ylim(c(0, max(data.raw$pred[!is.na(data.raw$state.poly)]))) + 
-      geom_rug(aes(x = pred, y = obs), col = rgb(1, 0, 0, alpha = .005)) + 
-      theme(legend.position = "none") +
+      xlim(c(0, min(max(data.raw$pred[!is.na(data.raw$state.poly)], 
+                        data.raw$obs[!is.na(data.raw$state.poly)], 
+                        data.raw$obs.true[!is.na(data.raw$state.poly)]), 1))) + 
+      ylim(c(0, min(max(data.raw$pred[!is.na(data.raw$state.poly)], 
+                        data.raw$obs[!is.na(data.raw$state.poly)], 
+                        data.raw$obs.true[!is.na(data.raw$state.poly)]), 1))) + 
+      geom_rug(aes(x = pred, y = obs), col = rgb(1, 0, 0,  alpha = .01)) + 
       ggtitle(paste("State ", i, sep = ""))
   }
   
@@ -2942,9 +2949,12 @@ calc.calib.blr.ipcw.mod <- function(data.mstate, data.raw, t.eval, p.est, max.we
     ### Create the plots
     plots.mspec.list[[i]] <- ggplot(data = data.raw %>% subset(!is.na(data.raw$state.poly)) %>% slice(1:10000) %>% 
                                       arrange(pred) %>% select(patid, pred, obs, obs.true)) +
-      geom_line(aes(x = pred, y = obs), color = "red") +
-      geom_line(aes(x = pred, y = obs.true), color = "blue", linetype = "dotted") +
+      geom_line(aes(x = pred, y = obs, color = "Estimated")) +
+      geom_line(aes(x = pred, y = obs.true, color = "True"), linetype = "twodash") +
       geom_abline(intercept = 0, slope = 1, linetype = "dashed") + 
+      scale_color_manual(values = c("red", "blue")) +
+      guides(color = guide_legend(override.aes = list(linetype = c(1,6)))) +
+      labs(color = "Calibration plot") +
       xlab("Predicted risk") + ylab("Observed risk") + 
       xlim(c(0, min(max(data.raw$pred[!is.na(data.raw$state.poly)], 
                     data.raw$obs[!is.na(data.raw$state.poly)], 
@@ -2952,8 +2962,7 @@ calc.calib.blr.ipcw.mod <- function(data.mstate, data.raw, t.eval, p.est, max.we
       ylim(c(0, min(max(data.raw$pred[!is.na(data.raw$state.poly)], 
                     data.raw$obs[!is.na(data.raw$state.poly)], 
                     data.raw$obs.true[!is.na(data.raw$state.poly)]), 1))) + 
-      geom_rug(aes(x = pred, y = obs), col = rgb(1, 0, 0, alpha = .005)) + 
-      theme(legend.position = "none") +
+      geom_rug(aes(x = pred, y = obs), col = rgb(1, 0, 0,  alpha = .01)) + 
       ggtitle(paste("State ", i, sep = ""))
   }
 
@@ -2983,9 +2992,12 @@ calc.calib.blr.ipcw.mod <- function(data.mstate, data.raw, t.eval, p.est, max.we
     ### Create the plots
     plots.pspec.list[[i]] <- ggplot(data = data.raw %>% subset(!is.na(data.raw$state.poly)) %>% slice(1:10000) %>% 
                                 arrange(pred) %>% select(patid, pred, obs, obs.true)) +
-      geom_line(aes(x = pred, y = obs), color = "red") +
-      geom_line(aes(x = pred, y = obs.true), color = "blue", linetype = "dotted") +
+      geom_line(aes(x = pred, y = obs, color = "Estimated")) +
+      geom_line(aes(x = pred, y = obs.true, color = "True"), linetype = "twodash") +
       geom_abline(intercept = 0, slope = 1, linetype = "dashed") + 
+      scale_color_manual(values = c("red", "blue")) +
+      guides(color = guide_legend(override.aes = list(linetype = c(1,6)))) +
+      labs(color = "Calibration plot") +
       xlab("Predicted risk") + ylab("Observed risk") + 
       xlim(c(0, min(max(data.raw$pred[!is.na(data.raw$state.poly)], 
                         data.raw$obs[!is.na(data.raw$state.poly)], 
@@ -2993,8 +3005,7 @@ calc.calib.blr.ipcw.mod <- function(data.mstate, data.raw, t.eval, p.est, max.we
       ylim(c(0, min(max(data.raw$pred[!is.na(data.raw$state.poly)], 
                         data.raw$obs[!is.na(data.raw$state.poly)], 
                         data.raw$obs.true[!is.na(data.raw$state.poly)]), 1))) + 
-      geom_rug(aes(x = pred, y = obs), col = rgb(1, 0, 0, alpha = .005)) + 
-      theme(legend.position = "none") +
+      geom_rug(aes(x = pred, y = obs), col = rgb(1, 0, 0,  alpha = .01)) + 
       ggtitle(paste("State ", i, sep = ""))
   }
   
@@ -3024,9 +3035,12 @@ calc.calib.blr.ipcw.mod <- function(data.mstate, data.raw, t.eval, p.est, max.we
     ### Create the plots
     plots.DGMspec.list[[i]] <- ggplot(data = data.raw %>% subset(!is.na(data.raw$state.poly)) %>% slice(1:10000) %>% 
                                         arrange(pred) %>% select(patid, pred, obs, obs.true)) +
-      geom_line(aes(x = pred, y = obs), color = "red") +
-      geom_line(aes(x = pred, y = obs.true), color = "blue", linetype = "dotted") +
+      geom_line(aes(x = pred, y = obs, color = "Estimated")) +
+      geom_line(aes(x = pred, y = obs.true, color = "True"), linetype = "twodash") +
       geom_abline(intercept = 0, slope = 1, linetype = "dashed") + 
+      scale_color_manual(values = c("red", "blue")) +
+      guides(color = guide_legend(override.aes = list(linetype = c(1,6)))) +
+      labs(color = "Calibration plot") +
       xlab("Predicted risk") + ylab("Observed risk") + 
       xlim(c(0, min(max(data.raw$pred[!is.na(data.raw$state.poly)], 
                         data.raw$obs[!is.na(data.raw$state.poly)], 
@@ -3034,8 +3048,7 @@ calc.calib.blr.ipcw.mod <- function(data.mstate, data.raw, t.eval, p.est, max.we
       ylim(c(0, min(max(data.raw$pred[!is.na(data.raw$state.poly)], 
                         data.raw$obs[!is.na(data.raw$state.poly)], 
                         data.raw$obs.true[!is.na(data.raw$state.poly)]), 1))) + 
-      geom_rug(aes(x = pred, y = obs), col = rgb(1, 0, 0, alpha = .005)) + 
-      theme(legend.position = "none") +
+      geom_rug(aes(x = pred, y = obs), col = rgb(1, 0, 0,  alpha = .01)) + 
       ggtitle(paste("State ", i, sep = ""))
   }
   
@@ -3124,18 +3137,24 @@ calc.calib.mlr.mod <- function(data.mstate, data.raw, t.eval, p.est, ps.int = 4,
     data.raw$pred <- data.raw[, paste("p.est", i, sep = "")]
     data.raw$obs <- data.raw[, paste("mlr.pred.obs", i, sep = "")]
     data.raw$obs.true <- data.raw[, paste("p.true", i, sep = "")]
-    
+      
     ### Create the plots
     plots.list[[i]] <- ggplot(data = data.raw %>% subset(!is.na(data.raw$state.poly)) %>% slice(1:10000) %>%
                                 arrange(pred) %>% select(patid, pred, obs, obs.true)) +
-      geom_point(aes(x = pred, y = obs), color = "red", size = 0.5, alpha = 0.05) +
-      geom_line(aes(x = pred, y = obs.true), color = "blue", linetype = "dotted") +
+      geom_point(aes(x = pred, y = obs, color = "Estimated"), size = 0.5, pch = 15, alpha = 0.05) +
+      geom_line(aes(x = pred, y = obs.true, color = "True"), linetype = "twodash") +
       geom_abline(intercept = 0, slope = 1, linetype = "dashed") + 
+      scale_color_manual(values = c("red", "blue")) +
+      guides(color = guide_legend(override.aes = list(linetype = c(NA,6), pch = c(15,NA), size = c(1,1)))) +
+      labs(color = "Calibration plot") +
       xlab("Predicted risk") + ylab("Observed risk") + 
-      xlim(c(0, max(data.raw$pred[!is.na(data.raw$state.poly)]))) + 
-      ylim(c(0, max(data.raw$pred[!is.na(data.raw$state.poly)]))) + 
-      geom_rug(aes(x = pred, y = obs), col = rgb(1, 0, 0, alpha = .005)) + 
-      theme(legend.position = "none") +
+      xlim(c(0, min(max(data.raw$pred[!is.na(data.raw$state.poly)], 
+                        data.raw$obs[!is.na(data.raw$state.poly)], 
+                        data.raw$obs.true[!is.na(data.raw$state.poly)]), 1))) + 
+      ylim(c(0, min(max(data.raw$pred[!is.na(data.raw$state.poly)], 
+                        data.raw$obs[!is.na(data.raw$state.poly)], 
+                        data.raw$obs.true[!is.na(data.raw$state.poly)]), 1))) + 
+      geom_rug(aes(x = pred, y = obs), col = rgb(1, 0, 0,  alpha = .01)) + 
       ggtitle(paste("State ", i, sep = ""))
   }
   
@@ -3287,10 +3306,13 @@ calc.calib.mlr.ipcw.mod <- function(data.mstate, data.raw, t.eval, p.est, ps.int
     
     ### Create the plots
     plots.mspec.list[[i]] <- ggplot(data = data.raw %>% subset(!is.na(data.raw$state.poly)) %>% slice(1:10000) %>%
-                                      arrange(pred) %>%  select(patid, pred, obs, obs.true)) +
-      geom_point(aes(x = pred, y = obs), color = "red", size = 0.5, alpha = 0.05) +
-      geom_line(aes(x = pred, y = obs.true), color = "blue", linetype = "dotted") +
+                                      arrange(pred) %>%  select(patid, pred, obs, obs.true)) +      
+      geom_point(aes(x = pred, y = obs, color = "Estimated"), size = 0.5, pch = 15, alpha = 0.05) +
+      geom_line(aes(x = pred, y = obs.true, color = "True"), linetype = "twodash") +
       geom_abline(intercept = 0, slope = 1, linetype = "dashed") + 
+      scale_color_manual(values = c("red", "blue")) +
+      guides(color = guide_legend(override.aes = list(linetype = c(NA,6), pch = c(15,NA), size = c(1,1)))) +
+      labs(color = "Calibration plot") +
       xlab("Predicted risk") + ylab("Observed risk") + 
       xlim(c(0, min(max(data.raw$pred[!is.na(data.raw$state.poly)], 
                         data.raw$obs[!is.na(data.raw$state.poly)], 
@@ -3298,8 +3320,7 @@ calc.calib.mlr.ipcw.mod <- function(data.mstate, data.raw, t.eval, p.est, ps.int
       ylim(c(0, min(max(data.raw$pred[!is.na(data.raw$state.poly)], 
                         data.raw$obs[!is.na(data.raw$state.poly)], 
                         data.raw$obs.true[!is.na(data.raw$state.poly)]), 1))) + 
-      geom_rug(aes(x = pred, y = obs), col = rgb(1, 0, 0, alpha = .005)) + 
-      theme(legend.position = "none") +
+      geom_rug(aes(x = pred, y = obs), col = rgb(1, 0, 0,  alpha = .01)) + 
       ggtitle(paste("State ", i, sep = ""))
   }
   
@@ -3315,10 +3336,13 @@ calc.calib.mlr.ipcw.mod <- function(data.mstate, data.raw, t.eval, p.est, ps.int
     
     ### Create the plots
     plots.pspec.list[[i]] <- ggplot(data = data.raw %>% subset(!is.na(data.raw$state.poly)) %>% slice(1:10000) %>%
-                                      arrange(pred) %>%  select(patid, pred, obs, obs.true)) +
-      geom_point(aes(x = pred, y = obs), color = "red", size = 0.5, alpha = 0.05) +
-      geom_line(aes(x = pred, y = obs.true), color = "blue", linetype = "dotted") +
+                                      arrange(pred) %>%  select(patid, pred, obs, obs.true)) +    
+      geom_point(aes(x = pred, y = obs, color = "Estimated"), size = 0.5, pch = 15, alpha = 0.05) +
+      geom_line(aes(x = pred, y = obs.true, color = "True"), linetype = "twodash") +
       geom_abline(intercept = 0, slope = 1, linetype = "dashed") + 
+      scale_color_manual(values = c("red", "blue")) +
+      guides(color = guide_legend(override.aes = list(linetype = c(NA,6), pch = c(15,NA), size = c(1,1)))) +
+      labs(color = "Calibration plot") +
       xlab("Predicted risk") + ylab("Observed risk") + 
       xlim(c(0, min(max(data.raw$pred[!is.na(data.raw$state.poly)], 
                         data.raw$obs[!is.na(data.raw$state.poly)], 
@@ -3326,8 +3350,7 @@ calc.calib.mlr.ipcw.mod <- function(data.mstate, data.raw, t.eval, p.est, ps.int
       ylim(c(0, min(max(data.raw$pred[!is.na(data.raw$state.poly)], 
                         data.raw$obs[!is.na(data.raw$state.poly)], 
                         data.raw$obs.true[!is.na(data.raw$state.poly)]), 1))) + 
-      geom_rug(aes(x = pred, y = obs), col = rgb(1, 0, 0, alpha = .005)) + 
-      theme(legend.position = "none") +
+      geom_rug(aes(x = pred, y = obs), col = rgb(1, 0, 0,  alpha = .01)) + 
       ggtitle(paste("State ", i, sep = ""))
   }
   
@@ -3343,10 +3366,13 @@ calc.calib.mlr.ipcw.mod <- function(data.mstate, data.raw, t.eval, p.est, ps.int
     
     ### Create the plots
     plots.DGMspec.list[[i]] <- ggplot(data = data.raw %>% subset(!is.na(data.raw$state.poly)) %>% slice(1:10000) %>%
-                                        arrange(pred) %>%  select(patid, pred, obs, obs.true)) +
-      geom_point(aes(x = pred, y = obs), color = "red", size = 0.5, alpha = 0.05) +
-      geom_line(aes(x = pred, y = obs.true), color = "blue", linetype = "dotted") +
+                                        arrange(pred) %>%  select(patid, pred, obs, obs.true)) +    
+      geom_point(aes(x = pred, y = obs, color = "Estimated"), size = 0.5, pch = 15, alpha = 0.05) +
+      geom_line(aes(x = pred, y = obs.true, color = "True"), linetype = "twodash") +
       geom_abline(intercept = 0, slope = 1, linetype = "dashed") + 
+      scale_color_manual(values = c("red", "blue")) +
+      guides(color = guide_legend(override.aes = list(linetype = c(NA,6), pch = c(15,NA), size = c(1,1)))) +
+      labs(color = "Calibration plot") +
       xlab("Predicted risk") + ylab("Observed risk") + 
       xlim(c(0, min(max(data.raw$pred[!is.na(data.raw$state.poly)], 
                         data.raw$obs[!is.na(data.raw$state.poly)], 
@@ -3354,8 +3380,7 @@ calc.calib.mlr.ipcw.mod <- function(data.mstate, data.raw, t.eval, p.est, ps.int
       ylim(c(0, min(max(data.raw$pred[!is.na(data.raw$state.poly)], 
                         data.raw$obs[!is.na(data.raw$state.poly)], 
                         data.raw$obs.true[!is.na(data.raw$state.poly)]), 1))) + 
-      geom_rug(aes(x = pred, y = obs), col = rgb(1, 0, 0, alpha = .005)) + 
-      theme(legend.position = "none") +
+      geom_rug(aes(x = pred, y = obs), col = rgb(1, 0, 0,  alpha = .01)) + 
       ggtitle(paste("State ", i, sep = ""))
   }
   
@@ -3456,7 +3481,6 @@ calc.calib.aj.moderate <- function(data.mstate, data.raw, tmat, t.eval, p.est, n
       xlab("Predicted risk") + ylab("Observed risk") + 
       xlim(c(0, max(c(data.ggplot[[i]]$pred, data.ggplot[[i]]$obs)))) + 
       ylim(c(0, max(c(data.ggplot[[i]]$pred, data.ggplot[[i]]$obs)))) +
-      theme(legend.position = "none") +
       ggtitle(paste("State ", i, sep = ""))
   }
   
@@ -3512,14 +3536,17 @@ calc.calib.pv.moderate <- function(data.raw, pv.comb, p.est){
     ### Create the plots
     plots.list[[i]] <- ggplot(data = data.pv %>% slice(1:10000) %>%
                                  arrange(pred) %>% select(pred, obs, obs.true)) +
-      geom_line(aes(x = pred, y = obs), color = "red") +
-      geom_line(aes(x = pred, y = obs.true), color = "blue", linetype = "dotted") +
+      geom_line(aes(x = pred, y = obs, color = "Estimated")) +
+      geom_line(aes(x = pred, y = obs.true, color = "True"), linetype = "twodash") +
+      geom_abline(intercept = 0, slope = 1, linetype = "dashed") + 
+      scale_color_manual(values = c("red", "blue")) +
+      guides(color = guide_legend(override.aes = list(linetype = c(1,6)))) +
+      labs(color = "Calibration plot") +
       geom_abline(intercept = 0, slope = 1, linetype = "dashed") + 
       xlab("Predicted risk") + ylab("Observed risk") + 
       xlim(c(0, max(data.pv$pred, data.pv$obs, data.pv$obs.true))) + 
       ylim(c(0, max(data.pv$pred, data.pv$obs, data.pv$obs.true))) + 
-      geom_rug(aes(x = pred, y = obs), col = rgb(1, 0, 0, alpha = .005)) + 
-      theme(legend.position = "none") +
+      geom_rug(aes(x = pred, y = obs), col = rgb(1, 0, 0, alpha = .01)) + 
       ggtitle(paste("State ", i, sep = ""))
   }
   
