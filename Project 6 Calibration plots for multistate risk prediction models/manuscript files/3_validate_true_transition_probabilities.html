@@ -172,83 +172,17 @@ pre code {
 <p>For each set of covariates we do the following:</p>
 <ol style="list-style-type: decimal">
 <li>Calculate transition probabilities according to formulae (implemented in the function <code>calc.true.transition.probs.DGM1</code> and are stored in <code>true.trans.probs</code>)</li>
-<li>Calculate porpotion of individuals in each state at 7-years (data is in <code>cohort.mstate</code>)</li>
+<li>Calculate porpotion of individuals in each state at 7-years (data is in <code>cohort.mstate</code>) and was simulated and saved into the .RData workspace which is loaded in below.</li>
 <li>Calculate transition probabilities according to Matrix exponential, which is valid when hazards are constant.</li>
 </ol>
-<p>We then compare the transition probabilities estimated using the formulae, with the other two approaches. This is a quality control check to verify these formulae are accurate, and match the data which is being simulated.</p>
+<p>We then compare the transition probabilities estimated using the formulae, with the other two approaches. This is a quality control check to verify these formulae are accurate, and match the data which is being simulated. The following chunk of code applies each of 1), 2) and 3), and saves the transition probabilities/proportions into <code>true.trans.probs</code> (1), <code>trans.probs.simulated</code> (2) and <code>trans.probs.power.series</code> (3).</p>
 <pre class="r"><code>### Set working directory
 rm(list=ls())
 setwd(&quot;/mnt/bmh01-rds/mrc-multi-outcome/Project_6&quot;)
 
-### Load packages and functions
+### Load functions
 source(&quot;code/z_functions.R&quot;)
-source(&quot;code/z_load_packages.R&quot;)</code></pre>
-<pre><code>## 
-## Attaching package: 'tidytable'</code></pre>
-<pre><code>## The following objects are masked from 'package:stats':
-## 
-##     dt, filter, lag</code></pre>
-<pre><code>## The following object is masked from 'package:base':
-## 
-##     %in%</code></pre>
-<pre><code>## 
-## Attaching package: 'dplyr'</code></pre>
-<pre><code>## The following objects are masked from 'package:tidytable':
-## 
-##     across, add_count, add_tally, anti_join, arrange, between,
-##     bind_cols, bind_rows, c_across, case_match, case_when, coalesce,
-##     consecutive_id, count, cross_join, cume_dist, cur_column, cur_data,
-##     cur_group_id, cur_group_rows, dense_rank, desc, distinct, filter,
-##     first, full_join, group_by, group_cols, group_split, group_vars,
-##     if_all, if_any, if_else, inner_join, is_grouped_df, lag, last,
-##     lead, left_join, min_rank, mutate, n, n_distinct, na_if, nest_by,
-##     nest_join, nth, percent_rank, pick, pull, recode, reframe,
-##     relocate, rename, rename_with, right_join, row_number, rowwise,
-##     select, semi_join, slice, slice_head, slice_max, slice_min,
-##     slice_sample, slice_tail, summarise, summarize, tally, top_n,
-##     transmute, tribble, ungroup</code></pre>
-<pre><code>## The following objects are masked from 'package:stats':
-## 
-##     filter, lag</code></pre>
-<pre><code>## The following objects are masked from 'package:base':
-## 
-##     intersect, setdiff, setequal, union</code></pre>
-<pre><code>## Loading required package: Hmisc</code></pre>
-<pre><code>## 
-## Attaching package: 'Hmisc'</code></pre>
-<pre><code>## The following objects are masked from 'package:dplyr':
-## 
-##     src, summarize</code></pre>
-<pre><code>## The following object is masked from 'package:tidytable':
-## 
-##     summarize</code></pre>
-<pre><code>## The following objects are masked from 'package:base':
-## 
-##     format.pval, units</code></pre>
-<pre><code>## Loading required package: stats4</code></pre>
-<pre><code>## Loading required package: splines</code></pre>
-<pre><code>## 
-## Attaching package: 'VGAM'</code></pre>
-<pre><code>## The following objects are masked from 'package:rms':
-## 
-##     calibrate, lrtest</code></pre>
-<pre><code>## 
-## Attaching package: 'ggpubr'</code></pre>
-<pre><code>## The following objects are masked from 'package:tidytable':
-## 
-##     group_by, mutate</code></pre>
-<pre><code>## 
-## Attaching package: 'boot'</code></pre>
-<pre><code>## The following objects are masked from 'package:VGAM':
-## 
-##     logit, simplex</code></pre>
-<pre><code>## The following object is masked from 'package:survival':
-## 
-##     aml</code></pre>
-<pre><code>## Loading required package: foreach</code></pre>
-<pre><code>## Loading required package: iterators</code></pre>
-<pre><code>## Loading required package: parallel</code></pre>
-<pre class="r"><code>source(&quot;code/z_functions_true_transition_probs.R&quot;)
+source(&quot;code/z_functions_true_transition_probs.R&quot;)
 
 ### Create data frame to store output
 differences.simulated &lt;- data.frame(matrix(NA, nrow = 6, ncol = 5))
@@ -300,7 +234,7 @@ for (set in c(1,2,3,4,5,6)){
   trans.probs.simulated &lt;- events(cohort.mstate[[&quot;data.mstate&quot;]])[[&quot;Frequencies&quot;]][,&quot;no event&quot;]/n.cohort
   
   ###
-  ### E3) stimate transition probabilities according to matrix eponential and power series
+  ### 3) stimate transition probabilities according to matrix eponential and power series
   ###
   
   ### Define transition intesities for off-diagnonal  elements
