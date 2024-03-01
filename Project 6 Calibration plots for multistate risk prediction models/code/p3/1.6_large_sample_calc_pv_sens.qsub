@@ -1,0 +1,11 @@
+#!/bin/bash --login
+#$ -S bin/bash
+#$ -cwd
+#$ -V
+
+module load compilers/gcc/11.2.0
+module load apps/gcc/R/4.3.1
+
+#$ -t 1-1200
+
+Rscript 1.6_large_sample_calc_pv_sens.R $SGE_TASK_ID > 1.3_large_sample_calc_pv_sens.$SGE_TASK_ID.out

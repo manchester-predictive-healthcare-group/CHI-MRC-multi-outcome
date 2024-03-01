@@ -1,0 +1,133 @@
+---
+title: "Validate the true transition probabilities estimated using the formulas"
+author: "Alex Pate"
+date: "14/11/2022"
+output: html_document
+---
+
+```{r, echo = FALSE, include = FALSE}
+### Set working directory
+rm(list=ls())
+setwd("/mnt/bmh01-rds/mrc-multi-outcome/Project_6")
+source("code/z_load_packages.R")
+```
+
+We simulated a cohort of data of size 500,000 where every individual has the same set of covariates and applied no censoring. We then compare the proportion of individuals in each state at time 7 years, with the "true predicted transition probabilities" that we have estimated using our formulas. We also compare the true transition probabilities estimated from the formulas, with the transition probabilities according to the matrix exponential which is valid for constant hazards (https://cran.r-project.org/web/packages/msm/vignettes/msm-manual.pdf). We do this for 6 different sets of covariates. 
+
+For each set of covariates we do the following:
+
+1) Calculate transition probabilities according to formulae (implemented in the function `calc.true.transition.probs.DGM1` and are stored in `true.trans.probs`)
+2) Calculate porpotion of individuals in each state at 7-years (data is in `cohort.mstate`) and was simulated and saved into the .RData workspace which is loaded in below.
+3) Calculate transition probabilities according to Matrix exponential, which is valid when hazards are constant.
+
+We then compare the transition probabilities estimated using the formulae, with the other two approaches. This is a quality control check to verify these formulae are accurate, and match the data which is being simulated. The following chunk of code applies each of 1), 2) and 3), and saves the transition probabilities/proportions into `true.trans.probs` (1), `trans.probs.simulated` (2) and `trans.probs.power.series` (3).
+
+```{r, include}
+### Set working directory
+rm(list=ls())
+setwd("/mnt/bmh01-rds/mrc-multi-outcome/Project_6")
+
+### Load functions
+source("code/z_functions.R")
+source("code/z_functions_true_transition_probs.R")
+
+### Create data frame to store output
+differences.simulated <- data.frame(matrix(NA, nrow = 6, ncol = 5))
+differences.power.series <- data.frame(matrix(NA, nrow = 6, ncol = 5))
+
+### Run through each set of covariates 
+for (set in c(1,2,3,4,5,6)){
+  
+  ### Load simulated cohort
+  load(paste("data/sim/validate_true_transition_probabilities_DGM1_set", set, ".RData", sep = ""))
+  
+  ### Assign colnames and rownames to the matrix of covariates for each scenario
+  colnames(covars) <- c("x12", "x13", "x15", "x24", "x25", "x34", "x35", "x45")
+  rownames(covars) <- paste("set = ", 1:6, sep = "")
+  
+  ###
+  ### 1) Estimate true transition probabilities according to formulae
+  ###
+  true.trans.probs <- calc.true.transition.probs.DGM1(u.eval = 0, t.eval = round(7*365.25), 
+                                                    x12.eval = x12.eval, 
+                                                    x13.eval = x13.eval, 
+                                                    x15.eval = x15.eval, 
+                                                    x24.eval = x24.eval, 
+                                                    x25.eval = x25.eval, 
+                                                    x34.eval = x34.eval, 
+                                                    x35.eval = x35.eval, 
+                                                    x45.eval = x45.eval, 
+                                                    shape12 = 1, scale12 = scales.sim["12"], #shape and scale for weibull baseline hazard for transition 1 -> 2
+                                                    shape13 = 1, scale13 = scales.sim["13"], #shape and scale for weibull baseline hazard for transition 1 -> 3
+                                                    shape15 = 1, scale15 = scales.sim["15"], #shape and scale for weibull baseline hazard for transition 1 -> 5
+                                                    shape24 = 1, scale24 = scales.sim["24"], #shape and scale for weibull baseline hazard for transition 2 -> 4
+                                                    shape25 = 1, scale25 = scales.sim["25"], #shape and scale for weibull baseline hazard for transition 2 -> 5
+                                                    shape34 = 1, scale34 = scales.sim["34"], #shape and scale for weibull baseline hazard for transition 3 -> 4
+                                                    shape35 = 1, scale35 = scales.sim["35"], #shape and scale for weibull baseline hazard for transition 3 -> 5
+                                                    shape45 = 1, scale45 = scales.sim["45"], #shape and scale for weibull baseline hazard for transition 3 -> 5
+                                                    beta.x12 = beta.x12, #covariate effects for transiion 12
+                                                    beta.x13 = beta.x13, #covariate effects for transiion 13
+                                                    beta.x15 = beta.x15, #covariate effects for transiion 15
+                                                    beta.x24 = beta.x24, #covariate effects for transiion 24
+                                                    beta.x25 = beta.x25, #covariate effects for transiion 25
+                                                    beta.x34 = beta.x34, #covariate effects for transiion 34
+                                                    beta.x35 = beta.x35, #covariate effects for transiion 35
+                                                    beta.x45 = beta.x45 #covariate effects for transiion 45
+)
+
+  ###
+  ### 2) Estimate transition probabilities through simulated data
+  ###
+  trans.probs.simulated <- events(cohort.mstate[["data.mstate"]])[["Frequencies"]][,"no event"]/n.cohort
+  
+  ###
+  ### 3) stimate transition probabilities according to matrix eponential and power series
+  ###
+  
+  ### Define transition intesities for off-diagnonal  elements
+  A <- matrix(
+    c(0, exp(covars[set,"x12"]*beta.x12)/scales.sim["12"], exp(covars[set,"x13"]*beta.x13)/scales.sim["13"], 0, exp(covars[set,"x15"]*beta.x15)/scales.sim["15"],
+      0,0,0,exp(covars[set,"x24"]*beta.x24)/scales.sim["24"], exp(covars[set,"x25"]*beta.x25)/scales.sim["25"], 
+      0,0,0,exp(covars[set,"x34"]*beta.x34)/scales.sim["34"], exp(covars[set,"x35"]*beta.x35)/scales.sim["35"],
+      0,0,0,0,exp(covars[set,"x45"]*beta.x45)/scales.sim["45"],
+      0,0,0,0,0), 
+    nrow = 5, ncol = 5, byrow = TRUE)
+  
+  ### Add diagonal elements
+  for (row in 1:5){
+    A[row,row] <- -sum(A[row,])
+    }
+  
+  ### Multiply by 7
+  A <- t.eval*A
+  
+  ### Take exponent of this matrix
+  trans.probs.power.series <- expm::expm(A)
+  
+  ### Calculate the difference between the probabilities estimated from the formulae, with the simulated data probabilities and the powe rseries probabilities
+  differences.simulated[set, ] <- trans.probs.simulated - true.trans.probs
+  differences.power.series[set, ] <- trans.probs.power.series[1, ] - true.trans.probs
+}
+```
+
+The set of covariates for each set is found in the rows of this table
+
+```{r, echo = FALSE}
+kable(covars)
+```
+
+The difference between the transition probabilities calculated from the formulas, and the proportion of observations in each state in the simulated data are in the following table. There are very small differences, which can be explained by random variation in the simulated data.
+
+```{r, echo = FALSE}
+colnames(differences.simulated) <- paste("State ", 1:5, sep = "")
+rownames(differences.simulated) <- paste("set = ", 1:6, sep = "")
+kable(differences.simulated)
+```
+
+The difference between the transition probabilities calculated from the formulas, and the transition probabilities from the Matrix exponential are in the following table. The differences are zero, indicating agreement between the two approaches.
+
+```{r, echo = FALSE}
+colnames(differences.power.series) <- paste("State ", 1:5, sep = "")
+rownames(differences.power.series) <- paste("set = ", 1:6, sep = "")
+kable(differences.power.series)
+```
