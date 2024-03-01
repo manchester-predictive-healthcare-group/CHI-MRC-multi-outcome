@@ -406,7 +406,7 @@ calc.scale <- function(p){
 ###
 ### 2.1) Calculate Aalen-Johansen estimator for a cohort of class 'msdata', at time t.eval.
 ###
-calc.calib.aj <- function(data.mstate, tmat, t.eval)
+calc.calib.aj <- function(data.mstate, tmat, t.eval){
   
   ### Fit csh's with no predictors
   csh.aj <- coxph(Surv(Tstart, Tstop, status) ~ strata(trans), data.mstate)
