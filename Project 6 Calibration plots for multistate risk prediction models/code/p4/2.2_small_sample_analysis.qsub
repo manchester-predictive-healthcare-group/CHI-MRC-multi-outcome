@@ -1,0 +1,16 @@
+#!/bin/bash --login
+#$ -S bin/bash
+#$ -cwd
+#$ -V
+
+module load compilers/gcc/11.2.0
+module load apps/gcc/R/4.3.1
+
+#$ -t 1-50
+
+Rscript 2.1_small_sample_analysis.R C1 1500 10 $SGE_TASK_ID > 2.1_small_sample_analysis_C1_n1500_npctls10.$SGE_TASK_ID.out
+Rscript 2.1_small_sample_analysis.R C2 1500 10 $SGE_TASK_ID > 2.1_small_sample_analysis_C2_n1500_npctls10.$SGE_TASK_ID.out
+Rscript 2.1_small_sample_analysis.R C3 1500 10 $SGE_TASK_ID > 2.1_small_sample_analysis_C3_n1500_npctls10.$SGE_TASK_ID.out
+Rscript 2.1_small_sample_analysis.R C1 3000 10 $SGE_TASK_ID > 2.1_small_sample_analysis_C1_n3000_npctls10.$SGE_TASK_ID.out
+Rscript 2.1_small_sample_analysis.R C2 3000 10 $SGE_TASK_ID > 2.1_small_sample_analysis_C2_n3000_npctls10.$SGE_TASK_ID.out
+Rscript 2.1_small_sample_analysis.R C3 3000 10 $SGE_TASK_ID > 2.1_small_sample_analysis_C3_n3000_npctls10.$SGE_TASK_ID.out
