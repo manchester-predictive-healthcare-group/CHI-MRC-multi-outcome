@@ -7,7 +7,7 @@
 - Functions used throughout the code are stored in the z_functions.R file. This is sourced is the start of every piece of code.
 - Required packages are loaded by sourcing the z_load_packages.R file at the start of every piece of code.
 - Items relevant to the manuscript are contained in the 'Manuscript files' section. This contains a html file with all Figures produced from the simulation
-(see document aa_supplementary_material_part2.html), manuscript Figures, and a validation of the formulae for estimating the transition probabilities.
+(see document aa_supplementary_material_part2.html). Figures included in the manuscript, and a validation of the formulae for estimating the transition probabilities.
 - Data and individual figures have not been provided to reduce disk space. These folders are there as placeholders, and required in order to run the code provided.
 
 # Code structure #
