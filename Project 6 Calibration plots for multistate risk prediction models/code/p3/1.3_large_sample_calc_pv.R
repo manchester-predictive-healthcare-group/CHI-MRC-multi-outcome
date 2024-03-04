@@ -1,5 +1,5 @@
 ###
-### This program will calculate the pseudo-values for a set of individuals. This is done seperately based on a number of input parameters, 
+### This program will calculate the pseudo-values for a set of individuals. This is done seperately based on a number of input parameters,
 ### and should be parallelised over the variable set (from 1 to n.cohort/set.size)
 ### 1) Scenario
 ### 2) Size of cohort
@@ -81,6 +81,6 @@ colnames(pv.out.set) <- c("patid", paste("pv.", state, sep = ""))
 rm(list=setdiff(ls(), list("pv.out.set", "scen", "state", "n.pctls", "pctl", "set", "n.cohort")))
 
 ### Save image
-save.image(paste("data/sim/pv/large_sample_calc_pv_", scen, 
+save.image(paste("data/sim/pv/large_sample_calc_pv_", scen,
                  "_S", state,"_npctls", n.pctls, "_pctl", pctl, "_set", set, ".RData", sep = ""))
 

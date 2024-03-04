@@ -153,6 +153,8 @@ The third section of this document contains sensitivity analyses. We assess perf
 
 ## Section 6.1 - Sensitivity analyses for BLR-IPCW in large sample analysis, moderate calibration
 
+We assess performance of BLR-IPCW without the inverse probability of censoring weights applied, and when the weights are perfectly specified.
+
 ```{r, echo=FALSE, results = 'asis', dpi = 36, out.width = "600px", out.height = "600px"}
 
 ### Assign label for scenario to match the manuscript
@@ -175,6 +177,8 @@ for (scen in c("C1", "C2", "C3")){
 ```
 
 ## 6.2 Sensitivity analyses for MLR-IPCW in large sample analysis, moderate calibration
+
+We assess performance of MLR-IPCW without the inverse probability of censoring weights applied, and when the weights are perfectly specified.
 
 ```{r, echo=FALSE, results = 'asis', dpi = 36, out.width = "600px", out.height = "600px"}
 
@@ -199,6 +203,8 @@ for (scen in c("C1", "C2", "C3")){
 
 ## 6.3 Sensitivity analyses for pseudo-value method in large sample analysis, moderate calibration
 
+We assess performance of the pseudo-value approach without grouping individuals by predicted risk before estimating the pseudo-values.
+
 ```{r, echo=FALSE, results = 'asis', dpi = 36, out.width = "600px", out.height = "600px"}
 
 ### Assign label for scenario to match the manuscript
@@ -210,7 +216,7 @@ for (scen in c("C1", "C2", "C3")){
   for (tp in 1:3){
     cat("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
     cat("\n\n\n")
-    cat("**Figure S", counter, ": Misspecification of weights, pseudo-value method**", sep = "")
+    cat("**Figure S", counter, ": Not grouping individuals by predicted risk of each state, pseudo-value method**", sep = "")
     cat("\n\n")
     cat("Scenario = ", scen.label[[scen]], ", ", tp.labels[tp], sep = "")
     cat("![](",paste("sens_large_sample_moderate_", scen,  "_tp", tp, "_pv.png", sep = ""),")")
