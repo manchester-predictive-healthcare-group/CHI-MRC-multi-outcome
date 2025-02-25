@@ -1,0 +1,232 @@
+---
+title: "calculate bias in each scenario, stratified by C"
+author: "Alex Pate"
+date: "2024-12-13"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include = FALSE}
+### Set working directory
+rm(list=ls())
+
+### Set working directory
+setwd("/mnt/bmh01-rds/mrc-multi-outcome/Project_8.2/")
+
+### Source functions
+R.func.sources <- list.files("R", full.names = TRUE)
+sapply(R.func.sources, source)
+
+### Load functions
+source("R/sim_functions.R")
+
+### Call libraries
+library(ggplot2)
+
+### Read in data
+metadata <- readRDS("data/heuristic_shrinkage_sim_metadata.rds")
+metadata <- subset(metadata, C.pop != 0)
+metadata <- subset(metadata, cat == FALSE)
+
+### Add the magnitude of bias/absolute bias
+metadata$S.VH.AB <- abs(metadata$S.VH.diff.mean)
+metadata$S.boot.AB <- abs(metadata$S.boot.diff.mean)
+```
+
+# Write functions
+
+```{r, include = FALSE}
+### Write a function to get the quantiles of the bias for a given range of C-statistics
+get_quantiles_by_C <- function(C1,C2,correlated = TRUE, magnitude = FALSE){
+  
+  # Subset dataset to be correlated/uncorrelated
+  df <- subset(metadata, C.pop > C1 & C.pop <= C2 & corr == correlated)
+  
+  if (magnitude == FALSE){
+      # Get quantiles for bias
+      quantiles.S.VH <- quantile(as.numeric(df$S.VH.diff.mean), p = c(0.025,0.25,0.5,0.75,0.975))
+      quantiles.S.boot <- quantile(as.numeric(df$S.boot.diff.mean), p = c(0.025,0.25,0.5,0.75,0.975))
+      
+      # Get mean for bias
+      mean.S.VH <- mean(df$S.VH.diff.mean)
+      mean.S.boot <- mean(df$S.boot.diff.mean)
+      
+      # Get sd for bias
+      sd.S.VH <- sd(df$S.VH.diff.mean)
+      sd.S.boot <- sd(df$S.boot.diff.mean)
+  
+  } else if (magnitude == TRUE){
+      # Get quantiles for absolute bias
+      quantiles.S.VH <- quantile(as.numeric(df$S.VH.AB), p = c(0.025,0.25,0.5,0.75,0.975))
+      quantiles.S.boot <- quantile(as.numeric(df$S.boot.AB), p = c(0.025,0.25,0.5,0.75,0.975))
+      
+      # Get mean for absolute bias
+      mean.S.VH <- mean(df$S.VH.AB)
+      mean.S.boot <- mean(df$S.boot.AB)
+      
+      # Get sd for absolute bias
+      sd.S.VH <- sd(df$S.VH.AB)
+      sd.S.boot <- sd(df$S.boot.AB)
+  }
+  
+  
+  # Concatenate into string
+  mean.S.VH <- paste(sprintf("%.3f", mean.S.VH), " (", sprintf("%.3f", sd.S.VH), ")", sep = "")
+  mean.S.boot <- paste(sprintf("%.3f", mean.S.boot), " (", sprintf("%.3f", sd.S.boot), ")", sep = "")
+  names(mean.S.VH) <- "mean"
+  names(mean.S.boot) <- "mean"
+
+  # Concatenate
+  quantiles.S.VH <- c(sprintf("%.3f", quantiles.S.VH), mean.S.VH)
+  quantiles.S.boot <- c(sprintf("%.3f", quantiles.S.boot), mean.S.boot)
+  
+  return(list("S.VH" = quantiles.S.VH,
+              "S.boot" = quantiles.S.boot))
+}
+
+### Write a function to get the number of observations with a given range of C-statistics
+get_N <- function(C1,C2,correlated = TRUE){
+  
+  df <- subset(metadata, C.pop > C1 & C.pop <= C2 & corr == correlated)
+  n <- nrow(df)
+  paste("N=", n)
+  
+}
+
+### Create a list of C-statistic ranges
+quantiles.list <- list(c(0.6, 0.65),
+                       c(0.65, 0.7),
+                       c(0.7, 0.75),
+                       c(0.75, 0.8),
+                       c(0.8, 0.85),
+                       c(0.85, 0.9))
+```
+
+# Bias
+
+## Get results for correlated data
+
+```{r}
+### Get quantiles
+S.by.quantiles <- lapply(quantiles.list, function(x) {get_quantiles_by_C(x[1],x[2])})
+S.all <- get_quantiles_by_C(0,1)
+
+### Put into a table
+S.by.quantiles <- lapply(S.by.quantiles, function(x) {
+  out <- rbind(x[[1]], x[[2]])
+  rownames(out) <- c("S_VH", "S_boot")
+  return(out)
+})
+S.all <- rbind(S.all[[1]], S.all[[2]])
+
+
+### Print S_pop by quantiles
+knitr::kable(S.all)
+knitr::kable(S.by.quantiles[[1]])
+knitr::kable(S.by.quantiles[[2]])
+knitr::kable(S.by.quantiles[[3]])
+knitr::kable(S.by.quantiles[[4]])
+knitr::kable(S.by.quantiles[[5]])
+knitr::kable(S.by.quantiles[[6]])
+
+### Get N values
+get_N(0,1)
+lapply(quantiles.list, function(x) {get_N(x[1],x[2])})
+
+```
+
+# Get results for uncorrelated data
+
+```{r}
+### Get quantiles
+S.by.quantiles <- lapply(quantiles.list, function(x) {get_quantiles_by_C(x[1],x[2], correlated = FALSE)})
+S.all <- get_quantiles_by_C(0,1, correlated = FALSE)
+
+### Put into a table
+S.by.quantiles <- lapply(S.by.quantiles, function(x) {
+  out <- rbind(x[[1]], x[[2]])
+  rownames(out) <- c("S_VH", "S_boot")
+  return(out)
+})
+S.all <- rbind(S.all[[1]], S.all[[2]])
+
+
+### Print S_pop by quantiles
+knitr::kable(S.all)
+knitr::kable(S.by.quantiles[[1]])
+knitr::kable(S.by.quantiles[[2]])
+knitr::kable(S.by.quantiles[[3]])
+knitr::kable(S.by.quantiles[[4]])
+knitr::kable(S.by.quantiles[[5]])
+knitr::kable(S.by.quantiles[[6]])
+
+### Get N values
+get_N(0,1, correlated = FALSE)
+lapply(quantiles.list, function(x) {get_N(x[1],x[2], correlated = FALSE)})
+```
+
+# Magnatude of Bias
+
+## Get results for correlated data
+
+```{r}
+### Get quantiles
+S.by.quantiles <- lapply(quantiles.list, function(x) {get_quantiles_by_C(x[1],x[2], magnitude = TRUE)})
+S.all <- get_quantiles_by_C(0,1, magnitude = TRUE)
+
+### Put into a table
+S.by.quantiles <- lapply(S.by.quantiles, function(x) {
+  out <- rbind(x[[1]], x[[2]])
+  rownames(out) <- c("S_VH", "S_boot")
+  return(out)
+})
+S.all <- rbind(S.all[[1]], S.all[[2]])
+
+
+### Print S_pop by quantiles
+knitr::kable(S.all)
+knitr::kable(S.by.quantiles[[1]])
+knitr::kable(S.by.quantiles[[2]])
+knitr::kable(S.by.quantiles[[3]])
+knitr::kable(S.by.quantiles[[4]])
+knitr::kable(S.by.quantiles[[5]])
+knitr::kable(S.by.quantiles[[6]])
+
+### Get N values
+get_N(0,1)
+lapply(quantiles.list, function(x) {get_N(x[1],x[2])})
+
+```
+
+## Get results for uncorrelated data
+
+```{r}
+### Get quantiles
+S.by.quantiles <- lapply(quantiles.list, function(x) {get_quantiles_by_C(x[1],x[2], correlated = FALSE, magnitude = TRUE)})
+S.all <- get_quantiles_by_C(0,1, correlated = FALSE, magnitude = TRUE)
+
+### Put into a table
+S.by.quantiles <- lapply(S.by.quantiles, function(x) {
+  out <- rbind(x[[1]], x[[2]])
+  rownames(out) <- c("S_VH", "S_boot")
+  return(out)
+})
+S.all <- rbind(S.all[[1]], S.all[[2]])
+
+
+### Print S_pop by quantiles
+knitr::kable(S.all)
+knitr::kable(S.by.quantiles[[1]])
+knitr::kable(S.by.quantiles[[2]])
+knitr::kable(S.by.quantiles[[3]])
+knitr::kable(S.by.quantiles[[4]])
+knitr::kable(S.by.quantiles[[5]])
+knitr::kable(S.by.quantiles[[6]])
+
+### Get N values
+get_N(0,1, correlated = FALSE)
+lapply(quantiles.list, function(x) {get_N(x[1],x[2], correlated = FALSE)})
+```

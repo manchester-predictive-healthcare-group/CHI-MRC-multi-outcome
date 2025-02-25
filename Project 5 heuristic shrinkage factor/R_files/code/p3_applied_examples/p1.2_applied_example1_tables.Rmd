@@ -1,0 +1,92 @@
+---
+title: "summarise_ce_mimic"
+author: "Alex Pate"
+date: "2024-12-12"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# P = 20
+
+```{r}
+### setwd
+rm(list=ls())
+setwd("/mnt/bmh01-rds/mrc-multi-outcome/Project_8.2")
+
+### Load workspace
+load("data/ce_mimic_P20.RData")
+print(paste("FINISHED", Sys.time()))
+
+differences <- lapply(data.output, function(x) {
+  diffs <- x$S.boot - x$S.VH
+  qtls <- round(quantile(diffs, p = c(0.025, 0.25, 0.5, 0.75, 0.975), na.rm = TRUE), 3)
+  return(qtls)})
+knitr::kable(t(differences[[1]]))
+knitr::kable(t(differences[[2]]))
+knitr::kable(t(differences[[3]]))
+knitr::kable(t(differences[[4]]))
+knitr::kable(t(differences[[5]]))
+knitr::kable(t(differences[[6]]))
+knitr::kable(t(differences[[7]]))
+
+### Show there is just one NA being removed from the N = 100 scenario
+n_miss <- lapply(data.output, function(x) {
+  diffs <- x$S.VH - x$S.boot
+  n_miss <- sum(is.na(diffs))
+  return(n_miss)})
+n_miss
+
+knitr::kable(t(round(data.output.means[[1]],3)))
+knitr::kable(t(round(data.output.means[[2]],3)))
+knitr::kable(t(round(data.output.means[[3]],3)))
+knitr::kable(t(round(data.output.means[[4]],3)))
+knitr::kable(t(round(data.output.means[[5]],3)))
+knitr::kable(t(round(data.output.means[[6]],3)))
+knitr::kable(t(round(data.output.means[[7]],3)))
+
+biggest.C.app
+```
+
+# P = 10
+
+```{r}
+##setwd
+rm(list=ls())
+setwd("/mnt/bmh01-rds/mrc-multi-outcome/Project_8.2")
+#
+##Load workspace
+load("data/ce_mimic_P10.RData")
+print(paste("FINISHED", Sys.time()))
+#
+differences <- lapply(data.output, function(x) {
+  diffs <- x$S.boot - x$S.VH
+  qtls <- round(quantile(diffs, p = c(0.025, 0.25, 0.5, 0.75, 0.975), na.rm = TRUE), 3)
+  return(qtls)})
+knitr::kable(t(differences[[1]]))
+knitr::kable(t(differences[[2]]))
+knitr::kable(t(differences[[3]]))
+knitr::kable(t(differences[[4]]))
+knitr::kable(t(differences[[5]]))
+knitr::kable(t(differences[[6]]))
+knitr::kable(t(differences[[7]]))
+#
+##Show there is just one NA being removed from the N = 100 scenario
+n_miss <- lapply(data.output, function(x) {
+  diffs <- x$S.VH - x$S.boot
+  n_miss <- sum(is.na(diffs))
+  return(n_miss)})
+n_miss
+
+knitr::kable(t(round(data.output.means[[1]],3)))
+knitr::kable(t(round(data.output.means[[2]],3)))
+knitr::kable(t(round(data.output.means[[3]],3)))
+knitr::kable(t(round(data.output.means[[4]],3)))
+knitr::kable(t(round(data.output.means[[5]],3)))
+knitr::kable(t(round(data.output.means[[6]],3)))
+knitr::kable(t(round(data.output.means[[7]],3)))
+
+biggest.C.app
+```

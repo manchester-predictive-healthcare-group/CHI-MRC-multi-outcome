@@ -1,0 +1,141 @@
+---
+title: "calculate MAPE estimators"
+author: "Alex Pate"
+date: "2024-12-13"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r cars}
+### Set working directory
+rm(list=ls())
+
+### Set working directory
+setwd("/mnt/bmh01-rds/mrc-multi-outcome/Project_8.2/")
+
+### Source functions
+R.func.sources <- list.files("R", full.names = TRUE)
+sapply(R.func.sources, source)
+
+### Load functions
+source("R/sim_functions.R")
+
+### Call libraries
+library(ggplot2)
+
+### Read in data
+metadata <- readRDS("data/heuristic_shrinkage_sim_metadata.rds")
+metadata <- subset(metadata, C.pop != 0)
+metadata <- subset(metadata, cat == FALSE)
+
+### Add SE for the diff
+metadata$S.VH.diff.se <- metadata$S.VH.diff.sd/sqrt(250)
+metadata$S.boot.diff.se <- metadata$S.boot.diff.sd/sqrt(250)
+
+### Write a function to get the quantiles for a given range of C-statistics
+get_quantiles <- function(C1,C2,correlated = TRUE){
+  
+  df <- subset(metadata, C.pop > C1 & C.pop <= C2 & corr == correlated)
+  quantiles.S.VH.MCE <- quantile(as.numeric(df$S.VH.diff.se), p = c(0.5,0.9,0.99))
+  quantiles.S.boot.MCE <- quantile(as.numeric(df$S.boot.diff.se), p = c(0.5,0.9,0.99))
+  
+  return(list("S.VH" = quantiles.S.VH.MCE,
+              "S.boot" = quantiles.S.boot.MCE))
+}
+
+### Write a function to get the number of observations with a given range of C-statistics
+get_N <- function(C1,C2,correlated = TRUE){
+  
+  df <- subset(metadata, C.pop > C1 & C.pop <= C2 & corr == correlated)
+  n <- nrow(df)
+  paste("N=", n)
+  
+}
+
+### Define cut-offs for C-statistic
+quantiles.list <- list(c(0.6, 0.65),
+                       c(0.65, 0.7),
+                       c(0.7, 0.75),
+                       c(0.75, 0.8),
+                       c(0.8, 0.85),
+                       c(0.85, 0.9))
+
+```
+
+# Get results for correlated data
+
+```{r}
+### Get quantiles
+MCE.by.quantiles <- lapply(quantiles.list, function(x) {get_quantiles(x[1],x[2])})
+MCE.all <- get_quantiles(0,1, correlated = FALSE)
+
+### Put into a table
+MCE.by.quantiles <- lapply(MCE.by.quantiles, function(x) {
+  out <- rbind(x[[1]], x[[2]])
+  rownames(out) <- c("S_VH", "S_boot")
+  return(out)
+})
+MCE.all <- rbind(MCE.all[[1]], MCE.all[[2]])
+rownames(MCE.all) <- c("S_VH", "S_boot")
+
+### Print S_pop by quantiles
+knitr::kable(MCE.all, digits = 3)
+knitr::kable(MCE.by.quantiles[[1]], digits = 3)
+knitr::kable(MCE.by.quantiles[[2]], digits = 3)
+knitr::kable(MCE.by.quantiles[[3]], digits = 3)
+knitr::kable(MCE.by.quantiles[[4]], digits = 3)
+knitr::kable(MCE.by.quantiles[[5]], digits = 3)
+knitr::kable(MCE.by.quantiles[[6]], digits = 3)
+
+### Get N values
+get_N(0,1)
+lapply(quantiles.list, function(x) {get_N(x[1],x[2])})
+```
+
+# Get results for uncorrelated data
+
+```{r}
+### Get quantiles
+MCE.by.quantiles <- lapply(quantiles.list, function(x) {get_quantiles(x[1],x[2], correlated = FALSE)})
+MCE.all <- get_quantiles(0,1, correlated = FALSE)
+
+### Put into a table
+MCE.by.quantiles <- lapply(MCE.by.quantiles, function(x) {
+  out <- rbind(x[[1]], x[[2]])
+  rownames(out) <- c("S_VH", "S_boot")
+  return(out)
+})
+
+MCE.all <- rbind(MCE.all[[1]], MCE.all[[2]])
+rownames(MCE.all) <- c("S_VH", "S_boot")
+
+### Print MCE by quantiles
+knitr::kable(MCE.all, digits = 3)
+knitr::kable(MCE.by.quantiles[[1]], digits = 3)
+knitr::kable(MCE.by.quantiles[[2]], digits = 3)
+knitr::kable(MCE.by.quantiles[[3]], digits = 3)
+knitr::kable(MCE.by.quantiles[[4]], digits = 3)
+knitr::kable(MCE.by.quantiles[[5]], digits = 3)
+knitr::kable(MCE.by.quantiles[[6]], digits = 3)
+
+### Get N values
+get_N(0,1)
+lapply(quantiles.list, function(x) {get_N(x[1],x[2])})
+```
+
+# Take a look at those with really high SE
+```{r}
+### Get quantiles
+quantile(metadata$S.VH.diff.se, p = c(0.5,0.9,0.99,1))
+quantile(metadata$S.boot.diff.se, p = c(0.5,0.9,0.99,1))
+
+### Take a look at those scenarios with high SE
+metadata.high.S.VH.MCE <- subset(metadata, S.VH.diff.se > 0.1)
+metadata.high.S.VH.MCE[1:30, c("C.pop", "P.meas", "P.unmeas", "nreq")]
+
+metadata.high.S.boot.MCE <- subset(metadata, S.boot.diff.se > 0.1)
+metadata.high.S.boot.MCE[1:30, c("C.pop", "P.meas", "P.unmeas", "nreq")]
+```
