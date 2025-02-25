@@ -1,0 +1,140 @@
+---
+title: "summarise_ce_mimic"
+author: "Alex Pate"
+date: "2024-12-12"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# P = 20
+
+```{r}
+### setwd
+rm(list=ls())
+setwd("/mnt/bmh01-rds/mrc-multi-outcome/Project_8.2")
+
+### Load libraries
+library(rms)
+library(boot)
+library(ggplot2)
+
+### Set seed
+set.seed(222)
+
+### Rename
+df <- readRDS("data/ce_df_mimic.rds")
+
+###
+colnames(df)
+
+###
+str(df$AKI)
+
+### Set number of iterations for bootstrapped
+n.S.boot <- 500
+
+### Set predictors to adjust for in models 
+predictors <- c("age", "gender", "bicarbonate_mean", "creatinine_mean", "chloride_mean", "hemoglobin_mean", "platelet_mean", "potassium_mean", "ptt_mean", "inr_mean", 
+                "pt_mean" , "bun_mean", "wbc_mean", "heartrate_mean", "sysbp_mean", "diasbp_mean", "resprate_mean", "tempc_mean", "spo2_mean", "glucose_mean")
+
+
+###
+### Define a function to calculate S using bootstrapping
+###
+function_calc_S_boot <- function(data, i){
+  
+  ### Take the bootstrap sample
+  boot.dat <- data[i, ]
+  
+  ### Create model in bootstrapped dataset
+  boot.model <- glm(as.formula(paste("AKI ~ ", paste(predictors, collapse = "+"), sep = "")), data = boot.dat, family = binomial(link = "logit")) 
+  
+  ### Generate predictions using this model using the new dataset
+  boot.lp <- predict(boot.model, newdata = data.temp)
+  
+  ### Create a temporary dataset with both these things
+  boot.dat.devel.temp <- data.frame(data.temp, "boot.lp" = boot.lp)
+  
+  ### Calculate calibration slope
+  boot.calib.model <- glm(AKI ~ boot.lp, data = boot.dat.devel.temp, family = binomial(link = "logit")) 
+  
+  ### Save slope
+  return(boot.calib.model$coefficients["boot.lp"])
+  
+}
+
+### Let n.samp <- 250
+n.samp <- 200
+
+### Sample df at random
+data.temp <- df[sample(1:nrow(df), n.samp, replace = FALSE), ]
+
+### Build model
+model.temp <- lrm(as.formula(paste("AKI ~ ", paste(predictors, collapse = "+"), sep = "")), data = data.temp)
+
+### Record required statistics for prediction of S.pop
+LR <- model.temp$deviance[1] - model.temp$deviance[2]
+C.app <- model.temp$stats["C"]
+R2.CS.app <- as.numeric(1 - exp(-(LR)/nrow(data.temp)))
+P <- length(model.temp$coefficients)
+S.VH <- as.numeric(1 - P/LR)
+
+### Run the bootstrapping
+boot.out <- boot(data.temp, function_calc_S_boot, R = n.S.boot)
+
+### Assign S.boot
+S.boot <- mean(boot.out$t)
+
+### Compare
+S.VH
+S.boot
+
+### Get lp
+df$lp <- predict(model.temp, newdata = df, type = "lp")
+
+### Apply shrinkage
+df$lp.shrunk.VH <- df$lp*S.VH
+df$lp.shrunk.boot <- df$lp*S.boot
+
+### Need to re-estimate intercept to ensure appropriate mean predicted risk
+model.adjusted.VH <- glm(AKI ~ offset(lp.shrunk.VH), family = binomial(link = "logit"), data = df)
+model.adjusted.boot <- glm(AKI ~ offset(lp.shrunk.boot), family = binomial(link = "logit"), data = df)
+
+### Add to the shrunk LP
+df$lp.shrunk.VH <- df$lp.shrunk.VH + coef(model.adjusted.VH)
+df$lp.shrunk.boot <- df$lp.shrunk.boot + coef(model.adjusted.boot)
+
+### Convert to probabilities
+df$p.shrunk.none <- exp(df$lp)/(1+exp(df$lp))
+df$p.shrunk.VH <- exp(df$lp.shrunk.VH)/(1+exp(df$lp.shrunk.VH))
+df$p.shrunk.boot <- exp(df$lp.shrunk.boot)/(1+exp(df$lp.shrunk.boot))
+
+### Check mean predicted probabilities are the same after shrinkage
+mean(df$p.shrunk.VH)
+mean(df$p.shrunk.boot)
+
+### Create long data
+df.long <- df |>
+  dplyr::rename(S_VH = p.shrunk.VH, S_boot = p.shrunk.boot) |> 
+  tidyr::pivot_longer(cols = c(S_VH, S_boot)) |>
+  dplyr::rename(p = value, shrinkage = name)
+
+### Create plot object
+plot.object <- ggplot(data = df.long) + 
+  geom_density(aes(x = p, color = shrinkage)) +
+  scale_color_manual(labels = c(expression(S[boot]), expression(S[VH])), values = c("red", "blue")) +
+  xlab("Predicted risk") + theme(legend.title = element_blank())
+
+### Plot
+plot(plot.object)
+
+### Save to disk
+Cairo::CairoPNG("figures/gg.applied.example1.png", width = 7, height = 7, unit = "in", dpi = 300)
+plot(plot.object)
+dev.off()
+
+
+```

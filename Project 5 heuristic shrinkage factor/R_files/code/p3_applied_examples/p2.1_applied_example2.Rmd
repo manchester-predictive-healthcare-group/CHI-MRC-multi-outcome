@@ -1,0 +1,63 @@
+---
+title: "Applied example 2"
+author: "Alex Pate"
+date: "2024-12-12"
+output: word_document
+---
+
+```{r}
+
+### Load libraries
+library(pmsampsize)
+library(samplesizedev)
+
+### Set seed
+set.seed(555)
+
+### C 0.65
+C_adj <- 0.65
+prop <- 0.05
+n_param <- 5
+
+nreq.pavlou <- try(samplesizedev(S = 0.9, phi = prop, c = C_adj, p = n_param, nsim = 1000))
+nreq.pavlou
+
+nreq.riley.c <- as.numeric(pmsampsize(type = "b", 
+                                      cstatistic = C_adj, 
+                                      parameters = n_param, 
+                                      shrinkage = 0.9, 
+                                      prevalence = prop)$results_table["Criteria 1", "Samp_size"])
+nreq.riley.c
+
+
+### C 0.71
+C_adj <- 0.71
+prop <- 0.05
+n_param <- 13
+
+nreq.pavlou <- try(samplesizedev(S = 0.9, phi = prop, c = C_adj, p = n_param, nsim = 1000))
+nreq.pavlou
+
+nreq.riley.c <- as.numeric(pmsampsize(type = "b", 
+                                    cstatistic = C_adj, 
+                                    parameters = n_param, 
+                                    shrinkage = 0.9, 
+                                    prevalence = prop)$results_table["Criteria 1", "Samp_size"])
+nreq.riley.c
+
+
+### C 0.85
+C_adj <- 0.85
+prop <- 0.05
+n_param <- 23
+
+nreq.pavlou <- try(samplesizedev(S = 0.9, phi = prop, c = C_adj, p = n_param, nsim = 1000))
+nreq.pavlou
+
+nreq.riley.c <- as.numeric(pmsampsize(type = "b", 
+                                      cstatistic = C_adj, 
+                                      parameters = n_param, 
+                                      shrinkage = 0.9, 
+                                      prevalence = prop)$results_table["Criteria 1", "Samp_size"])
+nreq.riley.c
+```

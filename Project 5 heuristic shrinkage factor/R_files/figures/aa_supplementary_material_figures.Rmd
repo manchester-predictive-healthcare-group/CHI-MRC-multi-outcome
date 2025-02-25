@@ -1,0 +1,81 @@
+---
+title: "Supplementary Figures"
+author: "Alex Pate"
+date: "2024-09-27"
+output: html_document
+---
+
+Associated with manuscript: Agreement between heuristic shrinkage factor and optimal shrinkage factors in logistic regression for risk prediction: a simulation study across different sample sizes and settings
+
+We present plots from simulation study 1 where:
+
+* Scenarios where data was simulated with a zero-covariance matrix
+* Plots presented by $R^{2}_{CS,app}$ and $C_{app}$, as opposed to $R^{2}_{CS,pop}$ and $C_{pop}$.
+* Median instead of mean
+
+```{r, echo = FALSE, results = "asis"}
+counter <- 1
+for (correlated in c(TRUE, FALSE)){
+  for (xvar2 in c("S.VH", "S.boot")){
+    for (type in c("mean", "median")){
+      for (byvar in c("noapp", "app")){
+        ### Define Figure captions
+        if (xvar2 == "S.VH"){xvar.label <- "$S_{VH}$"}
+        if (xvar2 == "S.boot"){xvar.label <- "$S_{boot}$"}
+        if (correlated == TRUE){corr.label <- "non-zero covariance in DGM"}
+        if (correlated == FALSE){corr.label <- "zero covariance in DGM"}
+        if (byvar == "app"){byvar.label <- "presented with respect to apparent model performance"}
+        if (byvar == "noapp"){byvar.label <- "presented with respect to population-level model performance"}
+        if (byvar == "app"){byvar.fig.label <- "app."}
+        if (byvar == "noapp"){byvar.fig.label <- NULL}
+        cat("\n\n\n")
+        cat("**Figure S", counter, ": ", type, "(", xvar.label, ") plotted against ", type, "($S_{opt}$), ", corr.label, ", ", byvar.label, "**", sep = "")
+        cat(" \n\n")
+        cat("*Estimator = ", type, "(", xvar.label, ")*", sep = "")
+        cat(" \n\n")
+        cat("*Covariance structure = ", corr.label, "*", sep = "")
+        cat(" \n\n")
+        cat("*By variable = ", byvar.label, "*", sep = "")
+        cat(" \n\n")
+        cat("![](",paste("gg.",
+                         byvar.fig.label,
+                         "corr", as.numeric(correlated), 
+                         ".cat", 0,
+                         ".", xvar2, 
+                         ".", type, 
+                         ".alpha", 0.25, ".png", sep = ""),")")
+        
+        cat(" \n\n")
+        cat("-------------------------------------------------------------------------------------------------------------------")
+        counter <- counter + 1
+      }
+    }
+  }
+}
+
+cat("\n\n\n")
+cat("**Figure S", counter, ": mean($S_opt$) plotted against mean($S_opt$), grouped by mean($C_app$), non-zero covariance in DGM**", sep = "")
+cat(" \n\n")
+cat("![](",paste("gg.corr1.S.VH.mean.C.group.png"),")")
+counter <- counter + 1
+
+cat("\n\n\n")
+cat("**Figure S", counter, ": mean($S_opt$) plotted against mean($S_opt$), grouped by $C_pop$, non-zero covariance in DGM**", sep = "")
+cat(" \n\n")
+cat("![](",paste("gg.corr1.S.VH.mean.C.pop.group.png"),")")
+counter <- counter + 1
+
+cat("\n\n\n")
+cat("**Figure S", counter, ": mean($S_opt$) plotted against mean($S_opt$), grouped by mean($C_app$), zero covariance in DGM**", sep = "")
+cat(" \n\n")
+cat("![](",paste("gg.corr0.S.VH.mean.C.group.png"),")")
+counter <- counter + 1
+
+cat("\n\n\n")
+cat("**Figure S", counter, ": mean($S_opt$) plotted against mean($S_opt$), grouped by $C_pop$, zero covariance in DGM**", sep = "")
+cat(" \n\n")
+cat("![](",paste("gg.corr0.S.VH.mean.C.pop.group.png"),")")
+counter <- counter + 1   
+```
+
+

@@ -1,0 +1,378 @@
+---
+title: "p3_summarise_ssd.R"
+author: "Alex Pate"
+date: "2024-12-10"
+output: word_document
+---
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r, include=FALSE}
+### Set working directory
+rm(list=ls())
+
+### Set working directory
+setwd("/mnt/bmh01-rds/mrc-multi-outcome/Project_8.2/")
+
+### Source functions
+R.func.sources <- list.files("R", full.names = TRUE)
+sapply(R.func.sources, source)
+
+### Load functions
+source("R/sim_functions.R")
+
+### Call libraries
+library(ggplot2)
+
+### Read in data
+metadata <- readRDS("data/heuristic_shrinkage_sim_metadata_ssd.rds")
+table(metadata$corr)
+
+### Split metadata into boservations both are recorded, and obserations just Riley recorded
+metadata.both <- subset(metadata, !is.na(S.pop.mean.riley) & !is.na(S.pop.mean.pavlou))
+metadata.all.riley <- subset(metadata, !is.na(S.pop.mean.riley))
+metadata.just.riley <- subset(metadata, !is.na(S.pop.mean.riley) & is.na(S.pop.mean.pavlou))
+
+### See how many just riley
+sum(is.na(metadata$S.pop.mean.riley) & is.na(metadata$S.pop.mean.pavlou))
+sum(!is.na(metadata$S.pop.mean.riley) & is.na(metadata$S.pop.mean.pavlou))
+sum(!is.na(metadata$S.pop.mean.riley) & is.na(metadata$S.pop.mean.pavlou))/nrow(metadata)
+
+### Write a function to get the quantiles for a given range of C-statistics
+get_quantiles <- function(C1,C2,correlated = TRUE, both = TRUE, magnitude = FALSE){
+  
+  if (both == TRUE){
+    ## Subset
+    df <- subset(metadata.both, C.pop > C1 & C.pop <= C2 & corr == correlated)
+    
+    ## Calculate quantiles
+    quantiles.riley <- quantile(as.numeric(df$S.pop.mean.riley), p = c(0.025,0.25,0.5,0.75,0.975))
+    quantiles.pavlou <- quantile(as.numeric(df$S.pop.mean.pavlou), p = c(0.025,0.25,0.5,0.75,0.975))
+    
+    ## Calculate mean/median difference from 0.9
+    if (magnitude == FALSE){
+      mean.riley <- mean(as.numeric(df$S.pop.mean.riley) - 0.9)
+      names(mean.riley) <- "mean"
+      median.riley <- median(as.numeric(df$S.pop.mean.riley) - 0.9)
+      names(median.riley) <- "median"
+      
+      mean.pavlou <- median(as.numeric(df$S.pop.mean.pavlou) - 0.9)
+      names(mean.pavlou) <- "mean"
+      median.pavlou <- median(as.numeric(df$S.pop.mean.pavlou) - 0.9)
+      names(median.pavlou) <- "median"
+    } else {
+      mean.riley <- mean(abs(as.numeric(df$S.pop.mean.riley) - 0.9))
+      names(mean.riley) <- "mean"
+      median.riley <- median(abs(as.numeric(df$S.pop.mean.riley) - 0.9))
+      names(median.riley) <- "median"
+      
+      mean.pavlou <- median(abs(as.numeric(df$S.pop.mean.pavlou) - 0.9))
+      names(mean.pavlou) <- "mean"
+      median.pavlou <- median(abs(as.numeric(df$S.pop.mean.pavlou) - 0.9))
+      names(median.pavlou) <- "median"
+    }
+
+    ## Concatenate
+    quantiles.riley <- c(quantiles.riley, mean.riley, median.riley)
+    quantiles.pavlou <- c(quantiles.pavlou, mean.pavlou, median.pavlou)
+    
+  } else {
+    ## Subset
+    df <- subset(metadata.just.riley, C.pop > C1 & C.pop <= C2 & corr == correlated)
+    
+    ## Calculate quantiles
+    quantiles.riley <- quantile(as.numeric(df$S.pop.mean.riley), p = c(0.025,0.25,0.5,0.75,0.975))
+    quantiles.pavlou <- NA
+    
+    ## Calculate mean/median difference from 0.9
+    if (magnitude == FALSE){
+      mean.riley <- mean(as.numeric(df$S.pop.mean.riley) - 0.9)
+      names(mean.riley) <- "mean"
+      median.riley <- median(as.numeric(df$S.pop.mean.riley) - 0.9)
+      names(median.riley) <- "median"
+      
+      mean.pavlou <- NA
+      names(mean.pavlou) <- "mean"
+      median.pavlou <- NA
+      names(median.pavlou) <- "median"
+    } else {
+      mean.riley <- mean(abs(as.numeric(df$S.pop.mean.riley) - 0.9))
+      names(mean.riley) <- "mean"
+      median.riley <- median(abs(as.numeric(df$S.pop.mean.riley) - 0.9))
+      names(median.riley) <- "median"
+      
+      mean.pavlou <- NA
+      names(mean.pavlou) <- "mean"
+      median.pavlou <- NA
+      names(median.pavlou) <- "median"
+    }
+
+    ## Concatenate
+    quantiles.riley <- c(quantiles.riley, mean.riley, median.riley)
+    quantiles.pavlou <- c(quantiles.pavlou, mean.pavlou, median.pavlou)
+    
+  }
+  return(list("riley" = quantiles.riley,
+              "pavlou" = quantiles.pavlou))
+}
+
+### Write a function to get the quantiles for a given range of C-statistics
+get_N <- function(C1,C2,correlated = TRUE, both = TRUE){
+  if (both == TRUE){
+    df <- subset(metadata.both, C.pop > C1 & C.pop <= C2 & corr == correlated)
+  } else {
+    df <- subset(metadata.just.riley, C.pop > C1 & C.pop <= C2 & corr == correlated)
+  }
+  n <- nrow(df)
+  paste("N=", n)
+}
+
+### Put S_VH by quantiles ranges into a list
+quantiles.list <- list(c(0.6, 0.65),
+                       c(0.65, 0.7),
+                       c(0.7, 0.75),
+                       c(0.75, 0.8),
+                       c(0.8, 0.85),
+                       c(0.85, 0.9))
+
+### Print range of C-statistics for the scenarios where Pavlou approach did not converge
+metadata.just.riley.corr <- subset(metadata.just.riley, corr == TRUE)
+metadata.just.riley.nocorr <- subset(metadata.just.riley, corr == FALSE)
+quantile(metadata.just.riley$C.pop, p = c(0, 0.025, 0.1, 0.25, 0.5, 0.75, 0.9, 0.975))
+quantile(metadata.just.riley.corr$C.pop, p = c(0, 0.025, 0.1, 0.25, 0.5, 0.75, 0.9, 0.975))
+quantile(metadata.just.riley.nocorr$C.pop, p = c(0, 0.025, 0.1, 0.25, 0.5, 0.75, 0.9, 0.975))
+```
+
+# Bias
+
+## Get results for correlated data
+
+```{r, echo = FALSE}
+S.pop.by.quantiles <- lapply(quantiles.list, function(x) {get_quantiles(x[1],x[2])})
+S.pop.by.quantiles.riley <- lapply(quantiles.list, function(x) {get_quantiles(x[1],x[2], both = FALSE)})
+S.pop.all <- get_quantiles(0,1)
+S.pop.all.riley <- get_quantiles(0,1, both = FALSE)
+
+### Put into a table
+S.pop.by.quantiles <- lapply(S.pop.by.quantiles, function(x) {
+  out <- rbind(x[[1]], x[[2]])
+  rownames(out) <- c("RvS", "Rvs-adj")
+  return(out)
+})
+S.pop.all <- rbind(S.pop.all[[1]], S.pop.all[[2]])
+
+### Suppress warnings for scenarios where N_adapted fails, as they give all NA, but we are only interetes in the results for N_original
+S.pop.by.quantiles.riley <- suppressWarnings(lapply(S.pop.by.quantiles.riley, function(x) {
+  out <- rbind(x[[1]], x[[2]])
+  rownames(out) <- c("RvS", "Rvs-adj")
+  return(out)
+}))
+S.pop.all.riley <- suppressWarnings(rbind(S.pop.all.riley[[1]], S.pop.all.riley[[2]]))
+```
+
+Range of $S_{opt}$ for all, then C-statistics of c(0.6, 0.65), c(0.65, 0.7), c(0.7, 0.75), c(0.75, 0.8), c(0.8, 0.85), and c(0.85, 0.9).
+
+```{r, echo = FALSE}
+### Print S_pop by quantiles
+knitr::kable(S.pop.all, digits = 3)
+knitr::kable(S.pop.by.quantiles[[1]], digits = 3)
+knitr::kable(S.pop.by.quantiles[[2]], digits = 3)
+knitr::kable(S.pop.by.quantiles[[3]], digits = 3)
+knitr::kable(S.pop.by.quantiles[[4]], digits = 3)
+knitr::kable(S.pop.by.quantiles[[5]], digits = 3)
+knitr::kable(S.pop.by.quantiles[[6]], digits = 3)
+```
+
+Get number of observations total, and in each C-statistic group c(0.6, 0.65), c(0.65, 0.7), c(0.7, 0.75), c(0.75, 0.8), c(0.8, 0.85), and c(0.85, 0.9).
+
+```{r, echo = FALSE}
+### Get N values
+get_N(0,1)
+lapply(quantiles.list, function(x) {get_N(x[1],x[2])})
+```
+
+Range of $S_{opt}$ for scenarios where $N_{adapted}$ failed.
+
+```{r, echo = FALSE}
+### Print S_pop by quantiles
+knitr::kable(S.pop.all.riley, digits = 3)
+
+### Get N values
+get_N(0,1, both = FALSE)
+```
+
+## Get results for uncorrelated data
+
+```{r}
+S.pop.by.quantiles <- lapply(quantiles.list, function(x) {get_quantiles(x[1],x[2], correlated = FALSE)})
+S.pop.by.quantiles.riley <- lapply(quantiles.list, function(x) {get_quantiles(x[1],x[2], correlated = FALSE, both = FALSE)})
+S.pop.all <- get_quantiles(0,1, correlated = FALSE)
+S.pop.all.riley <- get_quantiles(0,1, correlated = FALSE, both = FALSE)
+
+### Put into a table
+S.pop.by.quantiles <- lapply(S.pop.by.quantiles, function(x) {
+  out <- rbind(x[[1]], x[[2]])
+  rownames(out) <- c("RvS", "Rvs-adj")
+  return(out)
+})
+S.pop.all <- rbind(S.pop.all[[1]], S.pop.all[[2]])
+
+### Suppress warnings for scenarios where N_adapted fails, as they give all NA, but we are only interetes in the results for N_original
+S.pop.by.quantiles.riley <- suppressWarnings(lapply(S.pop.by.quantiles.riley, function(x) {
+  out <- rbind(x[[1]], x[[2]])
+  rownames(out) <- c("RvS", "Rvs-adj")
+  return(out)
+}))
+S.pop.all.riley <- suppressWarnings(rbind(S.pop.all.riley[[1]], S.pop.all.riley[[2]]))
+
+```
+
+Range of $S_{opt}$ for all, then C-statistics of c(0.6, 0.65), c(0.65, 0.7), c(0.7, 0.75), c(0.75, 0.8), c(0.8, 0.85), and c(0.85, 0.9).
+
+```{r, echo = FALSE}
+### Print S_pop by quantiles
+knitr::kable(S.pop.all, digits = 3)
+knitr::kable(S.pop.by.quantiles[[1]], digits = 3)
+knitr::kable(S.pop.by.quantiles[[2]], digits = 3)
+knitr::kable(S.pop.by.quantiles[[3]], digits = 3)
+knitr::kable(S.pop.by.quantiles[[4]], digits = 3)
+knitr::kable(S.pop.by.quantiles[[5]], digits = 3)
+knitr::kable(S.pop.by.quantiles[[6]], digits = 3)
+```
+
+Get number of observations total, and in each C-statistic group c(0.6, 0.65), c(0.65, 0.7), c(0.7, 0.75), c(0.75, 0.8), c(0.8, 0.85), and c(0.85, 0.9).
+
+```{r, echo = FALSE}
+### Get N values
+lapply(quantiles.list, function(x) {get_N(x[1],x[2], correlated = FALSE)})
+get_N(0,1, correlated = FALSE)
+```
+
+Range of $S_{opt}$ for scenarios where $N_{adapted}$ failed.
+
+```{r, echo = FALSE}
+### Print S_pop by quantiles
+knitr::kable(S.pop.all.riley, digits = 3)
+
+
+### Get N values
+get_N(0,1, correlated = FALSE, both = FALSE)
+```
+
+# Magnitude of bias
+
+## Get results for correlated data
+
+```{r, echo = FALSE}
+S.pop.by.quantiles <- lapply(quantiles.list, function(x) {get_quantiles(x[1],x[2], magnitude = TRUE)})
+S.pop.by.quantiles.riley <- lapply(quantiles.list, function(x) {get_quantiles(x[1],x[2], both = FALSE, magnitude = TRUE)})
+S.pop.all <- get_quantiles(0,1, magnitude = TRUE)
+S.pop.all.riley <- get_quantiles(0,1, both = FALSE, magnitude = TRUE)
+
+### Put into a table
+S.pop.by.quantiles <- lapply(S.pop.by.quantiles, function(x) {
+  out <- rbind(x[[1]], x[[2]])
+  rownames(out) <- c("RvS", "Rvs-adj")
+  return(out)
+})
+S.pop.all <- rbind(S.pop.all[[1]], S.pop.all[[2]])
+
+### Suppress warnings for scenarios where N_adapted fails, as they give all NA, but we are only interetes in the results for N_original
+S.pop.by.quantiles.riley <- suppressWarnings(lapply(S.pop.by.quantiles.riley, function(x) {
+  out <- rbind(x[[1]], x[[2]])
+  rownames(out) <- c("RvS", "Rvs-adj")
+  return(out)
+}))
+S.pop.all.riley <- suppressWarnings(rbind(S.pop.all.riley[[1]], S.pop.all.riley[[2]]))
+```
+
+Range of $S_{opt}$ for all, then C-statistics of c(0.6, 0.65), c(0.65, 0.7), c(0.7, 0.75), c(0.75, 0.8), c(0.8, 0.85), and c(0.85, 0.9).
+
+```{r, echo = FALSE}
+### Print S_pop by quantiles
+knitr::kable(S.pop.all, digits = 3)
+knitr::kable(S.pop.by.quantiles[[1]], digits = 3)
+knitr::kable(S.pop.by.quantiles[[2]], digits = 3)
+knitr::kable(S.pop.by.quantiles[[3]], digits = 3)
+knitr::kable(S.pop.by.quantiles[[4]], digits = 3)
+knitr::kable(S.pop.by.quantiles[[5]], digits = 3)
+knitr::kable(S.pop.by.quantiles[[6]], digits = 3)
+```
+
+Get number of observations total, and in each C-statistic group c(0.6, 0.65), c(0.65, 0.7), c(0.7, 0.75), c(0.75, 0.8), c(0.8, 0.85), and c(0.85, 0.9).
+
+```{r, echo = FALSE}
+### Get N values
+get_N(0,1)
+lapply(quantiles.list, function(x) {get_N(x[1],x[2])})
+```
+
+Range of $S_{opt}$ for scenarios where $N_{adapted}$ failed.
+
+```{r, echo = FALSE}
+### Print S_pop by quantiles
+knitr::kable(S.pop.all.riley, digits = 3)
+
+### Get N values
+get_N(0,1, both = FALSE)
+```
+
+## Get results for uncorrelated data
+
+```{r}
+S.pop.by.quantiles <- lapply(quantiles.list, function(x) {get_quantiles(x[1],x[2], correlated = FALSE, magnitude = TRUE)})
+S.pop.by.quantiles.riley <- lapply(quantiles.list, function(x) {get_quantiles(x[1],x[2], correlated = FALSE, both = FALSE, magnitude = TRUE)})
+S.pop.all <- get_quantiles(0,1, correlated = FALSE, magnitude = TRUE)
+S.pop.all.riley <- get_quantiles(0,1, correlated = FALSE, both = FALSE, magnitude = TRUE)
+
+### Put into a table
+S.pop.by.quantiles <- lapply(S.pop.by.quantiles, function(x) {
+  out <- rbind(x[[1]], x[[2]])
+  rownames(out) <- c("RvS", "Rvs-adj")
+  return(out)
+})
+S.pop.all <- rbind(S.pop.all[[1]], S.pop.all[[2]])
+
+### Suppress warnings for scenarios where N_adapted fails, as they give all NA, but we are only interetes in the results for N_original
+S.pop.by.quantiles.riley <- suppressWarnings(lapply(S.pop.by.quantiles.riley, function(x) {
+  out <- rbind(x[[1]], x[[2]])
+  rownames(out) <- c("RvS", "Rvs-adj")
+  return(out)
+}))
+S.pop.all.riley <- suppressWarnings(rbind(S.pop.all.riley[[1]], S.pop.all.riley[[2]]))
+
+```
+
+Range of $S_{opt}$ for all, then C-statistics of c(0.6, 0.65), c(0.65, 0.7), c(0.7, 0.75), c(0.75, 0.8), c(0.8, 0.85), and c(0.85, 0.9).
+
+```{r, echo = FALSE}
+### Print S_pop by quantiles
+knitr::kable(S.pop.all, digits = 3)
+knitr::kable(S.pop.by.quantiles[[1]], digits = 3)
+knitr::kable(S.pop.by.quantiles[[2]], digits = 3)
+knitr::kable(S.pop.by.quantiles[[3]], digits = 3)
+knitr::kable(S.pop.by.quantiles[[4]], digits = 3)
+knitr::kable(S.pop.by.quantiles[[5]], digits = 3)
+knitr::kable(S.pop.by.quantiles[[6]], digits = 3)
+```
+
+Get number of observations total, and in each C-statistic group c(0.6, 0.65), c(0.65, 0.7), c(0.7, 0.75), c(0.75, 0.8), c(0.8, 0.85), and c(0.85, 0.9).
+
+```{r, echo = FALSE}
+### Get N values
+lapply(quantiles.list, function(x) {get_N(x[1],x[2], correlated = FALSE)})
+get_N(0,1, correlated = FALSE)
+```
+
+Range of $S_{opt}$ for scenarios where $N_{adapted}$ failed.
+
+```{r, echo = FALSE}
+### Print S_pop by quantiles
+knitr::kable(S.pop.all.riley, digits = 3)
+
+
+### Get N values
+get_N(0,1, correlated = FALSE, both = FALSE)
+```
