@@ -17,7 +17,7 @@ rm(list=ls())
 setwd("/mnt/bmh01-rds/mrc-multi-outcome/Project_8.2")
 
 ### Load workspace
-load("data/ce_mimic_P20.RData")
+load("data/applied_example1_P20.RData")
 print(paste("FINISHED", Sys.time()))
 
 differences <- lapply(data.output, function(x) {
@@ -28,9 +28,6 @@ knitr::kable(t(differences[[1]]))
 knitr::kable(t(differences[[2]]))
 knitr::kable(t(differences[[3]]))
 knitr::kable(t(differences[[4]]))
-knitr::kable(t(differences[[5]]))
-knitr::kable(t(differences[[6]]))
-knitr::kable(t(differences[[7]]))
 
 ### Show there is just one NA being removed from the N = 100 scenario
 n_miss <- lapply(data.output, function(x) {
@@ -43,9 +40,6 @@ knitr::kable(t(round(data.output.means[[1]],3)))
 knitr::kable(t(round(data.output.means[[2]],3)))
 knitr::kable(t(round(data.output.means[[3]],3)))
 knitr::kable(t(round(data.output.means[[4]],3)))
-knitr::kable(t(round(data.output.means[[5]],3)))
-knitr::kable(t(round(data.output.means[[6]],3)))
-knitr::kable(t(round(data.output.means[[7]],3)))
 
 biggest.C.app
 ```
@@ -58,7 +52,7 @@ rm(list=ls())
 setwd("/mnt/bmh01-rds/mrc-multi-outcome/Project_8.2")
 #
 ##Load workspace
-load("data/ce_mimic_P10.RData")
+load("data/applied_example1_P10.RData")
 print(paste("FINISHED", Sys.time()))
 #
 differences <- lapply(data.output, function(x) {
@@ -69,9 +63,6 @@ knitr::kable(t(differences[[1]]))
 knitr::kable(t(differences[[2]]))
 knitr::kable(t(differences[[3]]))
 knitr::kable(t(differences[[4]]))
-knitr::kable(t(differences[[5]]))
-knitr::kable(t(differences[[6]]))
-knitr::kable(t(differences[[7]]))
 #
 ##Show there is just one NA being removed from the N = 100 scenario
 n_miss <- lapply(data.output, function(x) {
@@ -84,9 +75,6 @@ knitr::kable(t(round(data.output.means[[1]],3)))
 knitr::kable(t(round(data.output.means[[2]],3)))
 knitr::kable(t(round(data.output.means[[3]],3)))
 knitr::kable(t(round(data.output.means[[4]],3)))
-knitr::kable(t(round(data.output.means[[5]],3)))
-knitr::kable(t(round(data.output.means[[6]],3)))
-knitr::kable(t(round(data.output.means[[7]],3)))
 
 biggest.C.app
 ```

@@ -1,0 +1,360 @@
+---
+title: "Supplementary tables for simulation study 2 under the alternative DGM where Q_meas and the C-statistic are independent (see section 4 of manuscript)"
+author: "Alex Pate"
+date: "2024-12-10"
+output: 
+  word_document:
+    number_sections: true
+---
+
+```{r, include=FALSE}
+### Set working directory
+rm(list=ls())
+
+### Set working directory
+setwd("/mnt/bmh01-rds/mrc-multi-outcome/Project_8.2/")
+
+### Source functions
+R.func.sources <- list.files("R", full.names = TRUE)
+sapply(R.func.sources, source)
+
+### Load functions
+source("R/sim_functions.R")
+
+### Call libraries
+library(ggplot2)
+
+### Read in data
+metadata <- readRDS("data/sim_study4_metadata.rds")
+
+### Split metadata into boservations both are recorded, and obserations just Riley recorded
+metadata.both <- subset(metadata, !is.na(S.pop.mean.riley) & !is.na(S.pop.mean.pavlou))
+metadata.all.riley <- subset(metadata, !is.na(S.pop.mean.riley))
+metadata.just.riley <- subset(metadata, !is.na(S.pop.mean.riley) & is.na(S.pop.mean.pavlou))
+
+### See how many just riley
+sum(is.na(metadata$S.pop.mean.riley) & is.na(metadata$S.pop.mean.pavlou))
+sum(!is.na(metadata$S.pop.mean.riley) & is.na(metadata$S.pop.mean.pavlou))
+sum(!is.na(metadata$S.pop.mean.riley) & is.na(metadata$S.pop.mean.pavlou))/nrow(metadata)
+
+### Write a function to get the quantiles for a given range of C-statistics
+get_quantiles <- function(C1,C2,correlated = TRUE, both = TRUE, magnitude = FALSE){
+  
+  if (both == TRUE){
+    ## Subset
+    df <- subset(metadata.both, C.pop > C1 & C.pop <= C2 & corr == correlated)
+    
+    ## Calculate quantiles
+    quantiles.riley <- quantile(as.numeric(df$S.pop.mean.riley), p = c(0.025,0.25,0.5,0.75,0.975))
+    quantiles.pavlou <- quantile(as.numeric(df$S.pop.mean.pavlou), p = c(0.025,0.25,0.5,0.75,0.975))
+    
+    ## Calculate mean/median difference from 0.9
+    mean.riley <- mean(as.numeric(df$S.pop.mean.riley) - 0.9)
+    sd.riley <- sd(as.numeric(df$S.pop.mean.riley) - 0.9)
+    median.riley <- median(as.numeric(df$S.pop.mean.riley) - 0.9)
+    
+    mean.pavlou <- median(as.numeric(df$S.pop.mean.pavlou) - 0.9)
+    sd.pavlou <- sd(as.numeric(df$S.pop.mean.pavlou) - 0.9)
+    median.pavlou <- median(as.numeric(df$S.pop.mean.pavlou) - 0.9)
+    
+    mean.mag.riley <- mean(abs(as.numeric(df$S.pop.mean.riley) - 0.9))
+    sd.mag.riley <- sd(abs(as.numeric(df$S.pop.mean.riley) - 0.9))
+    median.mag.riley <- median(abs(as.numeric(df$S.pop.mean.riley) - 0.9))
+    
+    mean.mag.pavlou <- median(abs(as.numeric(df$S.pop.mean.pavlou) - 0.9))
+    sd.mag.pavlou <- sd(abs(as.numeric(df$S.pop.mean.pavlou) - 0.9))
+    median.mag.pavlou <- median(abs(as.numeric(df$S.pop.mean.pavlou) - 0.9))
+    
+  } else {
+    ## Subset
+    df <- subset(metadata.just.riley, C.pop > C1 & C.pop <= C2 & corr == correlated)
+    
+    ## Calculate quantiles
+    quantiles.riley <- quantile(as.numeric(df$S.pop.mean.riley), p = c(0.025,0.25,0.5,0.75,0.975))
+    quantiles.pavlou <- NA
+    
+    ## Calculate mean/median difference from 0.9
+    mean.riley <- mean(as.numeric(df$S.pop.mean.riley) - 0.9)
+    sd.riley <- sd(as.numeric(df$S.pop.mean.riley) - 0.9)
+    median.riley <- median(as.numeric(df$S.pop.mean.riley) - 0.9)
+    
+    mean.pavlou <- NA
+    sd.pavlou <- NA
+    median.pavlou <- NA
+    
+    mean.mag.riley <- mean(abs(as.numeric(df$S.pop.mean.riley) - 0.9))
+    sd.mag.riley <- sd(abs(as.numeric(df$S.pop.mean.riley) - 0.9))
+    median.mag.riley <- median(abs(as.numeric(df$S.pop.mean.riley) - 0.9))
+    
+    
+    mean.mag.pavlou <- NA
+    sd.mag.pavlou <- NA
+    median.mag.pavlou <- NA
+    
+  }
+  
+  ## Concatenate
+  quantiles.riley <- c(sprintf("%.3f", quantiles.riley), 
+                       paste(sprintf("%.3f", mean.riley), " (", sprintf("%.3f", sd.riley), ")", sep = ""), 
+                       paste(sprintf("%.3f", mean.mag.riley), " (", sprintf("%.3f", sd.mag.riley), ")", sep = ""))
+  quantiles.pavlou <- c(sprintf("%.3f", quantiles.pavlou), 
+                        paste(sprintf("%.3f", mean.pavlou), " (", sprintf("%.3f", sd.pavlou), ")", sep = ""), 
+                        paste(sprintf("%.3f", mean.mag.pavlou), " (", sprintf("%.3f", sd.mag.pavlou), ")", sep = ""))
+  
+  return(list("riley" = quantiles.riley,
+              "pavlou" = quantiles.pavlou))
+}
+
+### Write a function to get the quantiles for a given range of C-statistics
+get_N <- function(C1,C2,correlated = TRUE, both = TRUE){
+  if (both == TRUE){
+    df <- subset(metadata.both, C.pop > C1 & C.pop <= C2 & corr == correlated)
+  } else {
+    df <- subset(metadata.just.riley, C.pop > C1 & C.pop <= C2 & corr == correlated)
+  }
+  n <- nrow(df)
+  return(n)
+}
+
+### Put S_VH by quantiles ranges into a list
+C.list <- list(c(0,1), 
+               c(0.55, 0.6),
+               c(0.6, 0.65),
+               c(0.65, 0.7),
+               c(0.7, 0.75),
+               c(0.75, 0.8),
+               c(0.8, 0.85),
+               c(0.85, 0.9),
+               c(0.9, 0.95))
+```
+
+```{r, echo = FALSE}
+# Correlated data
+S.pop.stratified.C <- lapply(C.list, function(x) {get_quantiles(x[1],x[2])})
+S.pop.stratified.C.riley <- lapply(C.list, function(x) {get_quantiles(x[1],x[2], both = FALSE)})
+
+### Put into a table
+S.pop.stratified.C <- lapply(S.pop.stratified.C, function(x) {
+  out <- rbind(x[[1]], x[[2]])
+  out <- cbind(c("N_original", "N_sim"), out)
+  colnames(out) <- c("sample_size", 
+                     paste("p", c(2.5,25,50,75,97.5), sep = ""), 
+                     "mean (sd) of bias", 
+                     "mean (sd) of |bias|")
+  return(out)
+})
+
+### Suppress warnings for scenarios where N_adapted fails, as they give all NA, but we are only interetes in the results for N_original
+S.pop.stratified.C.riley <- suppressWarnings(lapply(S.pop.stratified.C.riley, function(x) {
+  out <- rbind(x[[1]], x[[2]])
+  out <- cbind(c("N_original", "N_sim"), out)
+  colnames(out) <- c("sample_size", 
+                     paste("p", c(2.5,25,50,75,97.5), sep = ""), 
+                     "mean (sd) of bias", 
+                     "mean (sd) of |bias|")
+  return(out)
+}))
+
+### Reform tables
+S.pop.stratified.C <- do.call("rbind", S.pop.stratified.C) |> as.data.frame()
+S.pop.stratified.C <- dplyr::mutate(S.pop.stratified.C, 
+                                C = c(rep("[0,1]", 2),
+                                          rep("(0.55,0.6]", 2),
+                                          rep("(0.6,0.65]", 2),
+                                          rep("(0.65,0.7]", 2),
+                                          rep("(0.7,0.75]", 2),
+                                          rep("(0.75,0.8]", 2),
+                                          rep("(0.8,0.85]", 2),
+                                          rep("(0.85,0.9]", 2),
+                                          rep("(0.9,0.95]", 2)
+                                    )) |>
+  dplyr::relocate(C)
+
+S.pop.stratified.C.riley <- do.call("rbind", S.pop.stratified.C.riley) |> as.data.frame()
+S.pop.stratified.C.riley <- dplyr::mutate(S.pop.stratified.C.riley, 
+                                    C = c(rep("[0,1]", 2),
+                                          rep("(0.55,0.6]", 2),
+                                          rep("(0.6,0.65]", 2),
+                                          rep("(0.65,0.7]", 2),
+                                          rep("(0.7,0.75]", 2),
+                                          rep("(0.75,0.8]", 2),
+                                          rep("(0.8,0.85]", 2),
+                                          rep("(0.85,0.9]", 2),
+                                          rep("(0.9,0.95]", 2)
+                                    )) |>
+  dplyr::relocate(C)
+
+### Get number of scenarios in each C-statistic range
+N.stratified.C <- lapply(C.list, function(x) {get_N(x[1],x[2])})
+N.stratified.C <- unlist(N.stratified.C)
+N.stratified.C <- data.frame("C" = c("[0,1]",
+                                     "(0.55,0.6]",
+                                     "(0.6,0.65]",
+                                     "(0.65,0.7]",
+                                     "(0.7,0.75]",
+                                     "(0.75,0.8]",
+                                     "(0.8,0.85]",
+                                     "(0.85,0.9]",
+                                     "(0.9,0.95]"),
+                             "Number_of_scenarios" = N.stratified.C)
+
+N.stratified.C.riley <- lapply(C.list, function(x) {get_N(x[1],x[2], both = FALSE)})
+N.stratified.C.riley <- unlist(N.stratified.C.riley)
+N.stratified.C.riley <- data.frame("C" = c("[0,1]",
+                                           "(0.55,0.6]",
+                                           "(0.6,0.65]",
+                                           "(0.65,0.7]",
+                                           "(0.7,0.75]",
+                                           "(0.75,0.8]",
+                                           "(0.8,0.85]",
+                                           "(0.85,0.9]",
+                                           "(0.9,0.95]"),
+                                   "Number_of_scenarios" = N.stratified.C.riley)
+
+### Combine
+S.pop.stratified.C <- dplyr::left_join(S.pop.stratified.C, N.stratified.C, by = dplyr::join_by(C))
+### Combine
+S.pop.stratified.C.riley <- dplyr::left_join(S.pop.stratified.C.riley, N.stratified.C.riley, by = dplyr::join_by(C))
+
+knitr::kable(S.pop.stratified.C, caption = "Supplementary Table 8.1: Simulation study 2 (alternative DGM - see section 4); Distribution of S_opt across different C-statistic groups in scenarios where N_sim converged; correlated data")
+knitr::kable(S.pop.stratified.C.riley, caption = "Supplementary Table 8.2: Simulation study 2 (alternative DGM - see section 4); Distribution of S_opt across different C-statistic groups in scenarios where N_sim failed to converged; correlated data")
+```
+
+```{r, echo = FALSE}
+## Get results for uncorrelated data
+S.pop.stratified.C <- lapply(C.list, function(x) {get_quantiles(x[1],x[2], correlated = FALSE)})
+S.pop.stratified.C.riley <- lapply(C.list, function(x) {get_quantiles(x[1],x[2], correlated = FALSE, both = FALSE)})
+
+### Put into a table
+S.pop.stratified.C <- lapply(S.pop.stratified.C, function(x) {
+  out <- rbind(x[[1]], x[[2]])
+  out <- cbind(c("N_original", "N_sim"), out)
+  colnames(out) <- c("sample_size", 
+                     paste("p", c(2.5,25,50,75,97.5), sep = ""), 
+                     "mean (sd) of bias", 
+                     "mean (sd) of |bias|")
+  return(out)
+})
+
+### Suppress warnings for scenarios where N_adapted fails, as they give all NA, but we are only interetes in the results for N_original
+S.pop.stratified.C.riley <- suppressWarnings(lapply(S.pop.stratified.C.riley, function(x) {
+  out <- rbind(x[[1]], x[[2]])
+  out <- cbind(c("N_original", "N_sim"), out)
+  colnames(out) <- c("sample_size", 
+                     paste("p", c(2.5,25,50,75,97.5), sep = ""), 
+                     "mean (sd) of bias", 
+                     "mean (sd) of |bias|")
+  return(out)
+}))
+
+### Reform tables
+S.pop.stratified.C <- do.call("rbind", S.pop.stratified.C) |> as.data.frame()
+S.pop.stratified.C <- dplyr::mutate(S.pop.stratified.C, 
+                                    C = c(rep("[0,1]", 2),
+                                          rep("(0.55,0.6]", 2),
+                                          rep("(0.6,0.65]", 2),
+                                          rep("(0.65,0.7]", 2),
+                                          rep("(0.7,0.75]", 2),
+                                          rep("(0.75,0.8]", 2),
+                                          rep("(0.8,0.85]", 2),
+                                          rep("(0.85,0.9]", 2),
+                                          rep("(0.9,0.95]", 2)
+                                    )) |>
+  dplyr::relocate(C)
+
+S.pop.stratified.C.riley <- do.call("rbind", S.pop.stratified.C.riley) |> as.data.frame()
+S.pop.stratified.C.riley <- dplyr::mutate(S.pop.stratified.C.riley, 
+                                          C = c(rep("[0,1]", 2),
+                                                rep("(0.55,0.6]", 2),
+                                                rep("(0.6,0.65]", 2),
+                                                rep("(0.65,0.7]", 2),
+                                                rep("(0.7,0.75]", 2),
+                                                rep("(0.75,0.8]", 2),
+                                                rep("(0.8,0.85]", 2),
+                                                rep("(0.85,0.9]", 2),
+                                                rep("(0.9,0.95]", 2)
+                                          )) |>
+  dplyr::relocate(C)
+
+### Get number of scenarios in each C-statistic range
+N.stratified.C <- lapply(C.list, function(x) {get_N(x[1],x[2], correlated = FALSE)})
+N.stratified.C <- unlist(N.stratified.C)
+N.stratified.C <- data.frame("C" = c("[0,1]",
+                                     "(0.55,0.6]",
+                                     "(0.6,0.65]",
+                                     "(0.65,0.7]",
+                                     "(0.7,0.75]",
+                                     "(0.75,0.8]",
+                                     "(0.8,0.85]",
+                                     "(0.85,0.9]",
+                                     "(0.9,0.95]"),
+                             "Number_of_scenarios" = N.stratified.C)
+
+N.stratified.C.riley <- lapply(C.list, function(x) {get_N(x[1],x[2], correlated = FALSE, both = FALSE)})
+N.stratified.C.riley <- unlist(N.stratified.C.riley)
+N.stratified.C.riley <- data.frame("C" = c("[0,1]",
+                                     "(0.55,0.6]",
+                                     "(0.6,0.65]",
+                                     "(0.65,0.7]",
+                                     "(0.7,0.75]",
+                                     "(0.75,0.8]",
+                                     "(0.8,0.85]",
+                                     "(0.85,0.9]",
+                                     "(0.9,0.95]"),
+                             "Number_of_scenarios" = N.stratified.C.riley)
+
+### Combine
+S.pop.stratified.C <- dplyr::left_join(S.pop.stratified.C, N.stratified.C, by = dplyr::join_by(C))
+### Combine
+S.pop.stratified.C.riley <- dplyr::left_join(S.pop.stratified.C.riley, N.stratified.C.riley, by = dplyr::join_by(C))
+
+knitr::kable(S.pop.stratified.C, caption = "Supplementary Table 8.3: Simulation study 2 (alternative DGM - see section 4); Distribution of S_opt across different C-statistic groups in scenarios where N_sim converged; uncorrelated data")
+knitr::kable(S.pop.stratified.C.riley, caption = "Supplementary Table 8.4: Simulation study 2 (alternative DGM - see section 4); Distribution of S_opt across different C-statistic groups in scenarios where N_sim failed to converged; uncorrelated data")
+```
+
+# Proportion of scenarios where N_sim failed
+
+```{r, include = FALSE}
+metadata.either  <- subset(metadata, !is.na(S.pop.mean.riley))
+
+get_prop_miss <- function(C1, C2, correlated = TRUE){
+  df <- subset(metadata, C.pop > C1 & C.pop <= C2 & corr == correlated & !is.na(S.pop.mean.riley))
+  prop_out <- sum(is.na(df$S.pop.mean.pavlou)/nrow(df))
+  return(prop_out)
+}
+```
+
+
+```{r, echo = FALSE}
+# Proportion failed in C-statistic ranges, correlated data
+prop.miss.stratified.C <- lapply(C.list, function(x) {get_prop_miss(x[1],x[2])})
+prop.miss.stratified.C <- unlist(prop.miss.stratified.C)
+prop.miss.stratified.C <- data.frame("C" = c("[0,1]",
+                                             "(0.55,0.6]",
+                                             "(0.6,0.65]",
+                                             "(0.65,0.7]",
+                                             "(0.7,0.75]",
+                                             "(0.75,0.8]",
+                                             "(0.8,0.85]",
+                                             "(0.85,0.9]",
+                                             "(0.9,0.95]"),
+                                     "Proportion failed" = round(prop.miss.stratified.C,2))
+knitr::kable(prop.miss.stratified.C, caption = "Supplementary Table 8.5: Simulation study 2 (alternative DGM - see section 4); Proportion of scenarios where N_sim converged in different C-statistic groups, correlated data")
+```
+
+```{r, echo = FALSE}
+# Proportion failed in C-statistic ranges, uncorrelated data
+prop.miss.stratified.C <- lapply(C.list, function(x) {get_prop_miss(x[1],x[2], correlated = FALSE)})
+prop.miss.stratified.C <- unlist(prop.miss.stratified.C)
+prop.miss.stratified.C <- data.frame("C" =  c("[0,1]",
+                                              "(0.55,0.6]",
+                                              "(0.6,0.65]",
+                                              "(0.65,0.7]",
+                                              "(0.7,0.75]",
+                                              "(0.75,0.8]",
+                                              "(0.8,0.85]",
+                                              "(0.85,0.9]",
+                                              "(0.9,0.95]"),
+                                     "Proportion failed" = round(prop.miss.stratified.C,2))
+knitr::kable(prop.miss.stratified.C, caption = "Supplementary Table 8.6: Simulation study 2 (alternative DGM - see section 4); Proportion of scenarios where N_sim converged in different C-statistic groups, uncorrelated data")
+```

@@ -101,7 +101,7 @@ for (sim in 1:n.sim){
   
   ### Get the sample sizes
   # pavlou
-  nreq.pavlou <- try(samplesizedev::samplesizedev(S = 0.9, phi = prop, c = C.pop, p = P1, nsim = 1000)$sim)
+  nreq.pavlou <- try(samplesizedev::samplesizedev(S = 0.9, phi = prop, c = C.pop, p = P1, nsim = 1000, parallel = FALSE)$sim)
   
   # riley
   R2.CS.pop <- 1 - exp(-(BLR.model.glm.valid$null.deviance - BLR.model.glm.valid$deviance)/nrow(dat.valid))

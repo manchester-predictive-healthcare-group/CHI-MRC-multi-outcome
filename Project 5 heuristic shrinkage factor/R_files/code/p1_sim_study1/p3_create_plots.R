@@ -15,7 +15,7 @@ source("R/sim_functions.R")
 library(ggplot2)
 
 ### Read in data
-metadata <- readRDS("data/heuristic_shrinkage_sim_metadata.rds")
+metadata <- readRDS("data/sim_study1_metadata.rds")
 metadata <- subset(metadata, C.pop != 0)
 
 ### Write a function which will combine data for a specific version
@@ -42,8 +42,9 @@ create_plot <- function(df, correlated = TRUE, cat = FALSE, xvar, yvar, byvar, b
   }
   
   ### Create colour range for ggplot
-  fun_color_range <- colorRampPalette(c("green", "blue"))
-  my_colors <- fun_color_range(20)
+  # fun_color_range <- colorRampPalette(c("green", "blue"))
+  # my_colors <- fun_color_range(20)
+  my_colors <- colorspace::rainbow_hcl(100, c = 70, l = 70)[20:100]
   
   ### Assign label for axes and legend
   x.label <- NULL
@@ -63,9 +64,9 @@ create_plot <- function(df, correlated = TRUE, cat = FALSE, xvar, yvar, byvar, b
   
   # y label
   if (yvar == "S.pop.mean"){
-    y.label <- expression(paste("mean(", S[pop], ")", sep = ""))
+    y.label <- expression(paste("mean(", S[opt], ")", sep = ""))
   } else if (yvar == "S.pop.median"){
-    y.label <- expression(paste("median(", S[pop], ")", sep = ""))
+    y.label <- expression(paste("median(", S[opt], ")", sep = ""))
   }
   
   # by label
@@ -83,6 +84,8 @@ create_plot <- function(df, correlated = TRUE, cat = FALSE, xvar, yvar, byvar, b
     by.label <- expression(C[pop])
   } else if (byvar == "P.meas"){
     by.label <- expression(Q[meas])
+  } else if (byvar == "EPP"){
+    by.label <- expression(EPP)
   } else if (byvar == "nreq"){
     by.label <- "N"
   }
@@ -97,14 +100,18 @@ create_plot <- function(df, correlated = TRUE, cat = FALSE, xvar, yvar, byvar, b
     gg.out <- ggplot(aes(x = !! xvar, y = !! yvar, color = !! byvar), data = df) +
       scale_colour_gradientn(colors = my_colors) 
   } else {
-    gg.out <- ggplot(aes(x = !! xvar, y = !! yvar, color = cut(!! byvar, bygroups, right = FALSE)), data = df)
+    if (byvar == "nreq"){
+      gg.out <- ggplot(aes(x = !! xvar, y = !! yvar, color = cut(!! byvar, bygroups, right = FALSE, dig.lab = 50)), data = df)
+    } else {
+      gg.out <- ggplot(aes(x = !! xvar, y = !! yvar, color = cut(!! byvar, bygroups, right = FALSE)), data = df)
+    }
   }
   
   ### Add data points
   if (is.null(alpha)){
-    gg.out <- gg.out + geom_point(size = 0.5) + geom_abline(intercept = 0, slope = 1)
+    gg.out <- gg.out + geom_point(size = 0.5) + geom_abline(intercept = 0, slope = 1) + xlim(c(0, 1.1)) + ylim(c(0, 1.1))
   } else {
-    gg.out <- gg.out + geom_point(size = 0.5, alpha = alpha) + geom_abline(intercept = 0, slope = 1)
+    gg.out <- gg.out + geom_point(size = 0.5, alpha = alpha) + geom_abline(intercept = 0, slope = 1)  + xlim(c(0, 1.1)) + ylim(c(0, 1.1))
   }
   
   ### Add extra bits
@@ -142,7 +149,6 @@ save_plots <- function(xvar2, type, correlated, cat, alpha = NULL){
                               xvar = paste(xvar2, ".", type, sep = ""),
                               yvar = paste("S.pop", ".", type, sep = ""),
                               byvar = paste("R2.CS.app.", type, sep = ""), 
-                              yrange = c(0,1), 
                               alpha = alpha)
   plot.corr.R2.pop <- create_plot(df = metadata, 
                               correlated = correlated,
@@ -150,7 +156,6 @@ save_plots <- function(xvar2, type, correlated, cat, alpha = NULL){
                               xvar = paste(xvar2, ".", type, sep = ""),
                               yvar = paste("S.pop", ".", type, sep = ""),
                               byvar = "R2.CS.pop", 
-                              yrange = c(0,1), 
                               alpha = alpha)
   plot.corr.C <- create_plot(df = metadata, 
                              correlated = correlated,
@@ -158,7 +163,6 @@ save_plots <- function(xvar2, type, correlated, cat, alpha = NULL){
                              xvar = paste(xvar2, ".", type, sep = ""),
                              yvar = paste("S.pop", ".", type, sep = ""),
                              byvar = paste("C.", type, sep = ""),  
-                             yrange = c(0,1), 
                              alpha = alpha)
   plot.corr.C.pop <- create_plot(df = metadata, 
                              correlated = correlated,
@@ -166,7 +170,6 @@ save_plots <- function(xvar2, type, correlated, cat, alpha = NULL){
                              xvar = paste(xvar2, ".", type, sep = ""),
                              yvar = paste("S.pop", ".", type, sep = ""),
                              byvar = "C.pop",  
-                             yrange = c(0,1), 
                              alpha = alpha)
   plot.corr.P <- create_plot(df = metadata, 
                              correlated = correlated,
@@ -174,7 +177,14 @@ save_plots <- function(xvar2, type, correlated, cat, alpha = NULL){
                              xvar = paste(xvar2, ".", type, sep = ""),
                              yvar = paste("S.pop", ".", type, sep = ""),
                              byvar = "P.meas", 
-                             yrange = c(0,1), 
+                             alpha = alpha)
+  plot.corr.EPP <- create_plot(df = metadata, 
+                             correlated = correlated,
+                             cat = cat,
+                             xvar = paste(xvar2, ".", type, sep = ""),
+                             yvar = paste("S.pop", ".", type, sep = ""),
+                             byvar = "EPP", 
+                             bygroups = c(0, 5, 10, 20, 40, 100, Inf), 
                              alpha = alpha)
   plot.corr.n <- create_plot(df = metadata, 
                              correlated = correlated,
@@ -182,23 +192,55 @@ save_plots <- function(xvar2, type, correlated, cat, alpha = NULL){
                              xvar = paste(xvar2, ".", type, sep = ""),
                              yvar = paste("S.pop", ".", type, sep = ""),
                              byvar = "nreq", 
-                             bygroups = c(100, 150, 300, 500, Inf), 
-                             yrange = c(0,1), 
+                             bygroups = c(100, 150, 300, 500, 1000, 2000, Inf), 
                              alpha = alpha)
   
   # Combine plots
-  plotlist <- list(plot.corr.R2.pop, plot.corr.C.pop, plot.corr.P, plot.corr.n)
+  plotlist <- list(plot.corr.R2.pop, plot.corr.C.pop, plot.corr.P, plot.corr.EPP, plot.corr.n)
   plotlist.app <- list(plot.corr.R2, plot.corr.C)
-  plots.corr.comb <- ggpubr::ggarrange(plotlist = plotlist, nrow = 2, ncol = 2)
+  plots.corr.comb <- ggpubr::ggarrange(plotlist = plotlist, nrow = 3, ncol = 2)
   plots.corr.comb.app <- ggpubr::ggarrange(plotlist = plotlist.app, nrow = 1, ncol = 2)
   
   # Save to disk
-  Cairo::CairoPNG(paste("figures/gg.corr", as.numeric(correlated), ".cat", as.numeric(cat), ".", xvar2, ".", type, ".alpha", ifelse(is.null(alpha), 0, alpha), ".png", sep = ""),
-                  width = 7, height = 7, unit = "in", dpi = 300)
+  # Cairo::CairoPNG(paste("figures/ss1/ss1_gg.corr", as.numeric(correlated), ".cat", as.numeric(cat), ".", xvar2, ".", type, ".alpha", ifelse(is.null(alpha), 0, alpha), ".png", sep = ""),
+  #                 width = 7, height = 7, unit = "in", dpi = 300)
+  # plot(plots.corr.comb)
+  # dev.off()
+  ragg::agg_png(paste("figures/ss1/ss1_gg.corr", as.numeric(correlated), ".cat", as.numeric(cat), ".", xvar2, ".", type, ".alpha", ifelse(is.null(alpha), 0, alpha), ".png", sep = ""),
+                units = "in",
+                res = 1000,
+                width = 1, height = 3/2, scaling = 1/7)
   plot(plots.corr.comb)
   dev.off()
-  Cairo::CairoPNG(paste("figures/gg.app.corr", as.numeric(correlated), ".cat", as.numeric(cat), ".", xvar2, ".", type, ".alpha", ifelse(is.null(alpha), 0, alpha), ".png", sep = ""),
-                  width = 7, height = 3.5, unit = "in", dpi = 300)
+  
+  ### Save Figure in high res for manuscript
+  if (xvar2 == "S.VH" & type == "mean" & correlated == TRUE & alpha == 0.25){
+    Cairo::CairoPNG("figures/ss1/ss1_Figure1.png",
+                    width = 7, height = 7*3/2, unit = "in", dpi = 800)
+    plot(plots.corr.comb)
+    dev.off()
+  }
+  if (xvar2 == "S.boot" & type == "mean" & correlated == TRUE & alpha == 0.25){
+    Cairo::CairoPNG("figures/ss1/ss1_Figure2.png",
+                    width = 7, height = 7*3/2, unit = "in", dpi = 800)
+    plot(plots.corr.comb)
+    dev.off()
+  }
+  if (xvar2 == "S.VH" & type == "median" & correlated == TRUE & alpha == 0.25){
+    Cairo::CairoPNG("figures/ss1/ss1_Figure3.png",
+                    width = 7, height = 7*3/2, unit = "in", dpi = 800)
+    plot(plots.corr.comb)
+    dev.off()
+  }
+  
+  # Cairo::CairoPNG(paste("figures/ss1/ss1_gg.app.corr", as.numeric(correlated), ".cat", as.numeric(cat), ".", xvar2, ".", type, ".alpha", ifelse(is.null(alpha), 0, alpha), ".png", sep = ""),
+  #                 width = 7, height = 3.5, unit = "in", dpi = 300)
+  # plot(plots.corr.comb.app)
+  # dev.off()
+  ragg::agg_png(paste("figures/ss1/ss1_gg.app.corr", as.numeric(correlated), ".cat", as.numeric(cat), ".", xvar2, ".", type, ".alpha", ifelse(is.null(alpha), 0, alpha), ".png", sep = ""),
+                units = "in",
+                res = 1000,
+                width = 1, height = 1.1/2, scaling = 1/7)
   plot(plots.corr.comb.app)
   dev.off()
   
@@ -211,7 +253,7 @@ for (xvar2 in c("S.VH", "S.boot")){
   for (type in c("mean", "median")){
     for (correlated in c(TRUE, FALSE)){
       for (cat in c(FALSE)){
-        for (alpha in c(0.25)){
+        for (alpha in c(0.25, 0.5)){
           print(paste(xvar2, type, correlated, cat, alpha))
           save_plots(xvar2 = xvar2, type = type, correlated = correlated, cat = cat, alpha = alpha)
         }
@@ -224,31 +266,35 @@ for (xvar2 in c("S.VH", "S.boot")){
 ### Reproduce C-statistic plot highlighting models with C-statistic around 0.8
 ###
 plot.corr.C <- create_plot(df = metadata, xvar = "S.VH.mean", yvar = "S.pop.mean", byvar = "C.mean", 
-                           bygroups = c(0, 0.775, 0.825, 1), yrange = c(0,1))
+                           bygroups = c(0, 0.775, 0.825, 1))
 
 plot.corr.C.pop <- create_plot(df = metadata, xvar = "S.VH.mean", yvar = "S.pop.mean", byvar = "C.pop", 
-                           bygroups = c(0, 0.73, 0.8, 1), yrange = c(0,1))
+                           bygroups = c(0, 0.73, 0.8, 1))
 
 plot.nocorr.C <- create_plot(df = metadata, correlated = FALSE, xvar = "S.VH.mean", yvar = "S.pop.mean", byvar = "C.mean", 
-                           bygroups = c(0, 0.775, 0.825, 1), yrange = c(0,1))
+                           bygroups = c(0, 0.775, 0.825, 1))
 
 plot.nocorr.C.pop <- create_plot(df = metadata, correlated = FALSE, xvar = "S.VH.mean", yvar = "S.pop.mean", byvar = "C.pop", 
-                               bygroups = c(0, 0.7, 0.8, 1), yrange = c(0,1))
+                               bygroups = c(0, 0.7, 0.8, 1))
 
 
 # Save to disk
-Cairo::CairoPNG("figures/gg.corr1.S.VH.mean.C.group.png", width = 7, height = 7, unit = "in", dpi = 300)
+Cairo::CairoPNG("figures/ss1/ss1_gg.corr1.S.VH.mean.C.group.png", width = 7, height = 7, unit = "in", dpi = 300)
 plot(plot.corr.C)
 dev.off()
 
-Cairo::CairoPNG("figures/gg.corr1.S.VH.mean.C.pop.group.png", width = 7, height = 7, unit = "in", dpi = 300)
+Cairo::CairoPNG("figures/ss1/ss1_gg.corr1.S.VH.mean.C.pop.group.png", width = 7, height = 7, unit = "in", dpi = 300)
 plot(plot.corr.C.pop)
 dev.off()
 
-Cairo::CairoPNG("figures/gg.corr0.S.VH.mean.C.group.png", width = 7, height = 7, unit = "in", dpi = 300)
+Cairo::CairoPNG("figures/ss1/ss1_Figure6.png", width = 7, height = 7, unit = "in", dpi = 800)
+plot(plot.corr.C.pop)
+dev.off()
+
+Cairo::CairoPNG("figures/ss1/ss1_gg.corr0.S.VH.mean.C.group.png", width = 7, height = 7, unit = "in", dpi = 300)
 plot(plot.nocorr.C)
 dev.off()
 
-Cairo::CairoPNG("figures/gg.corr0.S.VH.mean.C.pop.group.png", width = 7, height = 7, unit = "in", dpi = 300)
+Cairo::CairoPNG("figures/ss1/ss1_gg.corr0.S.VH.mean.C.pop.group.png", width = 7, height = 7, unit = "in", dpi = 300)
 plot(plot.nocorr.C.pop)
 dev.off()

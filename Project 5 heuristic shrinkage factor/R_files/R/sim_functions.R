@@ -78,44 +78,87 @@ BLR.DGM <- function(coef, #vector of coefficients, assuming for each outcome, th
 
 
 ########################################################################
-### 1.2) Function to generate the data using the binary logistic DGM ###
+### 1.2) Function to get coefficients which when we generate data,   ###
+### will have the desired C-statistic.
+### Generalisation of code from Austin BMC Medical Research Methdology, 2023, Feb 17;23:45
+### ('The iterative bisection procedure: a useful tool for determining parameter values')
+### Generalisation allows you to specify any number of P, intercept, and covariance structure between predictors 
 ########################################################################
 
-# ### Not sure if we actually need the prevalence command, this is determined through coef and beta0, which I will have to calculate in a seperate program?
-# BLR.DGM.cat.old <- function(coef, #vector of coefficients, assuming for each outcome, the effect of each predictor is the same
-#                     beta0, #vector of intercepts
-#                     N){
-#   
-#   #   N <- 10
-#   #   coef <- c(0.75, 0.75, 0.75, 0.75, 0.75)
-#   #   beta0 <- 0
-#   ### Define number of predictors
-#   P <- length(coef)
-#   
-#   ### Create an input dataset of patient covariates
-#   ## Create empty dataframe
-#   dat.covar <- data.frame(matrix(, nrow = N, ncol = P))
-#   ## Add variable names
-#   colnames(dat.covar) <- paste("x", 1:P, sep = "")
-#   ## Add covariates
-#   for (i in 1:P){
-#     dat.covar[, i] <- rbinom(N, 1, 0.5)
-#   }
-#   
-#   ### Create linear predictor
-#   probs <- exp(beta0 + as.matrix(dat.covar)%*%coef)/(1 + exp(beta0 + as.matrix(dat.covar)%*%coef))
-#   
-#   ### Create outcome
-#   Y <- rbinom(N, 1, probs)
-#   
-#   ### Add to an output dataset
-#   dat.out <- data.frame("Y" = Y, 
-#                         #"probs" = probs, 
-#                         dat.covar)
-#   dat.out$Y.fac <- factor(dat.out$Y)
-#   
-#   return(dat.out)
-# }
+get.coefs.specific.C.P <- function(P, target.cstat, covar_matrix, beta.0.outcome, N.pop = 1000000, tolerance = 0.001){
+  
+  # P <- 10
+  # target.cstat <- 0.8
+  # N.pop = 1000000
+  # tolerance = 0.001
+  # corr = TRUE
+  
+  ### Generate initial covariate effects at random
+  B.outcome.fixed <- runif(P, -0.5, 0.5)
+  
+  ################################################################################
+  # Generate P baseline covariates for each subject in the super-population.
+  ################################################################################
+  
+  ### Geneate covariate from a multivariate normal
+  X <- mvrnorm(N.pop, mu = rep(0, P), Sigma = covar_matrix)
+  X.df <- data.frame(X)
+  colnames(X.df) <- paste("x", 1:ncol(X.df), sep = "")
+  ### Add intercept to matrix for algorithm
+  X <- cbind(1,X)
+  
+  ################################################################################
+  # Bisection procedure to determine scalar that results in the desired
+  # c-statistic.
+  ################################################################################
+  
+  cstat.emp <- 0
+  
+  # Initial interval for scalar that multiplies the regression coefficients.
+  scalar.low <- 0
+  scalar.high <- 10
+  
+  iter.cstat <- 0
+  
+  while (abs(cstat.emp - target.cstat) > tolerance){
+    
+    iter.cstat <- iter.cstat + 1
+    
+    scalar <- (scalar.low + scalar.high)/2
+    
+    B.outcome <- scalar * B.outcome.fixed
+    # Modified coefficients to increase/decrease c-statistic of regression model.
+    
+    beta.outcome.modified <- c(beta.0.outcome,B.outcome)
+    # Set the intercept of the outcome model to the given value.
+    
+    XB <- X %*% beta.outcome.modified
+    
+    p.outcome <- exp(XB)/(1 + exp(XB))
+    X.df$Y <- rbinom(N.pop,1,p.outcome)
+    
+    remove(B.outcome,beta.outcome.modified,XB,p.outcome)
+    
+    # Estimate propensity score model in super-population
+    psm.pop <- lrm(as.formula(paste("Y~", paste("x", 1:(ncol(X.df)-1), sep = "", collapse = "+"), sep = "")), data = X.df)
+    cstat.emp <- psm.pop$stats["C"]
+    
+    remove(psm.pop)
+    
+    cat(iter.cstat,target.cstat,scalar,cstat.emp,file="Table3.txt",fill=T,
+        append=T)
+    
+    if (cstat.emp < target.cstat) scalar.low <- scalar else
+      scalar.high <- scalar
+    
+  }
+  
+  output <- B.outcome.fixed*scalar
+  return(output)
+  
+}
+
+
 
 
 ###
@@ -337,7 +380,6 @@ calc.S.VH.S.boot.S.pop <- function(dat.devel, dat.valid, n.S.boot){
   #BLR.model.null <- glm(Y.fac ~ 1 , data = dplyr::select(dat.devel, - c(Y)), family = binomial(link = "logit")) 
 
   BLR.model.lrm <- lrm(Y.fac ~ ., data = dplyr::select(dat.devel, - c(Y)), x = TRUE, y = TRUE, maxit = 1000)
-  print("BLR.model.done")
   
   if (BLR.model.lrm$fail == TRUE){
     return(c("S.VH" = NA, 
@@ -470,7 +512,6 @@ calc.S.pop <- function(dat.devel, dat.valid, n.S.boot){
   #BLR.model.null <- glm(Y.fac ~ 1 , data = dplyr::select(dat.devel, - c(Y)), family = binomial(link = "logit")) 
   
   BLR.model.lrm <- lrm(Y.fac ~ ., data = dplyr::select(dat.devel, - c(Y)), x = TRUE, y = TRUE, maxit = 1000)
-  print("BLR.model.done")
   
   if (BLR.model.lrm$fail == TRUE){
     return(c("S.VH" = NA, 

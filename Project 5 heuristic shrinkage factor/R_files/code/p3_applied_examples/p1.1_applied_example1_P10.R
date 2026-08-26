@@ -18,6 +18,10 @@ colnames(df)
 ###
 str(df$AKI)
 
+### Report outcome proportion
+table(df$AKI)
+prop.table(table(df$AKI))
+
 ### Build a model to predict AKI
 
 ### Set n.iter
@@ -37,7 +41,7 @@ predictors <- c("age", "gender", "bicarbonate_mean", "creatinine_mean", "chlorid
 data.output <- vector("list", length(n.vec))
 names(data.output) <- n.vec
 for (i in 1:length(n.vec)){
-  data.output[[i]] <- data.frame("S.VH" = rep(NA, n.iter), "S.boot" = rep(NA, n.iter), "R2.CS.app" = rep(NA, n.iter), "C.app" = rep(NA, n.iter))
+  data.output[[i]] <- data.frame("S.VH" = rep(NA, n.iter), "S.boot" = rep(NA, n.iter), "R2.CS.app" = rep(NA, n.iter), "C.app" = rep(NA, n.iter), "S.pop" = rep(NA, n.iter))
 }
 
 ###
@@ -65,10 +69,14 @@ function_calc_S_boot <- function(data, i){
   
 }
 
+### Create a validation dataset 
+### (will be used to try and estimate S.opt, although data is not big enough to do so)
+df.valid <- df
+
 ### Now run the simulation
 ### 1) Sample n individuals
 ### 2) Fit a model in this dataset
-### 3) Extract data, record S.VH and S.boot, C.app and R2.CS.app
+### 3) Extract data, record S.VH and S.boot, C.app, R2.CS.app and guesstimate of S.pop
 
 ### For each sample size
 for (i in 1:length(n.vec)){
@@ -94,6 +102,9 @@ for (i in 1:length(n.vec)){
     C.app <- model.temp$stats["C"]
     R2.CS.app <- as.numeric(1 - exp(-(LR)/nrow(data.temp)))
     P <- length(model.temp$coefficients)
+    
+    ###
+    ### Calculate S.VH
     S.VH <- as.numeric(1 - P/LR)
     
     ###
@@ -106,8 +117,21 @@ for (i in 1:length(n.vec)){
     S.boot <- mean(boot.out$t)
     
     ###
+    ### Calculate S.pop, although, the dataset is not big enough to calculate S.pop, so 
+    ### it's just an extra metric which readers may find informative (peer review request)
+    
+    ### Make predictions
+    df.valid$lp <- predict(model.temp, newdata = df.valid, type = "lp")
+
+    ### Fit recalibration model to calculate shrinkage factor
+    model.valid <- glm(AKI ~ lp, data = df.valid, family = binomial(link = "logit")) 
+    
+    ### Return the slope as the shrinkage factor
+    S.pop <- model.valid$coefficients["lp"]
+    
+    ###
     ### Save the output
-    data.output[[i]][iter, ] <- c(as.numeric(S.VH), as.numeric(S.boot),  as.numeric(R2.CS.app), as.numeric(C.app))
+    data.output[[i]][iter, ] <- c(as.numeric(S.VH), as.numeric(S.boot),  as.numeric(R2.CS.app), as.numeric(C.app), as.numeric(S.pop))
     
   }
   
@@ -124,7 +148,7 @@ biggest.C.app <- biggest.model$stats["C"]
 biggest.C.app
 
 ### Get mean C-statistics across the bootstrap iterations
-lapply(1:7, function(x){mean(data.output[[x]][,"C.app"])})
+lapply(1:4, function(x){mean(data.output[[x]][,"C.app"])})
 
 rm(list=setdiff(ls(), list("data.output", "data.output.means", "biggest.C.app")))
 save.image("data/applied_example1_P10.RData")

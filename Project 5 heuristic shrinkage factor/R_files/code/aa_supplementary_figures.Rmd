@@ -1,0 +1,149 @@
+---
+title: "Supplementary Figures"
+author: "Alex Pate"
+date: "2024-09-27"
+output: 
+  html_document:
+    number_sections: true
+---
+
+Associated with manuscript: Agreement between heuristic shrinkage factor and optimal shrinkage factors in logistic regression for risk prediction: a simulation study across different sample sizes and settings
+
+# Plots for results from simulation study 1
+
+We present plots of $S_{VH}$ and $S_{boot}$ plotted against $S_{opt}$ from simulation study 1 for every combination of the simulation inputs:
+
+* Scenarios where data was simulated with a zero-covariance matrix
+* Plots presented by $R^{2}_{CS,app}$ and $C_{app}$, as opposed to $R^{2}_{CS,pop}$ and $C_{pop}$.
+* Median instead of mean
+
+```{r, echo = FALSE, results = "asis"}
+counter <- 1
+for (correlated in c(TRUE, FALSE)){
+  for (xvar2 in c("S.VH", "S.boot")){
+    for (type in c("mean", "median")){
+      for (byvar in c("noapp", "app")){
+        ### Define Figure captions
+        if (xvar2 == "S.VH"){xvar.label <- "$S_{VH}$"}
+        if (xvar2 == "S.boot"){xvar.label <- "$S_{boot}$"}
+        if (correlated == TRUE){corr.label <- "non-zero covariance in DGM"}
+        if (correlated == FALSE){corr.label <- "zero covariance in DGM"}
+        if (byvar == "app"){byvar.label <- "presented with respect to apparent model performance"}
+        if (byvar == "noapp"){byvar.label <- "presented with respect to population-level model performance"}
+        if (byvar == "app"){byvar.fig.label <- "app."}
+        if (byvar == "noapp"){byvar.fig.label <- NULL}
+        cat("\n\n\n")
+        cat("**Figure S", counter, ": ", type, "(", xvar.label, ") plotted against ", type, "($S_{opt}$), ", corr.label, ", ", byvar.label, "**", sep = "")
+        cat(" \n\n")
+        cat("*Estimator = ", type, "(", xvar.label, ")*", sep = "")
+        cat(" \n\n")
+        cat("*Covariance structure = ", corr.label, "*", sep = "")
+        cat(" \n\n")
+        cat("*By variable = ", byvar.label, "*", sep = "")
+        cat(" \n\n")
+        cat("![](",paste("../figures/ss1/ss1_gg.",
+                         byvar.fig.label,
+                         "corr", as.numeric(correlated), 
+                         ".cat", 0,
+                         ".", xvar2, 
+                         ".", type, 
+                         ".alpha", 0.25, ".png", sep = ""),")")
+        
+        cat(" \n\n")
+        cat("-------------------------------------------------------------------------------------------------------------------")
+        counter <- counter + 1
+      }
+    }
+  }
+}
+
+cat("\n\n\n")
+cat("**Figure S", counter, ": mean($S_{VH}$) plotted against mean($S_{opt}$), grouped by mean($C_{app}$), non-zero covariance in DGM**", sep = "")
+cat(" \n\n")
+cat("![](",paste("../figures/ss1/ss1_gg.corr1.S.VH.mean.C.group.png"),")")
+counter <- counter + 1
+
+cat("\n\n\n")
+cat("**Figure S", counter, ": mean($S_{VH}$) plotted against mean($S_{opt}$), grouped by $C_{pop}$, non-zero covariance in DGM**", sep = "")
+cat(" \n\n")
+cat("![](",paste("../figures/ss1/ss1_gg.corr1.S.VH.mean.C.pop.group.png"),")")
+counter <- counter + 1
+
+cat("\n\n\n")
+cat("**Figure S", counter, ": mean($S_{VH}$) plotted against mean($S_{opt}$), grouped by mean($C_{app}$), zero covariance in DGM**", sep = "")
+cat(" \n\n")
+cat("![](",paste("../figures/ss1/ss1_gg.corr0.S.VH.mean.C.group.png"),")")
+counter <- counter + 1
+
+cat("\n\n\n")
+cat("**Figure S", counter, ": mean($S_{VH}$) plotted against mean($S_{opt}$), grouped by $C_{pop}$, zero covariance in DGM**", sep = "")
+cat(" \n\n")
+cat("![](",paste("../figures/ss1/ss1_gg.corr0.S.VH.mean.C.pop.group.png"),")")
+counter <- counter + 1   
+```
+
+# Plots for standard deviation results from simulation study 1
+
+We present plots of the standard deviation of $S_{VH}$ and $S_{boot}$ plotted against the standard deviation of $S_{opt}$ from simulation study 1. We remind readers we do not expect to see a standard deviation of zero, given that $S_{opt}$ itself has variation across simulation iterations.
+
+```{r, echo = FALSE, results = "asis"}
+for (correlated in c(TRUE, FALSE)){
+  for (xvar2 in c("S.VH", "S.boot")){
+    for (type in c("sd")){
+      for (byvar in c("noapp")){
+        ### Define Figure captions
+        if (xvar2 == "S.VH"){xvar.label <- "$S_{VH}$"}
+        if (xvar2 == "S.boot"){xvar.label <- "$S_{boot}$"}
+        if (correlated == TRUE){corr.label <- "non-zero covariance in DGM"}
+        if (correlated == FALSE){corr.label <- "zero covariance in DGM"}
+        if (byvar == "app"){byvar.label <- "presented with respect to apparent model performance"}
+        if (byvar == "noapp"){byvar.label <- "presented with respect to population-level model performance"}
+        if (byvar == "app"){byvar.fig.label <- "app."}
+        if (byvar == "noapp"){byvar.fig.label <- NULL}
+        cat("\n\n\n")
+        cat("**Figure S", counter, ": ", type, "(", xvar.label, ") plotted against ", type, "($S_{opt}$), ", corr.label, ", ", byvar.label, "**", sep = "")
+        cat(" \n\n")
+        cat("*Estimator = ", type, "(", xvar.label, ")*", sep = "")
+        cat(" \n\n")
+        cat("*Covariance structure = ", corr.label, "*", sep = "")
+        cat(" \n\n")
+        cat("*By variable = ", byvar.label, "*", sep = "")
+        cat(" \n\n")
+        cat("![](",paste("../figures/ss1/gg.",
+                         byvar.fig.label,
+                         "corr", as.numeric(correlated), 
+                         ".cat", 0,
+                         ".", xvar2, 
+                         ".", type, 
+                         ".alpha", 0.25, ".png", sep = ""),")")
+        
+        cat(" \n\n")
+        cat("-------------------------------------------------------------------------------------------------------------------")
+        counter <- counter + 1
+      }
+    }
+  }
+}
+```
+
+# Simulation study 2
+
+We present a plot of $N_{sim}$ against $N_{original}$:
+
+```{r, echo = FALSE, results = "asis"}
+cat("\n\n\n")
+cat("**Figure S", counter, ": $N_{sim}$ plotted against $N_{original}$**", sep = "")
+cat(" \n\n")
+cat("![](",paste("../figures/ss2/ss2_sensitivity_compare_Nsim_Noriginal.png"),")")
+counter <- counter + 1 
+```
+
+We also present plots for the instabilty of $S_{opt}$ in a range of scenarios meeting the sample size criteria for $N_{original}$ with different sample sizes:
+
+```{r, echo = FALSE, results = "asis"}
+cat("\n\n\n")
+cat("**Figure S", counter, ": Equivalent of Figure 5 from nanuscript but when criteria is met for $N_{original}$**", sep = "")
+cat(" \n\n")
+cat("![](",paste("../figures/ss2/gg.instability.ssd.S.pop.Noriginal.corr1.png"),")")
+counter <- counter + 1 
+```
